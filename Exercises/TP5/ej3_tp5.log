@@ -1,0 +1,397 @@
+-----------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP5\ej3_tp5.log
+  log type:  text
+ opened on:   2 Jun 2020, 12:15:53
+
+. ***TP 5: EJERCICIO 3***
+. use "CEOSAL2.dta"
+
+. sum, detail /*Hacemos una primera inferencia estadística como vistazo general de las variables presentadas para el caso.*/
+
+                  1990 compensation, $1000s
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%          129            100
+ 5%          270            129
+10%          358            174       Obs                 177
+25%          471            185       Sum of Wgt.         177
+
+50%          707                      Mean           865.8644
+                        Largest       Std. Dev.      587.5893
+75%         1119           2220
+90%         1550           2265       Variance       345261.2
+95%         1798           2792       Skewness       2.998603
+99%         2792           5299       Kurtosis       20.40129
+
+                          in years
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           38             33
+ 5%           41             38
+10%           45             39       Obs                 177
+25%           52             39       Sum of Wgt.         177
+
+50%           57                      Mean           56.42938
+                        Largest       Std. Dev.       8.42189
+75%           62             73
+90%           66             77       Variance       70.92822
+95%           69             80       Skewness       .0478625
+99%           80             86       Kurtosis       3.594758
+
+                   =1 if attended college
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            1              0
+10%            1              0       Obs                 177
+25%            1              0       Sum of Wgt.         177
+
+50%            1                      Mean           .9717514
+                        Largest       Std. Dev.      .1661523
+75%            1              1
+90%            1              1       Variance       .0276066
+95%            1              1       Skewness      -5.694653
+99%            1              1       Kurtosis       33.42907
+
+               =1 if attended graduate school
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            0              0
+10%            0              0       Obs                 177
+25%            0              0       Sum of Wgt.         177
+
+50%            1                      Mean           .5310734
+                        Largest       Std. Dev.      .5004492
+75%            1              1
+90%            1              1       Variance       .2504494
+95%            1              1       Skewness      -.1245345
+99%            1              1       Kurtosis       1.015509
+
+                     years with company
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            2              2
+ 5%            4              2
+10%            5              3       Obs                 177
+25%           12              3       Sum of Wgt.         177
+
+50%           23                      Mean           22.50282
+                        Largest       Std. Dev.      12.29473
+75%           33             44
+90%           37             45       Variance       151.1605
+95%           41             45       Skewness       .0243454
+99%           45             58       Kurtosis       2.004938
+
+                  years as ceo with company
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            1              0
+10%            1              0       Obs                 177
+25%            3              0       Sum of Wgt.         177
+
+50%            6                      Mean           7.954802
+                        Largest       Std. Dev.      7.150826
+75%           11             28
+90%           18             34       Variance       51.13431
+95%           24             37       Skewness       1.639672
+99%           37             37       Kurtosis        6.08402
+
+                  1990 firm sales, millions
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%           36             29
+ 5%          135             36
+10%          227             50       Obs                 177
+25%          561             59       Sum of Wgt.         177
+
+50%         1400                      Mean           3529.463
+                        Largest       Std. Dev.      6088.654
+75%         3500          24300
+90%         8600          27600       Variance       3.71e+07
+95%        14300          28000       Skewness       4.170838
+99%        28000          51300       Kurtosis       26.57272
+
+                   1990 profits, millions
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%         -438           -463
+ 5%          -40           -438
+10%           13           -271       Obs                 177
+25%           34           -132       Sum of Wgt.         177
+
+50%           63                      Mean           207.8305
+                        Largest       Std. Dev.      404.4543
+75%          208           1700
+90%          549           1700       Variance       163583.3
+95%         1300           1900       Skewness       3.166817
+99%         1900           2700       Kurtosis       14.88204
+
+               market value, end 1990, mills.
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%          390            387
+ 5%          421            390
+10%          477            398       Obs                 177
+25%          644            403       Sum of Wgt.         177
+
+50%         1200                      Mean           3600.316
+                        Largest       Std. Dev.      6442.276
+75%         3500          23600
+90%         9100          26300       Variance       4.15e+07
+95%        17900          42900       Skewness       3.884277
+99%        42900          45400       Kurtosis       21.07629
+
+                         log(salary)
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     4.859812        4.60517
+ 5%     5.598422       4.859812
+10%     5.880533       5.159055       Obs                 177
+25%     6.154858       5.220356       Sum of Wgt.         177
+
+50%     6.561031                      Mean           6.582848
+                        Largest       Std. Dev.      .6060594
+75%     7.020191       7.705263
+90%      7.34601        7.72533       Variance        .367308
+95%      7.49443       7.934514       Skewness      -.1135265
+99%     7.934514       8.575274       Kurtosis       3.427486
+
+                         log(sales)
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     3.583519       3.367296
+ 5%     4.905275       3.583519
+10%      5.42495       3.912023       Obs                 177
+25%     6.329721       4.077538       Sum of Wgt.         177
+
+50%     7.244227                      Mean           7.231025
+                        Largest       Std. Dev.      1.432086
+75%     8.160519       10.09823
+90%     9.059518       10.22557       Variance       2.050869
+95%     9.568015       10.23996       Skewness      -.1005735
+99%     10.23996       10.84545       Kurtosis       2.818564
+
+                         log(mktval)
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%     5.966147       5.958425
+ 5%     6.042633       5.966147
+10%     6.167517       5.986452       Obs                 177
+25%     6.467699       5.998937       Sum of Wgt.         177
+
+50%     7.090077                      Mean            7.39941
+                        Largest       Std. Dev.      1.133414
+75%     8.160519         10.069
+90%      9.11603       10.17732       Variance       1.284627
+95%     9.792556       10.66663       Skewness       .8502576
+99%     10.66663       10.72327       Kurtosis       2.974449
+
+                          comten^2
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            4              4
+ 5%           16              4
+10%           25              9       Obs                 177
+25%          144              9       Sum of Wgt.         177
+
+50%          529                      Mean           656.6836
+                        Largest       Std. Dev.      577.1227
+75%         1089           1936
+90%         1369           2025       Variance       333070.6
+95%         1681           2025       Skewness       .9624857
+99%         2025           3364       Kurtosis       4.428826
+
+                          ceoten^2
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%            1              0
+10%            1              0       Obs                 177
+25%            9              0       Sum of Wgt.         177
+
+50%           36                      Mean           114.1243
+                        Largest       Std. Dev.       212.566
+75%          121            784
+90%          324           1156       Variance        45184.3
+95%          576           1369       Skewness       3.658794
+99%         1369           1369       Kurtosis       18.90777
+
+                    profits as % of sales
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%    -48.13499      -203.0769
+ 5%    -.3418804      -48.13499
+10%     1.428571      -28.88087       Obs                 177
+25%     4.230769      -9.448979       Sum of Wgt.         177
+
+50%     6.833713                      Mean            6.42011
+                        Largest       Std. Dev.      17.86074
+75%     10.94737       23.94958
+90%           16       25.25253       Variance       319.0062
+95%     18.66667       30.55556       Skewness      -9.283817
+99%     30.55556       47.45763       Kurtosis       108.9652
+
+. /*(A) Para estimar el salario de los ejecutivos (SALARY) en función de las ventas de la empresa (SALES), el precio de merca
+> do (MKTVAL) y la antigüedad de la persona en el puesto (CEOTEN) se propone el siguiente modelo:
+> Y = B0 + B1X1 + B2X2 + B3X3 + U
+> Sin embargo, rapidamente detectamos que se estan empleando variables con unidades de medida distintas, por lo que se propon
+> e primero estandarizar todas las variables y luego regresarlas de la misma manera. zVar seran las variables "estandarizadas
+> "
+> Ejemplo: salary será zsalary*/
+. 
+. egen float zsales = std(sales), mean(0) std(1)
+
+. egen float zsalary = std(salary), mean(0) std(1)
+
+. egen float zmktval = std(mktval), mean(0) std(1)
+
+. egen float zceoten = std(ceoten), mean(0) std(1)
+
+. egen float zprofits = std(profits), mean(0) std(1)
+
+. 
+. reg zsalary zsales zmktval zceoten
+
+      Source |       SS       df       MS              Number of obs =     177
+-------------+------------------------------           F(  3,   173) =   14.53
+       Model |  35.4242933     3  11.8080978           Prob > F      =  0.0000
+    Residual |  140.575706   173  .812576338           R-squared     =  0.2013
+-------------+------------------------------           Adj R-squared =  0.1874
+       Total |         176   176  .999999998           Root MSE      =  .90143
+
+------------------------------------------------------------------------------
+     zsalary |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      zsales |   .1970776   .1042027     1.89   0.060    -.0085948      .40275
+     zmktval |   .2565584   .1039658     2.47   0.015     .0513536    .4617632
+     zceoten |    .154597   .0683704     2.26   0.025     .0196495    .2895445
+       _cons |  -2.32e-09   .0677556    -0.00   1.000    -.1337341    .1337341
+------------------------------------------------------------------------------
+
+. /*Del modelo correctamente propuesto (con variables estandarizadas) llegamos a una conclusión distinta a la anterior:
+> Coeficientes:
+> - Por cada unidad que se incrementa sales, manteniendo el resto constante, se incrementa 0.2 la variable salario.
+> - Por cada unidad que se incrementa el valor de mercado de la empresa, ceteris paribus, se incrementa 0.25 la variable sala
+> rio.
+> - Por cada unidad que se incrementa la antiguedad del CEO, manteniendo el resto de variables constantes, el salario se incr
+> ementa 0.15 unidades. Siendo esta la variable que menos afecta la explicacion del salario del CEO.
+> Significatividad:
+> Significatividad:
+> - Para un pvalor de 0.06, la variable de ventas es significativa individualmente en el modelo.
+> - La variable MKTVAL es también significativa individualmente dentro del modelo, para un pvalor de 0.015 en el test t.
+> - Sin embargo, NO encontramos significancia individual en la variable de antiguedad, que para un pvalor de 0.025 no rechaza
+>  la hipotesis nula. Esto se puede constatar de la siguiente manera:  */
+. test zceoten=0 /*Haciendo un test F individual, podemos ver que NO rechaza la hipotesis para dicho pvalor*/
+
+ ( 1)  zceoten = 0
+
+       F(  1,   173) =    5.11
+            Prob > F =    0.0250
+
+. /*Significancia global:
+> - El modelo no es significativo en forma conjunta, debido a que el test F, para un pvalor cercano a cero, nos arroja un res
+> ultado de NO rechazo de hipotesis nula.
+> - Asimismo, el R2, es decir, el porcentaje de ajuste global del modelo, es muy bajo. Nos presenta una proporcion de ajuste 
+> de 20%. Si regresaramos el modelo sin estandarizar, obtendriamos los mismos resultados de la salida de regresion*/
+. 
+. *(B) Añadiremos la variable utilidad de la empresa (PROFITS) al modelo anterior.
+. reg zsalary zsales zmktval zceoten zprofits
+
+      Source |       SS       df       MS              Number of obs =     177
+-------------+------------------------------           F(  4,   172) =   10.85
+       Model |   35.450159     4  8.86253976           Prob > F      =  0.0000
+    Residual |  140.549841   172  .817150237           R-squared     =  0.2014
+-------------+------------------------------           Adj R-squared =  0.1828
+       Total |         176   176  .999999998           Root MSE      =  .90396
+
+------------------------------------------------------------------------------
+     zsalary |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      zsales |   .1889366   .1140751     1.66   0.099    -.0362307    .4141039
+     zmktval |   .2319632   .1731488     1.34   0.182    -.1098068    .5737333
+     zceoten |   .1549317   .0685883     2.26   0.025     .0195484    .2903149
+    zprofits |   .0334776   .1881665     0.18   0.859    -.3379354    .4048905
+       _cons |  -2.41e-09   .0679461    -0.00   1.000    -.1341155    .1341155
+------------------------------------------------------------------------------
+
+. /*De este nuevo modelo podemos extraer las siguientes conclusiones a partir de los resultados y comparaciones con el anteri
+> or:
+> Coeficientes: 
+> - Mediante la adhesión de la variable utilidades, los coeficientes B0, B1, B2, B3 se mantuvieron casi inalterados en sus va
+> lores nominales.
+> Significatividad:
+> - De manera similar a la variable de antigüedad, las utilidades de la empresa no rechazan la hipotesis nula del test t, par
+> a un pvalor de 0.86, por lo que no son signifactivas individualmente.
+> - El test F de significancia global también NO rechaza la hipotesis nula, lo que hace no significativo al modelo en conjunt
+> o.
+> - El R2 es similar y si comparamos los R2 ajustados por los grados de libertad, tenemos que son modelos similares, con una 
+> diferencia infinitesimal estadisticamente de que el primer modelo es mejor (0,1828<0,1874). */
+. 
+. *(C) Evaluaremos presencia de multicolinealidad para los casos presentados:
+. 
+. corr zsales zmktval zceoten zprofits 
+(obs=177)
+
+             |   zsales  zmktval  zceoten zprofits
+-------------+------------------------------------
+      zsales |   1.0000
+     zmktval |   0.7547   1.0000
+     zceoten |  -0.0677   0.0066   1.0000
+    zprofits |   0.7983   0.9181  -0.0216   1.0000
+
+
+. /* De la matriz de correlación de variables observamos los siguientes resultados:
+> Valor de mercado-Ventas: correlación alta de 0.75
+> Utilidades-Ventas: correlación alta de 0.80
+> Valor de mercado-Utilidades: correlación alta de 0.92, casi perfecta.
+> Antigüedad-Utilidades: correlación negativa, imperfecta
+> Antigüedad-Ventas: correlación negativa, imperfecta
+> Valor de mercado-Antigüedad: correlación casi negativa */
+. 
+. estat vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+    zprofits |      7.63    0.131131
+     zmktval |      6.46    0.154864
+      zsales |      2.80    0.356786
+     zceoten |      1.01    0.986935
+-------------+----------------------
+    Mean VIF |      4.47
+
+. /*Determinando los factores inflacionarios de varianza podemos ver que ningun VIF>10 por lo que no son valores conflictivos
+> .
+> La media de FIV es 4.47, que de todas maneras sigue siendo un valor elevado (pero no problematico).
+> Por relacion matematica, como ningun FIV > 10; tambien sabemos que ningun índice de tolerancia es menor a 0.1 (1/VIF<0.1)*/
+. 
+. vce, corr
+
+Correlation matrix of coefficients of regress model
+
+        e(V) |   zsales   zmktval   zceoten  zprofits     _cons 
+-------------+--------------------------------------------------
+      zsales |   1.0000                                         
+     zmktval |  -0.0972    1.0000                               
+     zceoten |   0.0905   -0.0750    1.0000                     
+    zprofits |  -0.4011   -0.7984    0.0274    1.0000           
+       _cons |   0.0000    0.0000    0.0000   -0.0000    1.0000 
+
+. /*Si observamos la matriz de correlación de los COEFICIENTES de la regresion, vemos que:
+> para aquellas variables que tomaban una correlacion positiva, sus coeficientes estan correlacionados negativamente.
+> Para las variables que tenian una correlacion negativa, sus coeficientes adoptan una corr positiva.
+> Esta tendencia es un argumento que sustenta más nuestra hipotesis de multicolinealidad entre variables, aunque no es un det
+> erminante.
+> 
+> En síntesis, como no estamos en presencia de micronumerosidad (muestra pequeña) y los principales indicios concretos de mul
+> ticolinealidad, como por ejemplo un R2 muy alto, alguna variable con VIF mayor a 10, etc.
+> no podemos afirmar con seguridad que haya multicolinealidad, al menos NO perfecta.*/
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP5\ej3_tp5.log
+  log type:  text
+ closed on:   2 Jun 2020, 12:15:54
+-----------------------------------------------------------------------------------------------------------------------------

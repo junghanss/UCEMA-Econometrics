@@ -1,0 +1,188 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP8\ej9_tp8.log
+  log type:  text
+ opened on:  27 May 2020, 23:28:08
+
+. 
+. /*(A)/(B) Se propone el siguiente modelo para evaluar el impacto de la participacion en el curso sobre el salario, sin omitir variables:
+> (Salario) = B0 + B1*(educ) + B2(exper) + B3(edad) + B4(partic)*/
+. reg  salario partic /* Primero verificamos la relación directa entre explicación del salario ante la participacion */
+
+      Source |       SS       df       MS              Number of obs =      49
+-------------+------------------------------           F(  1,    47) =   11.41
+       Model |  3940483.24     1  3940483.24           Prob > F      =  0.0015
+    Residual |  16231628.7    47  345353.802           R-squared     =  0.1953
+-------------+------------------------------           Adj R-squared =  0.1782
+       Total |    20172112    48  420252.332           Root MSE      =  587.67
+
+------------------------------------------------------------------------------
+     salario |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      partic |   568.2274   168.2208     3.38   0.001     229.8109    906.6439
+       _cons |   1518.696   122.5373    12.39   0.000     1272.182    1765.209
+------------------------------------------------------------------------------
+
+. plot salario partic /* Como complemento visual, para una primer inferencia intuitiva, se solicita un grafico de dispersion. 
+> En caso de ser necesario, podemos tambien programar browse para ver los valores de las observaciones en cada variable */
+
+    3833 +  
+         |                                                                 *
+         |  
+         |                                                                 *
+         |                                                                 *
+         |                                                                 *
+         |  
+    S    |  
+    A    |  
+    L    |  
+    A    |                                                                 *
+    R    | *                                                               *
+    I    |                                                                 *
+    O    | *                                                               *
+         |                                                                 *
+         | *                                                               *
+         | *                                                               *
+         | *                                                               *
+         | *                                                               *
+         | *
+     981 +                                                                 *
+          +----------------------------------------------------------------+
+                0                     PARTIC                            1
+
+
+. 
+. reg salario educ exper edad partic /* Estimamos el modelo propuesto por MCO y abrimos tambien la tabla con los efectos marginales de cada variable independiente */
+
+      Source |       SS       df       MS              Number of obs =      49
+-------------+------------------------------           F(  4,    44) =    9.27
+       Model |  9225977.69     4  2306494.42           Prob > F      =  0.0000
+    Residual |  10946134.3    44  248775.779           R-squared     =  0.4574
+-------------+------------------------------           Adj R-squared =  0.4080
+       Total |    20172112    48  420252.332           Root MSE      =  498.77
+
+------------------------------------------------------------------------------
+     salario |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   132.4995   31.68798     4.18   0.000     68.63655    196.3624
+       exper |   37.96947   13.03989     2.91   0.006      11.6893    64.24965
+        edad |  -5.832355   7.686782    -0.76   0.452    -21.32405    9.659335
+      partic |   487.6751   147.3153     3.31   0.002     190.7806    784.5695
+       _cons |   648.2713   383.1342     1.69   0.098    -123.8849    1420.428
+------------------------------------------------------------------------------
+
+. mfx
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  1820.2041
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    educ |   132.4995      31.688    4.18   0.000   70.3922  194.607   6.22449
+   exper |   37.96947       13.04    2.91   0.004   12.4118  63.5272   8.83673
+    edad |  -5.832355     7.68678   -0.76   0.448  -20.8982  9.23346   42.3673
+  partic*|   487.6751      147.32    3.31   0.001   198.942  776.408   .530612
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. /* A partir del modelo y los indicadores resultantes, podemos observar lo siguiente:
+> Coeficientes:
+> - Por cada aumento unitario de educación, manteniendo el resto constante, el salario se incrementa en 132.50 unidades monetarias.
+> - Por cada incremento unitario en la variable 'exper', ceteris paribus, la variable explicada salario se ve afectada positivamente en 38 unidades monetarias.
+> - Por cada año que se suma a la variable edad, para el resto de variables fijas, el salario disminuye en 5.8 unidades monetarias.
+> - El coeficiente de la variable ficticia "Participacion", en referencia al programa de capacitación, nos muestra que en el caso de las observaciones que sí participaron (=1) su salario aumenta en 487.6 unidades monetar
+> ias, para el resto de variables constantes.
+> Eso podemos interpretarlo en el grafico de la regresion como un desplazamiento superior por sobre la constante, para aquellas personas que tengan valor 1 en la variable cualitativa.
+> En conclusión, el impacto promedio sobre el salario es de aproximadamente casi unas 500 unidades monetarias, alrededor de 75% de lo que representa el intercepto en sí mismo. 
+> 
+> En relación a un posible sesgo o un análisis más detallado de la variable participacion, si corremos un F-Test, tanto para la variable independiente sola, como para todas las variables explicativas, visualizaremos insi
+> gnificancia conjunta: */
+. test educ exper edad partic
+
+ ( 1)  educ = 0
+ ( 2)  exper = 0
+ ( 3)  edad = 0
+ ( 4)  partic = 0
+
+       F(  4,    44) =    9.27
+            Prob > F =    0.0000
+
+. test partic, mtest
+
+ ( 1)  partic = 0
+
+---------------------------------------
+       |    F(df,44)     df       p
+-------+-------------------------------
+  (1)  |       10.96      1     0.0019 #
+-------+-------------------------------
+  all  |       10.96      1     0.0019
+---------------------------------------
+                  # unadjusted p-values
+
+. 
+. corr educ exper edad partic /*Verificamos también correlacion lineal entre las variables
+> 
+> (C) Modificando la forma funcional del modelo a una semielasticidad del salario respecto las variables: */
+(obs=49)
+
+             |     educ    exper     edad   partic
+-------------+------------------------------------
+        educ |   1.0000
+       exper |  -0.2738   1.0000
+        edad |  -0.1357   0.4006   1.0000
+      partic |   0.0376   0.1733   0.2054   1.0000
+
+
+. gen lsalario = log(salario)
+
+. reg lsalario educ exper edad partic
+
+      Source |       SS       df       MS              Number of obs =      49
+-------------+------------------------------           F(  4,    44) =    9.43
+       Model |   2.1664357     4  .541608925           Prob > F      =  0.0000
+    Residual |  2.52829031    44  .057461143           R-squared     =  0.4615
+-------------+------------------------------           Adj R-squared =  0.4125
+       Total |  4.69472601    48  .097806792           Root MSE      =  .23971
+
+------------------------------------------------------------------------------
+    lsalario |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .059747   .0152292     3.92   0.000     .0290545    .0904394
+       exper |   .0201763    .006267     3.22   0.002     .0075461    .0328066
+        edad |  -.0014896   .0036943    -0.40   0.689    -.0089349    .0059557
+      partic |   .2341184   .0707996     3.31   0.002     .0914312    .3768057
+       _cons |    6.84365    .184134    37.17   0.000     6.472552    7.214748
+------------------------------------------------------------------------------
+
+. mfx
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  7.4549519
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+    educ |    .059747      .01523    3.92   0.000   .029898  .089596   6.22449
+   exper |   .0201763      .00627    3.22   0.001   .007893  .032459   8.83673
+    edad |  -.0014896      .00369   -0.40   0.687   -.00873  .005751   42.3673
+  partic*|   .2341184       .0708    3.31   0.001   .095354  .372883   .530612
+------------------------------------------------------------------------------
+(*) dy/dx is for discrete change of dummy variable from 0 to 1
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP8"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP8
+
+. use "Impacto.dta"
+
+. set more off
+
+. capture log close

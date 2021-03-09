@@ -1,0 +1,347 @@
+-------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\MYM\Downloads\TareaTP6.log
+  log type:  text
+ opened on:  11 May 2020, 13:09:15
+
+. 
+
+
+
+************************** Junghanss, Marco, Freysselinard, Werner **************************************************
+
+
+
+******************************************** Tarea Trabajo Práctico N°6 **********************************************.
+
+ 
+
+
+**************************  Actividad 1 ********************************
+
+a)	Cuando hacemos cambios de escala en los estimadores de MCO, todos los valores de las variables cambian en la misma proporción, es decir, 
+en una constante. Por lo tanto, cuando modificamos las unidades de medidas de las variables no puede variar el coeficiente de determinación. En 
+primer lugar, el R^2 depende de la relación entre los residuos y la variable explicada. Como la SCT y la SCR no varían, el R^2 es inmutable. En 
+segundo lugar, la idea de un modelo de regresión es encontrar si existe alguna significatividad o relación entre la variable explicada y la variable
+ explicativa, y justamente el R^2 intenta explicar cuan buena es esa relación entre las dos variables. Conceptualmente, si las variables que uno está 
+analizando están relacionadas, esa relación no puede desaparecer cuando uno hace un cambio de escala en las variables. Lo mismo pasa con los estadísticos 
+f y t. A su vez, desde el punto de vista estadístico no seria serio eliminar variables o que cambien las relaciones por hacer un cambio en las unidades
+de nuestro modelo.
+b)	En primer lugar, cuando uno trabaja en forma de logaritmos lo que se esta aproximando es cambios porcentuales de una variable. Con lo cual el
+ modelo de regresión se dice invariantes a cambios de escala de las variables. Por lo que si vas a usar log te garantiza que no se van a modificar la 
+relación de las variables, solo el intercepto.
+En segundo lugar, la incorporación de log en el modelo permite estimar en forma directa los coeficientes de elasticidad y el error estándar asociado al 
+coeficiente que si no es difícil de calcular si hay que hacer los pasos manuales.
+En tercer lugar. Como tenemos la restricción de que, Y tiene que ser positiva, cuando Y es positiva el log(Y) satisface los supuestos de MLC. 
+Esencialmente favorece el cumplimiento del supuesto de normalidad.
+En cuarto lugar, trabajar con log(Y) puede reducir otros problemas como la heterocedasticidad, que las distribuciones no sean tan asimétricas y suavizar
+ el impacto cuando hay valores muy extremos (el efecto de los outliers). Se podría deducir que la infusión de logaritmos mejora las estimaciones.
+           
+c)	Las funciones Cobb-Douglas constituyen un ejemplo de modelos intrínsicamente lineales dado que, si hacemos una transformación muy simple, como 
+la introducción de logaritmos, se convierte en un modelo lineal y es perfectamente trabajable con MCO y las técnicas clásicas. 
+
+
+
+
+
+
+
+
+
+**************************************   Ejercicio 1 ***********************************
+import excel "ejercicio_nro1.xls", sheet(Hoja2) firstrow
+reg Y X
+gen c1Y = 2*Y
+reg c1Y X
+gen c2X = 3*X
+reg Y c2X
+reg c1Y c2X
+gen c1Y2 = 2 + Y
+reg c1Y2 X 
+gen c2X2 = 3 + X
+reg Y c2X2
+gen logY = log(Y)
+reg logY X
+gen logc1Y = log(c1Y)
+reg logc1Y X
+gen logX = log(X)
+reg Y logX
+gen logc2X = log(c2X)
+reg Y logc2X
+/*Conclusiones:
+(1) Cuando modificamos la variable explicada (Y) con el producto de una constante (k) y manteniendo el resto de variables fijas, podemos apreciar 
+que los indicadores principales de la regresión lineal (R2, R2 ajustado y Test F) se mantuvieron iguales los resultados y los coeficientes (constante
+ y pendiente) se incrementaron, para este caso que la constante (k) es positiva.
+(2) Cuando modificamos la variable explicativa (X) con el producto de una constante (k) y manteniendo el resto de variables fijas, notamos que los 
+indicadores principales de la regresión lineal (R2, R2 ajustado y Test F) se mantuvieron iguales los resultados y de los coeficientes solo sufrió una 
+variación la pendiente, ya que la constante mantuvo apenas un cambio infinitesimal.
+(3) Cuando modificamos ambas variables (explicada y explicativa) multiplicándolas por una constante (k), vemos que los principales indicadores de la 
+regresión lineal se mantuvieron constantes pero que la constante y pendiente sufrieron cambios.
+Resumiendo, se puede inferir que las medidas cualitativas del modelo, su porcentaje de ajuste de regresión y prueba de significancia, no se ven 
+alteradas ante cambios nominales en las variables.
+
+(4) Al perturbar la variable explicada (Y) con la suma de una constante (k) y manteniendo el resto de variables fijas, podemos notar que el único 
+cambio yace en el coeficiente B0, es decir, la constante, porque la pendiente se mantuvo inalterada y los indicadores de relevancia de la regresión también.
+(5) Al perturbar la variable explicativa (X) con la suma de una constante (k) y manteniendo el resto de variables inalteradas, podemos observar que 
+nuevamente el único cambio yace en la constante (B0), con la diferencia de una tratarse de una perturbación más profunda, debido a que el cambio paso 
+de ser positivo (un incremento en B0) a ser negativo, generando que este llegue a un nivel decreciente (-9.686268).
+En síntesis, constatamos que una perturbación en Y afecta un poco a la constante y nada a la pendiente, pero una perturbación en X es capaz de afectar 
+mucho a la constante, aunque nuevamente mantiene inalterada la pendiente.
+
+(6-7) Cuando transformamos la funcionalidad del modelo a log-lin, representativo de una semielasticidad, podemos observar que aunque el logaritmo de
+ la variable explicativa, incluya dentro de su argumento también el producto con una constante (k), el único cambio observado es en el coeficiente B0
+ que se altera, dado que B1 (pendiente) se mantuvo fija. Para con las medidas de la regresión podemos decir que también se mantuvieron inalteradas en 
+comparación.
+(8-9) Cuando transformamos la funcionalidad del modelo a lin-log, también representativo de una semielasticidad, concluimos que sucede lo mismo que en 
+el caso anterior, es decir, que solo la pendiente (B1) se mantiene sin cambios y que la constante (B0) sufre perturbaciones significativas. La relevancia
+ del modelo se mantiene intacta (F Test, R2, R2 Ajustado).
+
+Podemos llegar a la conclusión de que los cambios nominales en las variables, dados a partir de un producto o cociente, solamente alteran, dependiendo 
+el caso, la constante o pendiente, pero no el porcentaje de ajuste de las variables del modelo y su prueba de significancia conjunta. 
+
+
+
+
+
+
+
+
+
+. 
+. 
+. 
+. **********************   Ejercicio N°8 *********************************
+. 
+. 
+. * Sea la siguiente función de producción Cobb-Douglas: Q = A * X1^a1 * X2^a2 *
+. * X3^a3 * u , en la que Q es la producción de la iésima empresa de electricidad
+. * de la muestra, X1 es el consumo de factor trabajo, X2 es el consumo del factor
+. * capital, X3 es el consumo de combustible y A es un parámetro que recoge otras
+. * fuentes de diferencias (no observables) entre la eficiencia productiva y de 
+. * las empresas. El grado de los rendimientos a escalar (r) viene dado por la 
+. * suma de los exponentes. Utilizando los datos del archivo "PRODUCCIÓN.dta", se
+. * le solicita:
+. 
+. use "Produccion1.dta"
+
+. 
+. 
+. 
+. 
+. 
+. 
+. * a) Estime la forma linealizada del modelo y comente los resultados (significación
+. * individual de los parámetros, significación conjunta del modelo y bondad de
+. * ajuste).
+. 
+. * Para linearizar, debemos aplicar logarítmos, de modo que el modelo nos quede:
+. * logq = logA + a1*logx1 + a2*logx2 + a3*logx3 + logu
+. * De este modo, debemos generar todas estas variables logarítmicas:
+. gen logQ = log(q)
+
+. gen logX1 = log(x1)
+
+. gen logX2 = log(x2)
+
+. gen logX3 = log(x3)
+
+. 
+. * De esta manera, ya generamos las variables que necesitamos para poder hacer la
+. * estimación de la forma linearizada del modelo: 
+. reg logQ logX1 logX2 logX3
+
+      Source |       SS       df       MS              Number of obs =      85
+-------------+------------------------------           F(  3,    81) =    7.72
+       Model |  .002249368     3  .000749789           Prob > F      =  0.0001
+    Residual |  .007868726    81  .000097145           R-squared     =  0.2223
+-------------+------------------------------           Adj R-squared =  0.1935
+       Total |  .010118094    84  .000120454           Root MSE      =  .00986
+
+------------------------------------------------------------------------------
+        logQ |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       logX1 |   .2925025    .101706     2.88   0.005     .0901395    .4948655
+       logX2 |   .2814659   .1619549     1.74   0.086    -.0407735    .6037053
+       logX3 |   .3356227   .1060568     3.16   0.002     .1246029    .5466424
+       _cons |   .5795467   1.422403     0.41   0.685    -2.250589    3.409682
+------------------------------------------------------------------------------
+
+. 
+. * Analicemos estos datos.
+. 
+. * Significatividad Individual:
+. * Para esto, podemos ver en la salida de regresión los p valores de t de student
+. * asociados a cada variable (logX1, log X2 y logX3), o también podemos usar el 
+. * comando "test" junto con ", mtest":
+. test logX1 , mtest
+
+ ( 1)  logX1 = 0
+
+---------------------------------------
+       |    F(df,81)     df       p
+-------+-------------------------------
+  (1)  |        8.27      1     0.0051 #
+-------+-------------------------------
+  all  |        8.27      1     0.0051
+---------------------------------------
+                  # unadjusted p-values
+
+. test logX2 , mtest
+
+ ( 1)  logX2 = 0
+
+---------------------------------------
+       |    F(df,81)     df       p
+-------+-------------------------------
+  (1)  |        3.02      1     0.0860 #
+-------+-------------------------------
+  all  |        3.02      1     0.0860
+---------------------------------------
+                  # unadjusted p-values
+
+. test logX3 , mtest
+
+ ( 1)  logX3 = 0
+
+---------------------------------------
+       |    F(df,81)     df       p
+-------+-------------------------------
+  (1)  |       10.01      1     0.0022 #
+-------+-------------------------------
+  all  |       10.01      1     0.0022
+---------------------------------------
+                  # unadjusted p-values
+
+. * Como vemos, nos devuelve los mismos valores (incluso, con las decimales) que 
+. * los que aparecen en la salida de regresión; solo que aquí los tenemos más 
+. * especificados.
+. * En el caso de logX1, el p valor del test t (o, en realidad, test F restringido),
+. * es decir que es un test de significatividad individual, es 0,0051. Esto quiere
+. * decir que la variable X1 es estadísticamente significativa individualmente para
+. * explicar a Q, a un nivel de singificancia incluso del 1%, ya que el p valor
+. * es muy pequeñO: 0,51%.
+. * Por su parte, logX2 tiene asociado un p valor de 0,086. Esto quiere decir que
+. * la variable X2 es significativa individualmente para niveles de significancia
+. * mayores al 8,6%; es decir, por ejemplo, a un alfa del 0,1 sí podemos decir
+. * que es significativa, pero ya, por ejemplo, a un 0,05 no, ya que no rechazaríamos
+. * la hipótesis nula de que la variable no es significativa individualmente. Es
+. * decir, si tomamos el habitual alfa=0,05, entonces deberíamos sacar a X2 (factor
+. * capital) del modelo, ya que no es individualmente significativa.
+. * Finalmente, logX3 presenta un p valor del 0,0022; este valor es muy pequeño:
+. * rechazamos la H0 que plantea que logX3 no es significativa: podemos afirmar 
+. * que X3 es individualmente significativa a un nivel de riesgo del 1%.
+. 
+. * Significatividad Conjunta:
+. * Para esto, simplemente usamos el test F, usando el comando "test":
+. test logX1 logX2 logX3 
+
+ ( 1)  logX1 = 0
+ ( 2)  logX2 = 0
+ ( 3)  logX3 = 0
+
+       F(  3,    81) =    7.72
+            Prob > F =    0.0001
+
+. * Como vemos, el p valor nos da 0,0001; como este valor es incluso menor a 0,01
+. * quiere decir que incluso si fueramos estrictos e impusieramos un nivel de 
+. * significatividad del 1%, el las el modelo seguiría siendo significativo, 
+. * porque rechaza la hipótesis nula de que logX1=logX2=logX3=0: es decir,
+. * las variables son estadísticamente significativas en forma conjunta para 
+. * explicar a la variable dependiente, a un nivel de significancia del 1%.
+. 
+. * Bondad de Ajuste:
+. * Para esto, podemos ver el coeficiente de determinación, el cual podemos
+. * pedirselo a la regresión usando el comando "di e(r2)":
+. di e(r2)
+.22231141
+
+. * Es decir que nada más el el 22,23% de la variabilidad de Q está explicada
+. * por X1, X2 y X3. No obstante, a pesar de que el R^2 no da bajo, el modelo de
+. * todos modos es significativo gracias a que el test F nos dio que rechazamos
+. * que las variables explicativas no sean conjuntamente significativas. 
+. 
+. 
+. 
+. 
+. 
+. 
+. 
+. * b) Interprete los estimadores obtenidos.
+. 
+. * Podemos pedirle a la regresión los estimadores: primero los construimos, 
+. * usando el comando "scalar ... = _b[...]", y después le pedimos a stata su
+. * valor, usando el comando "di ...":
+. 
+. * a1 (de logX1):
+. scalar a1 = _b[logX1]
+
+. di a1
+.29250251
+
+. * Que a1 sea igual a 0,2925 significa que la elasticidad de la producción respecto
+. * al trabajo (dado que X1: trabajo) es igual al 0,2925%: es decir, ante una 
+. * variación en un 1% en la cantidad empleada de trabajo, se espera que en
+. * promedio la producción varíe en el mismo sentido el un 0,2925%, manteniendo 
+. * todo el resto constante.
+. 
+. * a2 (de logX2):
+. scalar a2 = _b[logX2]
+
+. di a2
+.2814659
+
+. * La elasticidad capital de la producción es del 0,2814%: ante un aumento de un
+. * 1% de la cantidad de factor capital, se espera que en promedio la cantidad
+. * producida aumente en un 0,2814%, ceteris paribus.
+. 
+. * a3 (de logX3):
+. scalar a3 = _b[logX3]
+
+. di a3
+.33562266
+
+. * Ante un aumento de un 1% en el consumo de combustible, la producción aumenta
+. * en un 0,3356%, siempre y cuando se mantenga todo lo demás constante.
+. 
+. 
+. 
+. 
+. * c) Obtenga una estimación de los rendimientos a escala. Dé su definición 
+. * económica.
+. 
+. * En el caso de las funciones de producción Cobb Douglas, gracias a que son 
+. * funciones homogéneas, sus rendimientos a escala se pueden calcular simplemente
+. * sumando los exponentes asociados a los factores en la función de producción.
+. * Para esto, pedimos nuevamente los valores de los coeficientes, que ya los
+. * construimos en el punto b):
+. di a1
+.29250251
+
+. di a2 
+.2814659
+
+. di a3
+.33562266
+
+. * Y ahora, los sumamos, obteniendo así los rendimientos a escala (r):
+. scalar r = a1 + a2 + a3
+
+. di r
+.90959108
+
+. * Como nos da 0,9095, que es menor a 1, quiere decir que esta función de producción
+. * presenta rendimientos decrecientes a escala, también llamado deseconomías a
+. * escala: la producción aumenta menos que proporcionalmente que la proporción en
+. * que varían las cantidades empleadas de los factores productivos; por ejemplo,
+. * si la cantidad en que se emplean trabajo, capital y combustible se duplicara,
+. * entoces se esperaría que la cantidad producida aumentara en menos que el doble:
+. * en nuestro caso puntual, se esperaría que la producción aumentara un 90,95% 
+. * (mientras que las cantidades factoriales aumentaron un 100%).
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\MYM\Downloads\TareaTP6.log
+  log type:  text
+ closed on:  11 May 2020, 13:09:16
+-------------------------------------------------------------------------------------------------------------------------------

@@ -1,0 +1,436 @@
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP5\clase6.log
+  log type:  text
+ opened on:  14 May 2020, 09:13:28
+
+. use "Mortalidad_Infantil.dta"
+
+. *Modelo 1
+. reg MI PBI TAF
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  2,    61) =   73.83
+       Model |  257362.373     2  128681.187           Prob > F      =  0.0000
+    Residual |  106315.627    61  1742.87913           R-squared     =  0.7077
+-------------+------------------------------           Adj R-squared =  0.6981
+       Total |      363678    63  5772.66667           Root MSE      =  41.748
+
+------------------------------------------------------------------------------
+          MI |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         PBI |  -.0056466   .0020033    -2.82   0.006    -.0096524   -.0016408
+         TAF |  -2.231586   .2099472   -10.63   0.000    -2.651401    -1.81177
+       _cons |   263.6416   11.59318    22.74   0.000     240.4596    286.8236
+------------------------------------------------------------------------------
+
+. *Modelo 2
+. reg MI PBI
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  1,    62) =   12.36
+       Model |  60449.4605     1  60449.4605           Prob > F      =  0.0008
+    Residual |  303228.539    62  4890.78289           R-squared     =  0.1662
+-------------+------------------------------           Adj R-squared =  0.1528
+       Total |      363678    63  5772.66667           Root MSE      =  69.934
+
+------------------------------------------------------------------------------
+          MI |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         PBI |  -.0113645   .0032325    -3.52   0.001    -.0178262   -.0049027
+       _cons |   157.4244   9.845583    15.99   0.000     137.7434    177.1055
+------------------------------------------------------------------------------
+
+. /*Si bien son dos modelos con test de significancia aprobados;
+> en el modelo 2 incurrimos en un error de variable omitida, que nos disminuye el R2, sesga los estimadores y */
+. reg MI PBI TAF
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  2,    61) =   73.83
+       Model |  257362.373     2  128681.187           Prob > F      =  0.0000
+    Residual |  106315.627    61  1742.87913           R-squared     =  0.7077
+-------------+------------------------------           Adj R-squared =  0.6981
+       Total |      363678    63  5772.66667           Root MSE      =  41.748
+
+------------------------------------------------------------------------------
+          MI |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         PBI |  -.0056466   .0020033    -2.82   0.006    -.0096524   -.0016408
+         TAF |  -2.231586   .2099472   -10.63   0.000    -2.651401    -1.81177
+       _cons |   263.6416   11.59318    22.74   0.000     240.4596    286.8236
+------------------------------------------------------------------------------
+
+. scalar B2 = _b[TAF]
+
+. reg TAF PBI
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  1,    62) =    4.82
+       Model |  3072.80504     1  3072.80504           Prob > F      =  0.0319
+    Residual |   39540.945    62  637.757177           R-squared     =  0.0721
+-------------+------------------------------           Adj R-squared =  0.0571
+       Total |    42613.75    63   676.40873           Root MSE      =  25.254
+
+------------------------------------------------------------------------------
+         TAF |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         PBI |   .0025622   .0011673     2.20   0.032     .0002289    .0048956
+       _cons |   47.59716    3.55533    13.39   0.000     40.49016    54.70416
+------------------------------------------------------------------------------
+
+. scalar s1 = _b[PBI]
+
+. scalar sesgo = B2*s1
+
+. di sesgo  /*Sesgo en la variable PBI: es la resta entre 0.0025622 - 0.005466*/
+-.00571786
+
+. *Obtencion de beta insesgado y porcentaje explicado por la variable PBI
+. reg PBI TAF /*Primero regresamos la variable contra TODAS las otras explicativas*/
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  1,    62) =    4.82
+       Model |  33750527.5     1  33750527.5           Prob > F      =  0.0319
+    Residual |   434302773    62  7004883.43           R-squared     =  0.0721
+-------------+------------------------------           Adj R-squared =  0.0571
+       Total |   468053300    63  7429417.46           Root MSE      =  2646.7
+
+------------------------------------------------------------------------------
+         PBI |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         TAF |   28.14268   12.82111     2.20   0.032     2.513646    53.77171
+       _cons |  -39.30328   734.9526    -0.05   0.958    -1508.453    1429.846
+------------------------------------------------------------------------------
+
+. predict u, r
+
+. reg MI u /*Obtenemos beta insesgado (el PBI sin el efecto de las otras variables) y 0,0381 (R2) es el % explicado de la variable explicada sobre MI*/
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  1,    62) =    2.45
+       Model |  13847.3239     1  13847.3239           Prob > F      =  0.1223
+    Residual |  349830.676    62  5642.43026           R-squared     =  0.0381
+-------------+------------------------------           Adj R-squared =  0.0226
+       Total |      363678    63  5772.66667           Root MSE      =  75.116
+
+------------------------------------------------------------------------------
+          MI |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           u |  -.0056466   .0036044    -1.57   0.122    -.0128518    .0015586
+       _cons |      141.5   9.389514    15.07   0.000     122.7306    160.2694
+------------------------------------------------------------------------------
+
+. /*Test de Ramsey RESET es para omision de variables, relevancia de la formas funcional (si es la correcta, es una no-linealidad, etc), o para heterocedasticidad */
+. reg MI PBI
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  1,    62) =   12.36
+       Model |  60449.4605     1  60449.4605           Prob > F      =  0.0008
+    Residual |  303228.539    62  4890.78289           R-squared     =  0.1662
+-------------+------------------------------           Adj R-squared =  0.1528
+       Total |      363678    63  5772.66667           Root MSE      =  69.934
+
+------------------------------------------------------------------------------
+          MI |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         PBI |  -.0113645   .0032325    -3.52   0.001    -.0178262   -.0049027
+       _cons |   157.4244   9.845583    15.99   0.000     137.7434    177.1055
+------------------------------------------------------------------------------
+
+. estat ovtest /*Test de Ramsey: Rechazamos hipotesis nula... si tiene variables omitidas*/
+
+Ramsey RESET test using powers of the fitted values of MI
+       Ho:  model has no omitted variables
+                  F(3, 59) =     17.30
+                  Prob > F =      0.0000
+
+. reg MI PBI TAF
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  2,    61) =   73.83
+       Model |  257362.373     2  128681.187           Prob > F      =  0.0000
+    Residual |  106315.627    61  1742.87913           R-squared     =  0.7077
+-------------+------------------------------           Adj R-squared =  0.6981
+       Total |      363678    63  5772.66667           Root MSE      =  41.748
+
+------------------------------------------------------------------------------
+          MI |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         PBI |  -.0056466   .0020033    -2.82   0.006    -.0096524   -.0016408
+         TAF |  -2.231586   .2099472   -10.63   0.000    -2.651401    -1.81177
+       _cons |   263.6416   11.59318    22.74   0.000     240.4596    286.8236
+------------------------------------------------------------------------------
+
+. estat ovtest /*Test de Ramsey: NO podemos rechazar Ho, porque no tiene variables omitidas*/
+
+Ramsey RESET test using powers of the fitted values of MI
+       Ho:  model has no omitted variables
+                  F(3, 58) =      1.05
+                  Prob > F =      0.3761
+
+. *****TP 7
+. *Nuevas formas de introducir datos:
+. clear all
+
+. set obs 8 /*Seteamos un numero de observaciones*/
+obs was 0, now 8
+
+. gen ahorro = 3200 in 1  /*Generamos una variable y le asignamos un valor segun cada observacion */
+(7 missing values generated)
+
+. replace ahorro = 3500 in 2
+(1 real change made)
+
+. replace ahorro = 4200 in 3
+(1 real change made)
+
+. replace ahorro = 3900 in 4
+(1 real change made)
+
+. replace ahorro = 4500 in 5
+(1 real change made)
+
+. replace ahorro = 4400 in 6
+(1 real change made)
+
+. replace ahorro = 5000 in 7
+(1 real change made)
+
+. replace ahorro = 4700 in 8
+(1 real change made)
+
+. 
+. generate ingreso = 10800 in 1
+(7 missing values generated)
+
+. replace ingreso = 13300 in 2
+(1 real change made)
+
+. replace ingreso = 12500 in 3
+(1 real change made)
+
+. replace ingreso = 13200 in 4 
+(1 real change made)
+
+. replace ingreso = 14000 in 5
+(1 real change made)
+
+. replace ingreso = 15200 in 6 
+(1 real change made)
+
+. replace ingreso = 15600 in 7
+(1 real change made)
+
+. replace ingreso = 15500 in 8
+(1 real change made)
+
+. save "ejercicio1_ejemplo.dta", replace
+file ejercicio1_ejemplo.dta saved
+
+. brow /*La corremos y mostramos*/
+
+. 
+. *Prediccion de ahorro promedio
+. reg ahorro ingreso
+
+      Source |       SS       df       MS              Number of obs =       8
+-------------+------------------------------           F(  1,     6) =   18.11
+       Model |  1949314.77     1  1949314.77           Prob > F      =  0.0053
+    Residual |  645685.227     6  107614.204           R-squared     =  0.7512
+-------------+------------------------------           Adj R-squared =  0.7097
+       Total |     2595000     7  370714.286           Root MSE      =  328.05
+
+------------------------------------------------------------------------------
+      ahorro |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     ingreso |    .316833   .0744431     4.26   0.005     .1346774    .4989885
+       _cons |  -185.4136   1031.066    -0.18   0.863    -2708.342    2337.515
+------------------------------------------------------------------------------
+
+. predict A, xb /*las transformaciones lineales de las observaciones*/
+
+. predict D, stdp /**/
+
+. gen BI /*Banda Inferior*/ = A-D
+
+. gen BS /*Banda Superior*/ = A+D
+
+. twoway (line A ingreso)(line BS ingreso)(line BI ingreso)(scatter ahorro ingreso) /*
+> Otra forma de escribir lo anterior podría ser line A ingreso || line BS ingreso || etc */
+
+. 
+. *Prediccion de un ingreso 16000
+. gen I = ingreso - 16000
+
+. reg ahorro I
+
+      Source |       SS       df       MS              Number of obs =       8
+-------------+------------------------------           F(  1,     6) =   18.11
+       Model |  1949314.77     1  1949314.77           Prob > F      =  0.0053
+    Residual |  645685.227     6  107614.204           R-squared     =  0.7512
+-------------+------------------------------           Adj R-squared =  0.7097
+       Total |     2595000     7  370714.286           Root MSE      =  328.05
+
+------------------------------------------------------------------------------
+      ahorro |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           I |    .316833   .0744431     4.26   0.005     .1346774    .4989885
+       _cons |   4883.914   202.9683    24.06   0.000     4387.268    5380.559
+------------------------------------------------------------------------------
+
+. /*La constante nos representa el ahorro que generara la persona que tenga un ingreso de 16.000*/
+. scalar Prediccion = _b[_cons]
+
+. scalar LI /*Limite Inferior*/ = Prediccion - _se[_cons]
+
+. scalar LS /*Limite Superior*/ = Prediccion + _se[_cons]
+
+. di "Prediccion de ahorro promedio para personas con ingreso 16k         " Prediccion
+Prediccion de ahorro promedio para personas con ingreso 16k         4883.9137
+
+. di "Limite Inferior             " LI
+Limite Inferior             4680.9455
+
+. di "Limite Superior                     " LS
+Limite Superior                     5086.882
+
+. reg ahorro ingreso
+
+      Source |       SS       df       MS              Number of obs =       8
+-------------+------------------------------           F(  1,     6) =   18.11
+       Model |  1949314.77     1  1949314.77           Prob > F      =  0.0053
+    Residual |  645685.227     6  107614.204           R-squared     =  0.7512
+-------------+------------------------------           Adj R-squared =  0.7097
+       Total |     2595000     7  370714.286           Root MSE      =  328.05
+
+------------------------------------------------------------------------------
+      ahorro |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     ingreso |    .316833   .0744431     4.26   0.005     .1346774    .4989885
+       _cons |  -185.4136   1031.066    -0.18   0.863    -2708.342    2337.515
+------------------------------------------------------------------------------
+
+. 
+. mfx compute, at(ingreso=16000) /*otra forma alternativa de predecir*/
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  4883.9137
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+ ingreso |    .316833      .07444    4.26   0.000   .170927  .462739     16000
+------------------------------------------------------------------------------
+
+. set obs 15 /*ampliamos la cantidad de observaciones para introducir mas*/
+obs was 8, now 15
+
+. replace ingreso=16000 in 9
+(1 real change made)
+
+. replace ingreso= 8000 in 10
+(1 real change made)
+
+. replace ingreso=11400 in 11
+(1 real change made)
+
+. replace ingreso=12800 in 12
+(1 real change made)
+
+. replace ingreso=13600 in 13
+(1 real change made)
+
+. replace ingreso=14200 in 14
+(1 real change made)
+
+. replace ingreso=20000 in 15
+(1 real change made)
+
+. *brow
+. reg ahorro ingreso 
+
+      Source |       SS       df       MS              Number of obs =       8
+-------------+------------------------------           F(  1,     6) =   18.11
+       Model |  1949314.77     1  1949314.77           Prob > F      =  0.0053
+    Residual |  645685.227     6  107614.204           R-squared     =  0.7512
+-------------+------------------------------           Adj R-squared =  0.7097
+       Total |     2595000     7  370714.286           Root MSE      =  328.05
+
+------------------------------------------------------------------------------
+      ahorro |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     ingreso |    .316833   .0744431     4.26   0.005     .1346774    .4989885
+       _cons |  -185.4136   1031.066    -0.18   0.863    -2708.342    2337.515
+------------------------------------------------------------------------------
+
+. predict Ah, xb /*prediccion lineal de ahorro-ingreso*/
+
+. predict Sah, stdp
+
+. gen LIA /*Limite Inferior Ahorro*/ = Ah - Sah
+
+. gen LSA /*Limite Superior Ahorro*/ = Ah + Sah
+
+. list ingreso LIA Ah LSA in 9/15 /*Lo listamos solo para las nuevas observaciones*/
+
+     +------------------------------------------+
+     | ingreso        LIA         Ah        LSA |
+     |------------------------------------------|
+  9. |   16000   4680.945   4883.914   5086.882 |
+ 10. |    8000    1904.87    2349.25    2793.63 |
+ 11. |   11400    3215.81   3426.482   3637.154 |
+ 12. |   12800   3733.719   3870.048   4006.378 |
+ 13. |   13600   4006.904   4123.515   4240.125 |
+     |------------------------------------------|
+ 14. |   14200   4193.146   4313.614   4434.082 |
+ 15. |   20000   5672.641   6151.246    6629.85 |
+     +------------------------------------------+
+
+. **Observar la prediccion para una observacion en particular:
+. reg ahorro ingreso
+
+      Source |       SS       df       MS              Number of obs =       8
+-------------+------------------------------           F(  1,     6) =   18.11
+       Model |  1949314.77     1  1949314.77           Prob > F      =  0.0053
+    Residual |  645685.227     6  107614.204           R-squared     =  0.7512
+-------------+------------------------------           Adj R-squared =  0.7097
+       Total |     2595000     7  370714.286           Root MSE      =  328.05
+
+------------------------------------------------------------------------------
+      ahorro |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     ingreso |    .316833   .0744431     4.26   0.005     .1346774    .4989885
+       _cons |  -185.4136   1031.066    -0.18   0.863    -2708.342    2337.515
+------------------------------------------------------------------------------
+
+. scalar dsm = e(rmse) /*rmse = raiz cuadrada de la suma de los errores square del modelo*/
+
+. gen LIAo = LIA-dsm
+
+. gen LSAo = LSA+dsm
+
+. list ingreso LIAo LIA Ah LSA LSAo in 9/15
+
+     +----------------------------------------------------------------+
+     | ingreso       LIAo        LIA         Ah        LSA       LSAo |
+     |----------------------------------------------------------------|
+  9. |   16000   4352.899   4680.945   4883.914   5086.882   5414.928 |
+ 10. |    8000   1576.824    1904.87    2349.25    2793.63   3121.677 |
+ 11. |   11400   2887.764    3215.81   3426.482   3637.154     3965.2 |
+ 12. |   12800   3405.673   3733.719   3870.048   4006.378   4334.424 |
+ 13. |   13600   3678.858   4006.904   4123.515   4240.125   4568.171 |
+     |----------------------------------------------------------------|
+ 14. |   14200     3865.1   4193.146   4313.614   4434.082   4762.128 |
+ 15. |   20000   5344.595   5672.641   6151.246    6629.85   6957.896 |
+     +----------------------------------------------------------------+
+
+. /*En el cuadro incorporamos la prediccion sobre el promedio comparado con una prediccion individual
+> Ejemplo, generalmente una persona con ingreso 16000 tendra un intervalo de ahorro 4680<4883<5086
+> Ahora bien, una persona CUALQUIERA (no del modelo) ahorrara entre 4352 < mean(4680<4883<5086) < 5414
+> */
+. log close
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP5\clase6.log
+  log type:  text
+ closed on:  14 May 2020, 09:13:36
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

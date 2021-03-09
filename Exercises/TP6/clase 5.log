@@ -1,0 +1,376 @@
+-----------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP6\clase 5.log
+  log type:  text
+ opened on:  23 May 2020, 15:16:51
+
+. ***TP6-Ejercicio 2:
+. import excel "datosTP6.xls", sheet(Ej 2) firstrow
+
+. gen Xp = 1000*X
+
+. gen Yp = 1000*Y
+
+. reg Y X         /*Un incremento del coef X reduce en -1.57 unidades la var Y mateninedo todo lo demas constante
+> */
+
+      Source |       SS       df       MS              Number of obs =      12
+-------------+------------------------------           F(  1,    10) =   80.14
+       Model |  5601.11111     1  5601.11111           Prob > F      =  0.0000
+    Residual |  698.888889    10  69.8888889           R-squared     =  0.8891
+-------------+------------------------------           Adj R-squared =  0.8780
+       Total |        6300    11  572.727273           Root MSE      =    8.36
+
+------------------------------------------------------------------------------
+           Y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           X |  -1.577778   .1762434    -8.95   0.000    -1.970472   -1.185083
+       _cons |   210.4444   12.57086    16.74   0.000     182.4348    238.4541
+------------------------------------------------------------------------------
+
+. reg Y Xp        /*Un incremento del coef Xp reduce en -0.00158 unidades la var Y ::*/
+
+      Source |       SS       df       MS              Number of obs =      12
+-------------+------------------------------           F(  1,    10) =   80.14
+       Model |  5601.11111     1  5601.11111           Prob > F      =  0.0000
+    Residual |  698.888889    10  69.8888889           R-squared     =  0.8891
+-------------+------------------------------           Adj R-squared =  0.8780
+       Total |        6300    11  572.727273           Root MSE      =    8.36
+
+------------------------------------------------------------------------------
+           Y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          Xp |  -.0015778   .0001762    -8.95   0.000    -.0019705   -.0011851
+       _cons |   210.4444   12.57086    16.74   0.000     182.4348    238.4541
+------------------------------------------------------------------------------
+
+. reg Yp X        /*Un inc. del coef X reduce en -1577 unidades la var Yp ::*/    
+
+      Source |       SS       df       MS              Number of obs =      12
+-------------+------------------------------           F(  1,    10) =   80.14
+       Model |  5.6011e+09     1  5.6011e+09           Prob > F      =  0.0000
+    Residual |   698888889    10  69888888.9           R-squared     =  0.8891
+-------------+------------------------------           Adj R-squared =  0.8780
+       Total |  6.3000e+09    11   572727273           Root MSE      =    8360
+
+------------------------------------------------------------------------------
+          Yp |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           X |  -1577.778   176.2434    -8.95   0.000    -1970.472   -1185.083
+       _cons |   210444.4   12570.86    16.74   0.000     182434.8    238454.1
+------------------------------------------------------------------------------
+
+. reg Yp Xp       /*Un inc. del coef Xp reduce en -1.57 unidades la var Y ::*/
+
+      Source |       SS       df       MS              Number of obs =      12
+-------------+------------------------------           F(  1,    10) =   80.14
+       Model |  5.6011e+09     1  5.6011e+09           Prob > F      =  0.0000
+    Residual |   698888889    10  69888888.9           R-squared     =  0.8891
+-------------+------------------------------           Adj R-squared =  0.8780
+       Total |  6.3000e+09    11   572727273           Root MSE      =    8360
+
+------------------------------------------------------------------------------
+          Yp |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          Xp |  -1.577778   .1762434    -8.95   0.000    -1.970472   -1.185083
+       _cons |   210444.4   12570.86    16.74   0.000     182434.8    238454.1
+------------------------------------------------------------------------------
+
+. /*Basicamente las diferencias en los coeficientes constan del cambio de la escala de unidades.
+> Los R2 son todos IGUALES, no se modifican por los cambios en unidad. */
+. *Root MSE (La varianza del modelo)
+. 
+. ***Ejercicio 3:
+. import excel "Mortalidad_infantil.xls", firstrow clear /*clear es para borrar la base de variables anterior*/
+
+. *Si normalizamos/estandarizamos llevamos a terminos relativos
+. sum PBIpercpita
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+ PBIpercpita |        64     1401.25    2725.696        120      19830
+
+. scalar ds_P = r(sd)   /*sacamos desvio estandar*/
+
+. scalar M_P = r(mean)    /*sacamos media*/
+
+. sum Mortalidadinfantil
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+Mortalidad~l |        64       141.5    75.97807         12        312
+
+. scalar ds_M = r(sd)     
+
+. scalar M_M = r(mean)
+
+. sum Tasadealfabetizacinfemenina
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+Tasadealfa~a |        64     51.1875    26.00786          9         95
+
+. scalar ds_A = r(sd)
+
+. scalar M_A = r(mean)
+
+. 
+. gen PBI_n = (PBIpercpita - M_P) / ds_P   /*PBI normalizado*/
+(1 missing value generated)
+
+. gen M_n = (Mortalidadinfantil - M_M) / ds_M /*Mortalidad normalizado*/
+(1 missing value generated)
+
+. gen A_n = (Tasadealfabetizacinfemenina - M_A) / ds_A  /*Tasa de Alf normalizado*/
+(1 missing value generated)
+
+. 
+. reg M_n PBI_n A_n
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  2,    61) =   73.83
+       Model |  44.5829259     2   22.291463           Prob > F      =  0.0000
+    Residual |  18.4170735    61  .301919238           R-squared     =  0.7077
+-------------+------------------------------           Adj R-squared =  0.6981
+       Total |  62.9999995    63  .999999991           Root MSE      =  .54947
+
+------------------------------------------------------------------------------
+         M_n |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       PBI_n |  -.2025703   .0718665    -2.82   0.006    -.3462762   -.0588644
+         A_n |  -.7638884   .0718665   -10.63   0.000    -.9075944   -.6201825
+       _cons |  -3.58e-09    .068684    -0.00   1.000    -.1373421    .1373421
+------------------------------------------------------------------------------
+
+. /*La regresion de las variables normalizadas nos muestran 
+> Una variacion de punto porcentual del PBI nos reduce en -0.20 % puntos en Mortalidad infantil, teniendo un desv
+> io estandar de 0.71, con un nivel de significatividad de 0.01%
+> Una variacion de punto porcentual de Alfabetizacion nos reduce en -0.76 % puntos en Mortalidad infantil, siendo
+>  esta la de mayor impacto. Es más significativa porque al 0.00 P valor su estadistico t es -10
+> 
+> Comparamos ahora regresando las variables SIN normalizar:*/
+. reg Mortalidadinfantil PBIpercpita Tasadealfabetizacinfemenina
+
+      Source |       SS       df       MS              Number of obs =      64
+-------------+------------------------------           F(  2,    61) =   73.83
+       Model |  257362.373     2  128681.187           Prob > F      =  0.0000
+    Residual |  106315.627    61  1742.87913           R-squared     =  0.7077
+-------------+------------------------------           Adj R-squared =  0.6981
+       Total |      363678    63  5772.66667           Root MSE      =  41.748
+
+---------------------------------------------------------------------------------------------
+         Mortalidadinfantil |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+----------------------------+----------------------------------------------------------------
+                PBIpercpita |  -.0056466   .0020033    -2.82   0.006    -.0096524   -.0016408
+Tasadealfabetizacinfemenina |  -2.231586   .2099472   -10.63   0.000    -2.651401    -1.81177
+                      _cons |   263.6416   11.59318    22.74   0.000     240.4596    286.8236
+---------------------------------------------------------------------------------------------
+
+. /*Ahi pareceria que el PBI no es una variable significativa pero porque su unidad de medida es muy grande en pr
+> oporcion a los datos de mortalidad, 
+> normalizando podemos ver los efectos en comparacion a lo que es normal en cada variable. Estandarizando las uni
+> dades de medida y obtenemos coeficientes relativos porcentualizando todo*/
+. 
+. ***Ejercicio 4:
+. import excel "datosTP6.xls", sheet(Ej 4) firstrow clear
+
+. /*Variable proxy es aquella que usamos para aproximar una variable que en realidad queremos probar. Ejemplo: us
+> amos 'comisiones' para aproximar 'ventas'*/
+. reg  Remuneracinporcomisiones Antigedad Antigedad2
+
+      Source |       SS       df       MS              Number of obs =      19
+-------------+------------------------------           F(  2,    16) =   10.20
+       Model |  55383715.2     2  27691857.6           Prob > F      =  0.0014
+    Residual |  43440495.3    16  2715030.96           R-squared     =  0.5604
+-------------+------------------------------           Adj R-squared =  0.5055
+       Total |  98824210.5    18  5490233.92           Root MSE      =  1647.7
+
+------------------------------------------------------------------------------
+Remuneraci~s |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+   Antigedad |   4092.021   906.7817     4.51   0.000     2169.729    6014.312
+  Antigedad2 |  -202.1842   44.96821    -4.50   0.000    -297.5125   -106.8558
+       _cons |  -14633.38   4267.683    -3.43   0.003    -23680.46   -5586.292
+------------------------------------------------------------------------------
+
+. /*El coef Antiguedad es positivo y el Ant.Square negativo, suponemos una parabola, rend marginales decrecientes
+> .
+> El coef Antiguedad Square nos muestra que ante un incremento de este, la v.explicada disminuye
+> Efecto total de un año mas de antiguedad es B1-|B2|*Antiguedad(2), en promedio y manteniendo todo constante. */
+. *Recordemos que los coeficientes Beta son valores marginales: La derivada primera de B2 respecto Ant.Square es 
+> B2*Antiguedad*2
+. 
+. /*Para saber en que año comienza la 'desmotivacion' debemos saber el valor maximo de la parabola, es decir, el 
+> punto critico, donde X'>0 y pasa a X'<0
+> Matematicamente: B1 + B2*Antiguedad*2 = 0
+> B1 = -B2*Antiguedad*2
+> B1/(-B2*2) = Antiguedad
+> */
+. scalar a = _b[Antigedad] / (-2*_b[Antigedad2])
+
+. if _b[Antigedad2]<0 {
+. di "año a partir del cual comienza la desmotivacion  " a
+año a partir del cual comienza la desmotivacion  10.119536
+. } 
+
+. else {
+. di "año hasta el que dura la desmotivacion " a
+. }
+
+. ***Ejercicio 5
+. use "Datos1.dta", clear
+
+. *Modelo 1 (LIN-LIN):
+. reg y x 
+
+      Source |       SS       df       MS              Number of obs =      55
+-------------+------------------------------           F(  1,    53) =   25.14
+       Model |  386.857175     1  386.857175           Prob > F      =  0.0000
+    Residual |  815.500771    53   15.386807           R-squared     =  0.3217
+-------------+------------------------------           Adj R-squared =  0.3090
+       Total |  1202.35795    54  22.2658879           Root MSE      =  3.9226
+
+------------------------------------------------------------------------------
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           x |   .7271861   .1450255     5.01   0.000     .4363017    1.018071
+       _cons |  -.3382984   2.384744    -0.14   0.888    -5.121489    4.444893
+------------------------------------------------------------------------------
+
+. /*Ante una variacion 1 unidad de X, varia en 0.72 unidades Y. El R2 es 0.32 y el X es muy significativo para ex
+> plicar Y*/
+. 
+. *Modelo 2 (LIN-LOG):
+. reg y l_x
+
+      Source |       SS       df       MS              Number of obs =      55
+-------------+------------------------------           F(  1,    53) =   20.61
+       Model |  336.601896     1  336.601896           Prob > F      =  0.0000
+    Residual |   865.75605    53  16.3350198           R-squared     =  0.2800
+-------------+------------------------------           Adj R-squared =  0.2664
+       Total |  1202.35795    54  22.2658879           Root MSE      =  4.0417
+
+------------------------------------------------------------------------------
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         l_x |   7.045078   1.551984     4.54   0.000     3.932191    10.15796
+       _cons |  -7.909321   4.271321    -1.85   0.070    -16.47651    .6578648
+------------------------------------------------------------------------------
+
+. /*Semielasticidad: Como cambiamos la forma funcional del modelo (en vez de linea recta, es una creciente log), 
+> el R2 disminuyó. Muy usado para optimizacion dinamica.
+> En una variacion de 1 punto porcentual (%) de X, la v.explicada Y cambia en 7 unidades */
+. 
+. *Modelo 3 (LOG-LIN):
+. reg l_y x
+
+      Source |       SS       df       MS              Number of obs =      55
+-------------+------------------------------           F(  1,    53) =   38.22
+       Model |  4.78885394     1  4.78885394           Prob > F      =  0.0000
+    Residual |  6.64035896    53  .125289792           R-squared     =  0.4190
+-------------+------------------------------           Adj R-squared =  0.4080
+       Total |  11.4292129    54  .211652091           Root MSE      =  .35396
+
+------------------------------------------------------------------------------
+         l_y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           x |    .080907   .0130866     6.18   0.000     .0546585    .1071555
+       _cons |   1.032699   .2151916     4.80   0.000     .6010796    1.464319
+------------------------------------------------------------------------------
+
+. /*Semielasticidad: Ante una variacion de 1 unidad de X, la v.explicada varía en 0.8 puntos porcentuales (%)*/
+. 
+. *Modelo 4 (LOG-LOG):
+. reg l_y l_x
+
+      Source |       SS       df       MS              Number of obs =      55
+-------------+------------------------------           F(  1,    53) =   35.97
+       Model |  4.62113743     1  4.62113743           Prob > F      =  0.0000
+    Residual |  6.80807546    53  .128454254           R-squared     =  0.4043
+-------------+------------------------------           Adj R-squared =  0.3931
+       Total |  11.4292129    54  .211652091           Root MSE      =  .35841
+
+------------------------------------------------------------------------------
+         l_y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         l_x |   .8254712   .1376264     6.00   0.000     .5494276    1.101515
+       _cons |   .0766992   .3787709     0.20   0.840    -.6830192    .8364175
+------------------------------------------------------------------------------
+
+. /*Elasticidad: Ante una variacion del 1% de X, se modifica 0.82% Y. Disminuyo un poco el R2.
+> 
+> Los estadisticos 't' han ido cambiando a medida que cambiabamos la forma funcional, porque es estamos modifican
+> do el comportamiento del modelo... */
+. 
+. *Modelo 5 (Cuadratico):
+. reg y x sq_x
+
+      Source |       SS       df       MS              Number of obs =      55
+-------------+------------------------------           F(  2,    52) =   12.88
+       Model |   398.28378     2   199.14189           Prob > F      =  0.0000
+    Residual |  804.074166    52  15.4629647           R-squared     =  0.3313
+-------------+------------------------------           Adj R-squared =  0.3055
+       Total |  1202.35795    54  22.2658879           Root MSE      =  3.9323
+
+------------------------------------------------------------------------------
+           y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           x |   .0629307   .7862791     0.08   0.937    -1.514854    1.640715
+        sq_x |   .0266756   .0310314     0.86   0.394    -.0355935    .0889447
+       _cons |   3.099539   4.659265     0.67   0.509    -6.249961    12.44904
+------------------------------------------------------------------------------
+
+. /*En este nos rechaza todos las variables, por los estadisticos 't'. Es una mierda.*/
+. 
+. *Diferencias entre cambiar las formas funcionales (cambiar la relacion de variables) vs estandarizar el modelo 
+> (solo cambiar las unidades)
+. 
+. ***Ejercicio 6:
+. import excel "datosTP6.xls", sheet(Ej 6) firstrow clear
+
+. *Estimaremos una Cobb Douglas PB = (A)*(CE**b1)*(HT**b2)*u
+. *Para regresar semejante funcion mandatoriamente debemos aplicar logaritmos de ambos lados: ¨
+. * log(PB) = log[(A)*(CE**b1)*(HT**b2)*u]
+. * log(PB) = log(A) + b1*log(CE) + b2*log(HT) + log(u)
+. gen L_PB = log(Produccinbrutaentn)
+
+. gen L_CE = log(Consumoelctricoenkw)
+
+. gen L_HT = log(Horasdetrabajo)
+
+.    
+. reg L_PB L_CE L_HT
+
+      Source |       SS       df       MS              Number of obs =      10
+-------------+------------------------------           F(  2,     7) =  507.67
+       Model |   1.7729874     2  .886493698           Prob > F      =  0.0000
+    Residual |  .012223509     7  .001746216           R-squared     =  0.9932
+-------------+------------------------------           Adj R-squared =  0.9912
+       Total |  1.78521091     9  .198356767           Root MSE      =  .04179
+
+------------------------------------------------------------------------------
+        L_PB |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        L_CE |   1.040741   .1226046     8.49   0.000     .7508271    1.330655
+        L_HT |   .2671612   .0756569     3.53   0.010     .0882611    .4460613
+       _cons |  -10.34186   .9624806   -10.75   0.000    -12.61777   -8.065957
+------------------------------------------------------------------------------
+
+. /*Si la suma de los betas es >1 es rend. constante de escala crecientes y si es <1 decrecientes*/
+. 
+. /*Diferencias entre correlacion simple vs correlacion parcial:
+> Correlacion parcial: es entre una var(a) y var(b), pero donde una var(c) corrige el efecto de a sobre b
+> Se necesita minimo 3 variables*/
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP6"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP6
+
+. set more off
+
+. capture log close

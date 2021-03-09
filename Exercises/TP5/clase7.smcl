@@ -1,0 +1,459 @@
+{smcl}
+{com}{sf}{ul off}{txt}{.-}
+      name:  {res}<unnamed>
+       {txt}log:  {res}C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP5\clase7.smcl
+  {txt}log type:  {res}smcl
+ {txt}opened on:  {res}23 May 2020, 15:26:59
+{txt}
+{com}. **Multicolinealidad**
+. import excel "datosTP5.xls", firstrow sheet(Ej 2)
+{res}{txt}
+{com}. reg Consumo Ingreso Riqueza
+
+      {txt}Source {c |}       SS       df       MS              Number of obs ={res}      10
+{txt}{hline 13}{char +}{hline 30}           F(  2,     7) ={res}   92.40
+    {txt}   Model {char |} {res} 8565.55407     2  4282.77704           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 324.445926     7   46.349418           {txt}R-squared     = {res} 0.9635
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.9531
+    {txt}   Total {char |} {res}       8890     9  987.777778           {txt}Root MSE      = {res}  6.808
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     Consumo{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}Ingreso {c |}{col 14}{res}{space 2} .9415373{col 26}{space 2} .8228983{col 37}{space 1}    1.14{col 46}{space 3}0.290{col 54}{space 4}-1.004308{col 67}{space 3} 2.887383
+{txt}{space 5}Riqueza {c |}{col 14}{res}{space 2}-.0424345{col 26}{space 2} .0806645{col 37}{space 1}   -0.53{col 46}{space 3}0.615{col 54}{space 4}-.2331757{col 67}{space 3} .1483067
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 24.77473{col 26}{space 2}   6.7525{col 37}{space 1}    3.67{col 46}{space 3}0.008{col 54}{space 4} 8.807609{col 67}{space 3} 40.74186
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. /*Inferencia general de los resultados de la regresion:
+> - Pocas observaciones (micronumerosidad)
+> - Buen estadistico F (modelo significativo para explicar Y)
+> - R2 alto
+> - Mal estadistico t (var ingreso NO significativa)
+> 
+> La multico. puede deberse a:
+> 1) Alta correlación lineal entre variables
+> 2) Muestra pequeña (micronumerosidad)  */
+. *Ahora vemos la tolerancia y el FIV (factor inflacionario de varianza):
+. reg Ingreso Riqueza
+
+      {txt}Source {c |}       SS       df       MS              Number of obs ={res}      10
+{txt}{hline 13}{char +}{hline 30}           F(  1,     8) ={res} 3849.02
+    {txt}   Model {char |} {res} 32931.5534     1  32931.5534           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 68.4466181     8  8.55582726           {txt}R-squared     = {res} 0.9979
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.9977
+    {txt}   Total {char |} {res}      33000     9  3666.66667           {txt}Root MSE      = {res}  2.925
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     Ingreso{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}Riqueza {c |}{col 14}{res}{space 2} .0979231{col 26}{space 2} .0015784{col 37}{space 1}   62.04{col 46}{space 3}0.000{col 54}{space 4} .0942834{col 67}{space 3} .1015629
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2}-.3862708{col 26}{space 2} 2.897956{col 37}{space 1}   -0.13{col 46}{space 3}0.897{col 54}{space 4}-7.068968{col 67}{space 3} 6.296427
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. scalar R2 = e(r2)  /*Sustraemos el R2*/
+{txt}
+{com}. scalar Tolerancia_Ingreso = 1-R2  /*Tolerancia: 1-R2*/
+{txt}
+{com}. scalar VIF = 1/Tolerancia_Ingreso  /*FIV= 1/Tolerance*/
+{txt}
+{com}. di Tolerancia_Ingreso, VIF
+{res}.00207414 482.12755
+{txt}
+{com}. 
+. reg Riqueza Ingreso
+
+      {txt}Source {c |}       SS       df       MS              Number of obs ={res}      10
+{txt}{hline 13}{char +}{hline 30}           F(  1,     8) ={res} 3849.02
+    {txt}   Model {char |} {res} 3427202.73     1  3427202.73           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 7123.27273     8  890.409091           {txt}R-squared     = {res} 0.9979
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.9977
+    {txt}   Total {char |} {res}    3434326     9  381591.778           {txt}Root MSE      = {res}  29.84
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     Riqueza{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}Ingreso {c |}{col 14}{res}{space 2} 10.19091{col 26}{space 2} .1642623{col 37}{space 1}   62.04{col 46}{space 3}0.000{col 54}{space 4}  9.81212{col 67}{space 3}  10.5697
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 7.545455{col 26}{space 2} 29.47581{col 37}{space 1}    0.26{col 46}{space 3}0.804{col 54}{space 4}-60.42589{col 67}{space 3}  75.5168
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. scalar R2=e(r2)
+{txt}
+{com}. scalar Tolerancia_Riqueza = 1-R2
+{txt}
+{com}. scalar VIF_2 = 1/Tolerancia_Riqueza
+{txt}
+{com}. 
+. reg Consumo Ingreso Riqueza 
+
+      {txt}Source {c |}       SS       df       MS              Number of obs ={res}      10
+{txt}{hline 13}{char +}{hline 30}           F(  2,     7) ={res}   92.40
+    {txt}   Model {char |} {res} 8565.55407     2  4282.77704           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 324.445926     7   46.349418           {txt}R-squared     = {res} 0.9635
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.9531
+    {txt}   Total {char |} {res}       8890     9  987.777778           {txt}Root MSE      = {res}  6.808
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     Consumo{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}Ingreso {c |}{col 14}{res}{space 2} .9415373{col 26}{space 2} .8228983{col 37}{space 1}    1.14{col 46}{space 3}0.290{col 54}{space 4}-1.004308{col 67}{space 3} 2.887383
+{txt}{space 5}Riqueza {c |}{col 14}{res}{space 2}-.0424345{col 26}{space 2} .0806645{col 37}{space 1}   -0.53{col 46}{space 3}0.615{col 54}{space 4}-.2331757{col 67}{space 3} .1483067
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 24.77473{col 26}{space 2}   6.7525{col 37}{space 1}    3.67{col 46}{space 3}0.008{col 54}{space 4} 8.807609{col 67}{space 3} 40.74186
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. estat vif /*test predeterminado stata para ver si lo que hicimos manualmente está bien*/
+
+{txt}    Variable {c |}       VIF       1/VIF  
+{hline 13}{c +}{hline 22}
+{space 5}Ingreso {c |} {res}   482.13    0.002074
+{txt}{space 5}Riqueza {c |} {res}   482.13    0.002074
+{txt}{hline 13}{c +}{hline 22}
+    Mean VIF {c |} {res}   482.13
+{txt}
+{com}. di Tolerancia_Ingreso
+{res}.00207414
+{txt}
+{com}. di Tolerancia_Riqueza
+{res}.00207414
+{txt}
+{com}. di VIF
+{res}482.12755
+{txt}
+{com}. di VIF_2
+{res}482.12755
+{txt}
+{com}. 
+. /*Si nosotros quisieramos hacer inferencia y chequear significatividad:
+> Podemos dividir a la varianza de las varaibles por el 1/VIF
+> = Ejemplo: multiplicar 0.002074 el StdERr 0.822(^2)   */
+. 
+. reg Consumo Ingreso /* R2 muy alto == correlacion alta */
+
+      {txt}Source {c |}       SS       df       MS              Number of obs ={res}      10
+{txt}{hline 13}{char +}{hline 30}           F(  1,     8) ={res}  202.87
+    {txt}   Model {char |} {res} 8552.72727     1  8552.72727           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 337.272727     8  42.1590909           {txt}R-squared     = {res} 0.9621
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.9573
+    {txt}   Total {char |} {res}       8890     9  987.777778           {txt}Root MSE      = {res}  6.493
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     Consumo{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}Ingreso {c |}{col 14}{res}{space 2} .5090909{col 26}{space 2} .0357428{col 37}{space 1}   14.24{col 46}{space 3}0.000{col 54}{space 4} .4266678{col 67}{space 3}  .591514
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 24.45455{col 26}{space 2} 6.413817{col 37}{space 1}    3.81{col 46}{space 3}0.005{col 54}{space 4} 9.664256{col 67}{space 3} 39.24483
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. reg Consumo Riqueza
+
+      {txt}Source {c |}       SS       df       MS              Number of obs ={res}      10
+{txt}{hline 13}{char +}{hline 30}           F(  1,     8) ={res}  176.67
+    {txt}   Model {char |} {res} 8504.87666     1  8504.87666           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 385.123344     8  48.1404181           {txt}R-squared     = {res} 0.9567
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.9513
+    {txt}   Total {char |} {res}       8890     9  987.777778           {txt}Root MSE      = {res} 6.9383
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     Consumo{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}Riqueza {c |}{col 14}{res}{space 2} .0497638{col 26}{space 2}  .003744{col 37}{space 1}   13.29{col 46}{space 3}0.000{col 54}{space 4} .0411301{col 67}{space 3} .0583974
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 24.41104{col 26}{space 2} 6.874097{col 37}{space 1}    3.55{col 46}{space 3}0.007{col 54}{space 4} 8.559349{col 67}{space 3} 40.26274
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. *Correcion de varianza
+. reg Consumo Ingreso Riqueza 
+
+      {txt}Source {c |}       SS       df       MS              Number of obs ={res}      10
+{txt}{hline 13}{char +}{hline 30}           F(  2,     7) ={res}   92.40
+    {txt}   Model {char |} {res} 8565.55407     2  4282.77704           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 324.445926     7   46.349418           {txt}R-squared     = {res} 0.9635
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.9531
+    {txt}   Total {char |} {res}       8890     9  987.777778           {txt}Root MSE      = {res}  6.808
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     Consumo{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}Ingreso {c |}{col 14}{res}{space 2} .9415373{col 26}{space 2} .8228983{col 37}{space 1}    1.14{col 46}{space 3}0.290{col 54}{space 4}-1.004308{col 67}{space 3} 2.887383
+{txt}{space 5}Riqueza {c |}{col 14}{res}{space 2}-.0424345{col 26}{space 2} .0806645{col 37}{space 1}   -0.53{col 46}{space 3}0.615{col 54}{space 4}-.2331757{col 67}{space 3} .1483067
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 24.77473{col 26}{space 2}   6.7525{col 37}{space 1}    3.67{col 46}{space 3}0.008{col 54}{space 4} 8.807609{col 67}{space 3} 40.74186
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. scalar VC = _se[Ingreso]^2 * Tolerancia_Ingreso /*multiplicar por tolerancia es lo mismo que dividir por FIV*/
+{txt}
+{com}. /*Con el desvio estandar despues hacemos el test de hipotesis para ver si ==0*/
+. scalar DC = VC^(1/2)
+{txt}
+{com}. scalar t = _b[Ingreso]/DC
+{txt}
+{com}. di t /*Un numero alto significativo*/
+{res}25.123051
+{txt}
+{com}. di ttail(9, t) /*Es significativa por estar cercano a cero. Pasamos de la regresion normal con un pvalor 0.290 a 0.000*/
+{res}6.026e-10
+{txt}
+{com}. 
+. ****************************
+. *********DUMMIES************
+. clear all
+{txt}
+{com}. set more off
+{txt}
+{com}. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP4"
+{res}C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP4
+{txt}
+{com}. use "Voto.dta", clear 
+{txt}
+{com}. tab democa /*Show democrats, inferencia.. porcentajes*/
+
+     {txt}democA {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          0 {c |}{res}         77       44.51       44.51
+{txt}          1 {c |}{res}         96       55.49      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}        173      100.00
+{txt}
+{com}. sum votosA gastosA gastosB fortA /*Inferencia estadistica, media, max, etc.
+> Para saber que UNIDADES se usan en esos datos, debemos sumar "votosA" al sum
+> deducimos que es porcentual por intuicion*/
+
+{txt}    Variable {c |}       Obs        Mean    Std. Dev.       Min        Max
+{hline 13}{c +}{hline 56}
+{space 6}votosA {c |}{res}       173    50.50289    16.78476         16         84
+{txt}{space 5}gastosA {c |}{res}       173    310.6111    280.9857         .3    1470.67
+{txt}{space 5}gastosB {c |}{res}       173    305.0885     306.278        .93    1548.19
+{txt}{space 7}fortA {c |}{res}       173    49.75723     9.98365         22         71
+{txt}
+{com}. reg votosA gastosA gastosB fortA democa 
+
+      {txt}Source {c |}       SS       df       MS              Number of obs ={res}     173
+{txt}{hline 13}{char +}{hline 30}           F(  4,   168) ={res}   70.43
+    {txt}   Model {char |} {res} 30355.2012     4  7588.80029           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 18102.0474   168  107.750282           {txt}R-squared     = {res} 0.6264
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.6175
+    {txt}   Total {char |} {res} 48457.2486   172  281.728189           {txt}Root MSE      = {res}  10.38
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}      votosA{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}gastosA {c |}{col 14}{res}{space 2} .0318006{col 26}{space 2} .0032042{col 37}{space 1}    9.92{col 46}{space 3}0.000{col 54}{space 4}  .025475{col 67}{space 3} .0381263
+{txt}{space 5}gastosB {c |}{col 14}{res}{space 2}-.0300953{col 26}{space 2} .0029571{col 37}{space 1}  -10.18{col 46}{space 3}0.000{col 54}{space 4}-.0359332{col 67}{space 3}-.0242574
+{txt}{space 7}fortA {c |}{col 14}{res}{space 2} .5554211{col 26}{space 2} .0921082{col 37}{space 1}    6.03{col 46}{space 3}0.000{col 54}{space 4} .3735825{col 67}{space 3} .7372597
+{txt}{space 6}democa {c |}{col 14}{res}{space 2} 9.382202{col 26}{space 2} 1.840633{col 37}{space 1}    5.10{col 46}{space 3}0.000{col 54}{space 4} 5.748452{col 67}{space 3} 13.01595
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 16.96447{col 26}{space 2} 5.217739{col 37}{space 1}    3.25{col 46}{space 3}0.001{col 54}{space 4} 6.663686{col 67}{space 3} 27.26525
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. /*Analisis formal de los coeficientes:
+> - Un aumento de 1 "unidad" en gastos (partido) A, influyen en +0.032 "unidades" (puntos porcentuales) votos A
+> - Un aumento de 1 unidad en gastos (partido) B, influyeen en -0.03 puntos porcentuales votos A
+> - Un aumento de 1 punto porcentual de fortaleza A, influye en 0.55 puntos porcentuales votos A
+> - DUMMY: Si el estado es democrata, los votos MINIMOS del partido A serán de 9.38 puntos porcentuales adicionales, respecto los estados no democratas
+> Nota: los puntos porcentuales se utilizan cuando son modelos lineales pero las variables expresadas en tasas*/
+. 
+. 
+. gen LvotosA =log(votosA)
+{txt}
+{com}. gen LgastosA =log(gastosA)
+{txt}
+{com}. gen LgastosB =log(gastosB)
+{txt}
+{com}. gen LfortA =log(fortA) /*no hacia falta pasarla a log pero es indistinto*/
+{txt}
+{com}. /*La variable dummy NO se debe pasar a logaritmos*/
+. reg LvotosA LgastosA LgastosB LfortA
+
+      {txt}Source {c |}       SS       df       MS              Number of obs ={res}     173
+{txt}{hline 13}{char +}{hline 30}           F(  3,   169) ={res}  200.62
+    {txt}   Model {char |} {res} 18.0343497     3  6.01144991           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 5.06388665   169  .029963826           {txt}R-squared     = {res} 0.7808
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.7769
+    {txt}   Total {char |} {res} 23.0982364   172  .134292072           {txt}Root MSE      = {res}  .1731
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}     LvotosA{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 4}LgastosA {c |}{col 14}{res}{space 2} .1468789{col 26}{space 2}  .008586{col 37}{space 1}   17.11{col 46}{space 3}0.000{col 54}{space 4} .1299292{col 67}{space 3} .1638285
+{txt}{space 4}LgastosB {c |}{col 14}{res}{space 2}-.1251776{col 26}{space 2} .0084776{col 37}{space 1}  -14.77{col 46}{space 3}0.000{col 54}{space 4}-.1419132{col 67}{space 3} -.108442
+{txt}{space 6}LfortA {c |}{col 14}{res}{space 2} .1792226{col 26}{space 2} .0650733{col 37}{space 1}    2.75{col 46}{space 3}0.007{col 54}{space 4} .0507614{col 67}{space 3} .3076839
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 3.044268{col 26}{space 2} .2536755{col 37}{space 1}   12.00{col 46}{space 3}0.000{col 54}{space 4} 2.543487{col 67}{space 3} 3.545049
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. /*Analisis formal de los coeficientes:
+> - Un aumento de 1 porciento en gastos A, influye en 0.13 porciento
+> - Un aumetno de 1 porciento en gastos B, influye en -0.117 porciento
+> - Un aumento de 1 porciento de fortA, aumenta votos A en 0.28 porciento
+> - Si el distrito es democrata, los votos A tendrian 9.4 porciento extra (multiplicamos 0.094x100)
+> La dummy sigue siendo lineal, por ende, forma funcional tipo "log-lin" */
+. 
+. tab district, gen(D) /*Para cada distrito nos genera una varaible nueva que toma 1 en caso que
+> los datos correspondan a ese distrito, o 0 sino.. variables cualitativas */
+
+   {txt}district {c |}      Freq.     Percent        Cum.
+{hline 12}{c +}{hline 35}
+          1 {c |}{res}         21       12.14       12.14
+{txt}          2 {c |}{res}         16        9.25       21.39
+{txt}          3 {c |}{res}         16        9.25       30.64
+{txt}          4 {c |}{res}         15        8.67       39.31
+{txt}          5 {c |}{res}         14        8.09       47.40
+{txt}          6 {c |}{res}         18       10.40       57.80
+{txt}          7 {c |}{res}          8        4.62       62.43
+{txt}          8 {c |}{res}          8        4.62       67.05
+{txt}          9 {c |}{res}          6        3.47       70.52
+{txt}         10 {c |}{res}          5        2.89       73.41
+{txt}         11 {c |}{res}          4        2.31       75.72
+{txt}         12 {c |}{res}          2        1.16       76.88
+{txt}         13 {c |}{res}          2        1.16       78.03
+{txt}         14 {c |}{res}          4        2.31       80.35
+{txt}         15 {c |}{res}          4        2.31       82.66
+{txt}         16 {c |}{res}          1        0.58       83.24
+{txt}         17 {c |}{res}          3        1.73       84.97
+{txt}         18 {c |}{res}          1        0.58       85.55
+{txt}         19 {c |}{res}          4        2.31       87.86
+{txt}         20 {c |}{res}          1        0.58       88.44
+{txt}         21 {c |}{res}          1        0.58       89.02
+{txt}         22 {c |}{res}          1        0.58       89.60
+{txt}         23 {c |}{res}          4        2.31       91.91
+{txt}         24 {c |}{res}          2        1.16       93.06
+{txt}         26 {c |}{res}          1        0.58       93.64
+{txt}         27 {c |}{res}          2        1.16       94.80
+{txt}         30 {c |}{res}          2        1.16       95.95
+{txt}         31 {c |}{res}          1        0.58       96.53
+{txt}         32 {c |}{res}          1        0.58       97.11
+{txt}         34 {c |}{res}          1        0.58       97.69
+{txt}         36 {c |}{res}          1        0.58       98.27
+{txt}         37 {c |}{res}          1        0.58       98.84
+{txt}         40 {c |}{res}          1        0.58       99.42
+{txt}         42 {c |}{res}          1        0.58      100.00
+{txt}{hline 12}{c +}{hline 35}
+      Total {c |}{res}        173      100.00
+{txt}
+{com}. 
+. reg votosA gastosA gastosB fortA democa D1-D34
+{txt}note: D22 omitted because of collinearity
+
+      Source {c |}       SS       df       MS              Number of obs ={res}     173
+{txt}{hline 13}{char +}{hline 30}           F( 37,   135) ={res}    8.58
+    {txt}   Model {char |} {res} 33997.2977    37  918.845883           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 14459.9509   135  107.110747           {txt}R-squared     = {res} 0.7016
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.6198
+    {txt}   Total {char |} {res} 48457.2486   172  281.728189           {txt}Root MSE      = {res} 10.349
+
+{txt}{hline 13}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}      votosA{col 14}{c |}      Coef.{col 26}   Std. Err.{col 38}      t{col 46}   P>|t|{col 54}     [95% Con{col 67}f. Interval]
+{hline 13}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 5}gastosA {c |}{col 14}{res}{space 2} .0337209{col 26}{space 2} .0037313{col 37}{space 1}    9.04{col 46}{space 3}0.000{col 54}{space 4} .0263414{col 67}{space 3} .0411003
+{txt}{space 5}gastosB {c |}{col 14}{res}{space 2}-.0316216{col 26}{space 2} .0032214{col 37}{space 1}   -9.82{col 46}{space 3}0.000{col 54}{space 4}-.0379925{col 67}{space 3}-.0252507
+{txt}{space 7}fortA {c |}{col 14}{res}{space 2} .5064328{col 26}{space 2} .1015841{col 37}{space 1}    4.99{col 46}{space 3}0.000{col 54}{space 4} .3055307{col 67}{space 3}  .707335
+{txt}{space 6}democa {c |}{col 14}{res}{space 2} 8.942979{col 26}{space 2} 2.062472{col 37}{space 1}    4.34{col 46}{space 3}0.000{col 54}{space 4} 4.864045{col 67}{space 3} 13.02191
+{txt}{space 10}D1 {c |}{col 14}{res}{space 2} 5.927765{col 26}{space 2} 10.68426{col 37}{space 1}    0.55{col 46}{space 3}0.580{col 54}{space 4}-15.20241{col 67}{space 3} 27.05794
+{txt}{space 10}D2 {c |}{col 14}{res}{space 2} 9.044668{col 26}{space 2} 10.83092{col 37}{space 1}    0.84{col 46}{space 3}0.405{col 54}{space 4}-12.37556{col 67}{space 3}  30.4649
+{txt}{space 10}D3 {c |}{col 14}{res}{space 2} 10.51211{col 26}{space 2} 10.85736{col 37}{space 1}    0.97{col 46}{space 3}0.335{col 54}{space 4} -10.9604{col 67}{space 3} 31.98463
+{txt}{space 10}D4 {c |}{col 14}{res}{space 2} 12.24869{col 26}{space 2} 10.85179{col 37}{space 1}    1.13{col 46}{space 3}0.261{col 54}{space 4}-9.212808{col 67}{space 3} 33.71019
+{txt}{space 10}D5 {c |}{col 14}{res}{space 2} 13.14655{col 26}{space 2} 10.82218{col 37}{space 1}    1.21{col 46}{space 3}0.227{col 54}{space 4}  -8.2564{col 67}{space 3} 34.54949
+{txt}{space 10}D6 {c |}{col 14}{res}{space 2} 8.938052{col 26}{space 2} 10.79317{col 37}{space 1}    0.83{col 46}{space 3}0.409{col 54}{space 4}-12.40751{col 67}{space 3} 30.28361
+{txt}{space 10}D7 {c |}{col 14}{res}{space 2} 13.25893{col 26}{space 2} 11.06608{col 37}{space 1}    1.20{col 46}{space 3}0.233{col 54}{space 4}-8.626373{col 67}{space 3} 35.14422
+{txt}{space 10}D8 {c |}{col 14}{res}{space 2} 7.071228{col 26}{space 2} 11.03968{col 37}{space 1}    0.64{col 46}{space 3}0.523{col 54}{space 4}-14.76186{col 67}{space 3} 28.90431
+{txt}{space 10}D9 {c |}{col 14}{res}{space 2} 6.037959{col 26}{space 2} 11.34653{col 37}{space 1}    0.53{col 46}{space 3}0.596{col 54}{space 4}-16.40199{col 67}{space 3} 28.47791
+{txt}{space 9}D10 {c |}{col 14}{res}{space 2} 13.56424{col 26}{space 2} 11.37339{col 37}{space 1}    1.19{col 46}{space 3}0.235{col 54}{space 4}-8.928817{col 67}{space 3}  36.0573
+{txt}{space 9}D11 {c |}{col 14}{res}{space 2}  7.77949{col 26}{space 2} 11.80822{col 37}{space 1}    0.66{col 46}{space 3}0.511{col 54}{space 4}-15.57354{col 67}{space 3} 31.13252
+{txt}{space 9}D12 {c |}{col 14}{res}{space 2} 3.209765{col 26}{space 2} 13.15565{col 37}{space 1}    0.24{col 46}{space 3}0.808{col 54}{space 4}-22.80807{col 67}{space 3}  29.2276
+{txt}{space 9}D13 {c |}{col 14}{res}{space 2}-1.651181{col 26}{space 2} 12.77768{col 37}{space 1}   -0.13{col 46}{space 3}0.897{col 54}{space 4}-26.92149{col 67}{space 3} 23.61913
+{txt}{space 9}D14 {c |}{col 14}{res}{space 2} 6.484204{col 26}{space 2} 11.72009{col 37}{space 1}    0.55{col 46}{space 3}0.581{col 54}{space 4}-16.69453{col 67}{space 3} 29.66294
+{txt}{space 9}D15 {c |}{col 14}{res}{space 2} 4.251539{col 26}{space 2} 11.59551{col 37}{space 1}    0.37{col 46}{space 3}0.714{col 54}{space 4}-18.68081{col 67}{space 3} 27.18389
+{txt}{space 9}D16 {c |}{col 14}{res}{space 2} 25.47304{col 26}{space 2} 14.73896{col 37}{space 1}    1.73{col 46}{space 3}0.086{col 54}{space 4}-3.676087{col 67}{space 3} 54.62216
+{txt}{space 9}D17 {c |}{col 14}{res}{space 2} .4454793{col 26}{space 2} 12.20237{col 37}{space 1}    0.04{col 46}{space 3}0.971{col 54}{space 4}-23.68704{col 67}{space 3}   24.578
+{txt}{space 9}D18 {c |}{col 14}{res}{space 2}-9.944022{col 26}{space 2} 14.75546{col 37}{space 1}   -0.67{col 46}{space 3}0.502{col 54}{space 4}-39.12577{col 67}{space 3} 19.23773
+{txt}{space 9}D19 {c |}{col 14}{res}{space 2} 11.22913{col 26}{space 2} 11.75397{col 37}{space 1}    0.96{col 46}{space 3}0.341{col 54}{space 4} -12.0166{col 67}{space 3} 34.47486
+{txt}{space 9}D20 {c |}{col 14}{res}{space 2} 17.65443{col 26}{space 2} 14.73039{col 37}{space 1}    1.20{col 46}{space 3}0.233{col 54}{space 4}-11.47775{col 67}{space 3}  46.7866
+{txt}{space 9}D21 {c |}{col 14}{res}{space 2}-5.319901{col 26}{space 2} 14.78623{col 37}{space 1}   -0.36{col 46}{space 3}0.720{col 54}{space 4} -34.5625{col 67}{space 3}  23.9227
+{txt}{space 9}D22 {c |}{col 14}{res}{space 2}        0{col 26}{txt}  (omitted)
+{space 9}D23 {c |}{col 14}{res}{space 2} 7.156381{col 26}{space 2} 11.65476{col 37}{space 1}    0.61{col 46}{space 3}0.540{col 54}{space 4}-15.89314{col 67}{space 3}  30.2059
+{txt}{space 9}D24 {c |}{col 14}{res}{space 2} 2.177252{col 26}{space 2} 12.75374{col 37}{space 1}    0.17{col 46}{space 3}0.865{col 54}{space 4}-23.04572{col 67}{space 3} 27.40023
+{txt}{space 9}D25 {c |}{col 14}{res}{space 2}-1.517813{col 26}{space 2} 14.72463{col 37}{space 1}   -0.10{col 46}{space 3}0.918{col 54}{space 4}-30.63861{col 67}{space 3} 27.60298
+{txt}{space 9}D26 {c |}{col 14}{res}{space 2} 1.852202{col 26}{space 2} 12.82916{col 37}{space 1}    0.14{col 46}{space 3}0.885{col 54}{space 4}-23.51992{col 67}{space 3} 27.22432
+{txt}{space 9}D27 {c |}{col 14}{res}{space 2} 14.48507{col 26}{space 2} 12.77302{col 37}{space 1}    1.13{col 46}{space 3}0.259{col 54}{space 4}-10.77603{col 67}{space 3} 39.74617
+{txt}{space 9}D28 {c |}{col 14}{res}{space 2} 11.32352{col 26}{space 2} 14.70934{col 37}{space 1}    0.77{col 46}{space 3}0.443{col 54}{space 4}-17.76703{col 67}{space 3} 40.41407
+{txt}{space 9}D29 {c |}{col 14}{res}{space 2} 7.542184{col 26}{space 2} 14.82861{col 37}{space 1}    0.51{col 46}{space 3}0.612{col 54}{space 4}-21.78425{col 67}{space 3} 36.86861
+{txt}{space 9}D30 {c |}{col 14}{res}{space 2} 14.89005{col 26}{space 2} 14.69994{col 37}{space 1}    1.01{col 46}{space 3}0.313{col 54}{space 4}-14.18191{col 67}{space 3}   43.962
+{txt}{space 9}D31 {c |}{col 14}{res}{space 2}-.7266121{col 26}{space 2} 14.80066{col 37}{space 1}   -0.05{col 46}{space 3}0.961{col 54}{space 4}-29.99776{col 67}{space 3} 28.54454
+{txt}{space 9}D32 {c |}{col 14}{res}{space 2}   14.922{col 26}{space 2} 14.93791{col 37}{space 1}    1.00{col 46}{space 3}0.320{col 54}{space 4}-14.62059{col 67}{space 3} 44.46459
+{txt}{space 9}D33 {c |}{col 14}{res}{space 2}-14.28914{col 26}{space 2} 15.53351{col 37}{space 1}   -0.92{col 46}{space 3}0.359{col 54}{space 4}-45.00964{col 67}{space 3} 16.43136
+{txt}{space 9}D34 {c |}{col 14}{res}{space 2} 3.856127{col 26}{space 2} 15.05558{col 37}{space 1}    0.26{col 46}{space 3}0.798{col 54}{space 4}-25.91918{col 67}{space 3} 33.63144
+{txt}{space 7}_cons {c |}{col 14}{res}{space 2} 10.92709{col 26}{space 2} 12.00361{col 37}{space 1}    0.91{col 46}{space 3}0.364{col 54}{space 4}-12.81236{col 67}{space 3} 34.66653
+{txt}{hline 13}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. /*Vemos que D22 se omitio porque se empleó como base (n-1 variables dummy para n variables)
+> Todas las v.dummies nos dieron insignificativas
+> Ejemplo interpretacion: para el D21 se obtuvieron -5.31 puntos porcentuales (menos) que el D22 (que es la base)
+> para el D30 se obtuvieron 14.89 puntos porcentuales mas que el D22 (base) 
+> Todas SIEMPRE se deben comparar con DUMMY 22, no entre sí
+> Stata elige como base el que posee mayor colinealidad, sino podemos hacerlo, por ejemplo, asì
+> reg ... ... D1-D15 D17-D34 (ahi omitimos el D16)*/
+. *Aplicando un comando nuevo para RLM:
+. xi:reg votosA gastosA gastosB fortA democa i.district
+{txt}i.district{col 19}_Idistrict_1-42{col 39}(naturally coded; _Idistrict_1 omitted)
+
+      Source {c |}       SS       df       MS              Number of obs ={res}     173
+{txt}{hline 13}{char +}{hline 30}           F( 37,   135) ={res}    8.58
+    {txt}   Model {char |} {res} 33997.2977    37  918.845883           {txt}Prob > F      = {res} 0.0000
+    {txt}Residual {char |} {res} 14459.9509   135  107.110747           {txt}R-squared     = {res} 0.7016
+{txt}{hline 13}{char +}{hline 30}           Adj R-squared = {res} 0.6198
+    {txt}   Total {char |} {res} 48457.2486   172  281.728189           {txt}Root MSE      = {res} 10.349
+
+{txt}{hline 14}{c TT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{col 1}       votosA{col 15}{c |}      Coef.{col 27}   Std. Err.{col 39}      t{col 47}   P>|t|{col 55}     [95% Con{col 68}f. Interval]
+{hline 14}{c +}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{space 6}gastosA {c |}{col 15}{res}{space 2} .0337209{col 27}{space 2} .0037313{col 38}{space 1}    9.04{col 47}{space 3}0.000{col 55}{space 4} .0263414{col 68}{space 3} .0411003
+{txt}{space 6}gastosB {c |}{col 15}{res}{space 2}-.0316216{col 27}{space 2} .0032214{col 38}{space 1}   -9.82{col 47}{space 3}0.000{col 55}{space 4}-.0379925{col 68}{space 3}-.0252507
+{txt}{space 8}fortA {c |}{col 15}{res}{space 2} .5064328{col 27}{space 2} .1015841{col 38}{space 1}    4.99{col 47}{space 3}0.000{col 55}{space 4} .3055307{col 68}{space 3}  .707335
+{txt}{space 7}democa {c |}{col 15}{res}{space 2} 8.942979{col 27}{space 2} 2.062472{col 38}{space 1}    4.34{col 47}{space 3}0.000{col 55}{space 4} 4.864045{col 68}{space 3} 13.02191
+{txt}{space 1}_Idistrict_2 {c |}{col 15}{res}{space 2} 3.116903{col 27}{space 2} 3.493071{col 38}{space 1}    0.89{col 47}{space 3}0.374{col 55}{space 4}-3.791316{col 68}{space 3} 10.02512
+{txt}{space 1}_Idistrict_3 {c |}{col 15}{res}{space 2} 4.584348{col 27}{space 2} 3.527955{col 38}{space 1}    1.30{col 47}{space 3}0.196{col 55}{space 4}-2.392862{col 68}{space 3} 11.56156
+{txt}{space 1}_Idistrict_4 {c |}{col 15}{res}{space 2} 6.320927{col 27}{space 2} 3.535986{col 38}{space 1}    1.79{col 47}{space 3}0.076{col 55}{space 4}-.6721656{col 68}{space 3} 13.31402
+{txt}{space 1}_Idistrict_5 {c |}{col 15}{res}{space 2}  7.21878{col 27}{space 2} 3.579379{col 38}{space 1}    2.02{col 47}{space 3}0.046{col 55}{space 4} .1398698{col 68}{space 3} 14.29769
+{txt}{space 1}_Idistrict_6 {c |}{col 15}{res}{space 2} 3.010287{col 27}{space 2} 3.398933{col 38}{space 1}    0.89{col 47}{space 3}0.377{col 55}{space 4}-3.711757{col 68}{space 3}  9.73233
+{txt}{space 1}_Idistrict_7 {c |}{col 15}{res}{space 2}  7.33116{col 27}{space 2}  4.33952{col 38}{space 1}    1.69{col 47}{space 3}0.093{col 55}{space 4}-1.251075{col 68}{space 3}  15.9134
+{txt}{space 1}_Idistrict_8 {c |}{col 15}{res}{space 2} 1.143463{col 27}{space 2} 4.318959{col 38}{space 1}    0.26{col 47}{space 3}0.792{col 55}{space 4} -7.39811{col 68}{space 3} 9.685036
+{txt}{space 1}_Idistrict_9 {c |}{col 15}{res}{space 2} .1101937{col 27}{space 2} 4.855159{col 38}{space 1}    0.02{col 47}{space 3}0.982{col 55}{space 4}-9.491817{col 68}{space 3} 9.712204
+{txt}_Idistrict_10 {c |}{col 15}{res}{space 2} 7.636478{col 27}{space 2} 5.216248{col 38}{space 1}    1.46{col 47}{space 3}0.146{col 55}{space 4}-2.679656{col 68}{space 3} 17.95261
+{txt}_Idistrict_11 {c |}{col 15}{res}{space 2} 1.851725{col 27}{space 2} 5.750205{col 38}{space 1}    0.32{col 47}{space 3}0.748{col 55}{space 4}-9.520412{col 68}{space 3} 13.22386
+{txt}_Idistrict_12 {c |}{col 15}{res}{space 2}   -2.718{col 27}{space 2} 8.039477{col 38}{space 1}   -0.34{col 47}{space 3}0.736{col 55}{space 4}-18.61761{col 68}{space 3} 13.18161
+{txt}_Idistrict_13 {c |}{col 15}{res}{space 2}-7.578945{col 27}{space 2} 7.686412{col 38}{space 1}   -0.99{col 47}{space 3}0.326{col 55}{space 4} -22.7803{col 68}{space 3} 7.622413
+{txt}_Idistrict_14 {c |}{col 15}{res}{space 2} .5564392{col 27}{space 2} 5.683254{col 38}{space 1}    0.10{col 47}{space 3}0.922{col 55}{space 4}-10.68329{col 68}{space 3} 11.79617
+{txt}_Idistrict_15 {c |}{col 15}{res}{space 2}-1.676226{col 27}{space 2} 5.761525{col 38}{space 1}   -0.29{col 47}{space 3}0.772{col 55}{space 4}-13.07075{col 68}{space 3} 9.718297
+{txt}_Idistrict_16 {c |}{col 15}{res}{space 2} 19.54527{col 27}{space 2} 10.67528{col 38}{space 1}    1.83{col 47}{space 3}0.069{col 55}{space 4}-1.567147{col 68}{space 3} 40.65769
+{txt}_Idistrict_17 {c |}{col 15}{res}{space 2}-5.482286{col 27}{space 2} 6.550581{col 38}{space 1}   -0.84{col 47}{space 3}0.404{col 55}{space 4}-18.43732{col 68}{space 3} 7.472749
+{txt}_Idistrict_18 {c |}{col 15}{res}{space 2}-15.87179{col 27}{space 2} 10.72328{col 38}{space 1}   -1.48{col 47}{space 3}0.141{col 55}{space 4}-37.07913{col 68}{space 3} 5.335554
+{txt}_Idistrict_19 {c |}{col 15}{res}{space 2} 5.301366{col 27}{space 2} 5.708416{col 38}{space 1}    0.93{col 47}{space 3}0.355{col 55}{space 4}-5.988124{col 68}{space 3} 16.59086
+{txt}_Idistrict_20 {c |}{col 15}{res}{space 2} 11.72666{col 27}{space 2} 10.64629{col 38}{space 1}    1.10{col 47}{space 3}0.273{col 55}{space 4}-9.328419{col 68}{space 3} 32.78174
+{txt}_Idistrict_21 {c |}{col 15}{res}{space 2}-11.24767{col 27}{space 2} 10.68693{col 38}{space 1}   -1.05{col 47}{space 3}0.294{col 55}{space 4}-32.38312{col 68}{space 3}  9.88779
+{txt}_Idistrict_22 {c |}{col 15}{res}{space 2}-5.927765{col 27}{space 2} 10.68426{col 38}{space 1}   -0.55{col 47}{space 3}0.580{col 55}{space 4}-27.05794{col 68}{space 3} 15.20241
+{txt}_Idistrict_23 {c |}{col 15}{res}{space 2} 1.228616{col 27}{space 2}  5.67224{col 38}{space 1}    0.22{col 47}{space 3}0.829{col 55}{space 4}-9.989328{col 68}{space 3} 12.44656
+{txt}_Idistrict_24 {c |}{col 15}{res}{space 2}-3.750512{col 27}{space 2} 7.786519{col 38}{space 1}   -0.48{col 47}{space 3}0.631{col 55}{space 4}-19.14985{col 68}{space 3} 11.64883
+{txt}_Idistrict_26 {c |}{col 15}{res}{space 2}-7.445578{col 27}{space 2} 10.68117{col 38}{space 1}   -0.70{col 47}{space 3}0.487{col 55}{space 4}-28.56965{col 68}{space 3}  13.6785
+{txt}_Idistrict_27 {c |}{col 15}{res}{space 2}-4.075563{col 27}{space 2} 7.764174{col 38}{space 1}   -0.52{col 47}{space 3}0.601{col 55}{space 4}-19.43071{col 68}{space 3} 11.27958
+{txt}_Idistrict_30 {c |}{col 15}{res}{space 2} 8.557309{col 27}{space 2} 7.722466{col 38}{space 1}    1.11{col 47}{space 3}0.270{col 55}{space 4}-6.715353{col 68}{space 3} 23.82997
+{txt}_Idistrict_31 {c |}{col 15}{res}{space 2} 5.395754{col 27}{space 2} 10.69328{col 38}{space 1}    0.50{col 47}{space 3}0.615{col 55}{space 4}-15.75225{col 68}{space 3} 26.54376
+{txt}_Idistrict_32 {c |}{col 15}{res}{space 2} 1.614419{col 27}{space 2} 10.69473{col 38}{space 1}    0.15{col 47}{space 3}0.880{col 55}{space 4}-19.53647{col 68}{space 3}  22.7653
+{txt}_Idistrict_34 {c |}{col 15}{res}{space 2} 8.962284{col 27}{space 2} 10.64076{col 38}{space 1}    0.84{col 47}{space 3}0.401{col 55}{space 4}-12.08187{col 68}{space 3} 30.00643
+{txt}_Idistrict_36 {c |}{col 15}{res}{space 2}-6.654377{col 27}{space 2} 10.67403{col 38}{space 1}   -0.62{col 47}{space 3}0.534{col 55}{space 4}-27.76432{col 68}{space 3} 14.45557
+{txt}_Idistrict_37 {c |}{col 15}{res}{space 2} 8.994234{col 27}{space 2} 10.82713{col 38}{space 1}    0.83{col 47}{space 3}0.408{col 55}{space 4}-12.41849{col 68}{space 3} 30.40696
+{txt}_Idistrict_40 {c |}{col 15}{res}{space 2} -20.2169{col 27}{space 2}  11.2961{col 38}{space 1}   -1.79{col 47}{space 3}0.076{col 55}{space 4}-42.55711{col 68}{space 3} 2.123305
+{txt}_Idistrict_42 {c |}{col 15}{res}{space 2}-2.071638{col 27}{space 2} 10.84275{col 38}{space 1}   -0.19{col 47}{space 3}0.849{col 55}{space 4}-23.51525{col 68}{space 3} 19.37198
+{txt}{space 8}_cons {c |}{col 15}{res}{space 2} 16.85485{col 27}{space 2} 5.911438{col 38}{space 1}    2.85{col 47}{space 3}0.005{col 55}{space 4} 5.163846{col 68}{space 3} 28.54586
+{txt}{hline 14}{c BT}{hline 11}{hline 11}{hline 9}{hline 8}{hline 13}{hline 12}
+{res}{txt}
+{com}. /*Por default, omite la primer variable*/
+. 
+{txt}end of do-file
+
+{com}. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+{txt}
+{com}. clear all
+{txt}
+{com}. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP5"
+{res}C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP5
+{txt}
+{com}. set more off
+{txt}
+{com}. capture log close
+{smcl}
+{com}{sf}{ul off}
