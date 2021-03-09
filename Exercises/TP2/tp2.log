@@ -1,0 +1,280 @@
+-----------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP2\tp2.log
+  log type:  text
+ opened on:  23 May 2020, 14:01:04
+
+. ******TP 2********************
+. ******Ejercicio 1*************
+. import excel "TP2.xls", sheet(Hoja1) firstrow 
+
+. regress /*Para regresionar*/ Y X
+
+      Source |       SS       df       MS              Number of obs =      12
+-------------+------------------------------           F(  1,    10) =   11.09
+       Model |  43.5955882     1  43.5955882           Prob > F      =  0.0076
+    Residual |  39.3210784    10  3.93210784           R-squared     =  0.5258
+-------------+------------------------------           Adj R-squared =  0.4784
+       Total |  82.9166667    11  7.53787879           Root MSE      =   1.983
+
+------------------------------------------------------------------------------
+           Y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           X |   5.661765   1.700369     3.33   0.008     1.873106    9.450424
+       _cons |    7.29902    5.47121     1.33   0.212    -4.891595    19.48963
+------------------------------------------------------------------------------
+
+. predict residuo /*de la regresion hecha, genera una variable, los residuales*/
+(option xb assumed; fitted values)
+
+. scatter residuo X /*Graficamos*/
+
+. sum X 
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+           X |        12         3.2    .3516196        2.7        3.7
+
+. scalar Mx= r(mean)
+
+. gen x_Mx = X-Mx
+
+. gen x_Mx_u = x_Mx * residuo
+
+. sum x_Mx_u
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+      x_Mx_u |        12    .6416668    8.922355  -11.29289   14.12377
+
+. scalar xMxu = r(sum)
+
+. gen x_u= X*residuo
+
+. sum x_u
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+         x_u |        12      81.975      15.288   60.98162   104.5159
+
+. scalar xu = r(sum)
+
+. display /*o di*/ xMxu
+7.7000022
+
+. di xu
+983.69996
+
+. sum residuo
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+     residuo |        12    25.41667    1.990788   22.58578   28.24755
+
+. di r(mean)
+25.416666
+
+. gen Y_u=Y*residuo
+
+. sum Y_u
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+         Y_u |        12    649.6399    112.6575   486.1912   847.4265
+
+. scalar yu = r(sum)
+
+. di yu
+7795.6788
+
+. predict Yp, xb
+
+. gen Yp_u = Yp*residuo
+
+. sum Yp_u
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+        Yp_u |        12    649.6399    101.0823   510.1177    797.924
+
+. scalar Ypu =r(sum)
+
+. di Ypu /*es mi prediccion sin considerar lo inobservable*/
+7795.6786
+
+. *Asumiendo estos supuestos:
+. *La esperanza de los residuos es 0
+. sum residuo
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+     residuo |        12    25.41667    1.990788   22.58578   28.24755
+
+. scalar Mu = r(mean)
+
+. scalar sumu=r(sum)
+
+. di Mu
+25.416666
+
+. di sumu
+305
+
+. *la covX y u es 0
+. di xu
+983.69996
+
+. * My=B0+B1*Mx
+. sum Y
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+           Y |        12    25.41667     2.74552         21         30
+
+. scalar My=r(mean)
+
+. reg Y X
+
+      Source |       SS       df       MS              Number of obs =      12
+-------------+------------------------------           F(  1,    10) =   11.09
+       Model |  43.5955882     1  43.5955882           Prob > F      =  0.0076
+    Residual |  39.3210784    10  3.93210784           R-squared     =  0.5258
+-------------+------------------------------           Adj R-squared =  0.4784
+       Total |  82.9166667    11  7.53787879           Root MSE      =   1.983
+
+------------------------------------------------------------------------------
+           Y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           X |   5.661765   1.700369     3.33   0.008     1.873106    9.450424
+       _cons |    7.29902    5.47121     1.33   0.212    -4.891595    19.48963
+------------------------------------------------------------------------------
+
+. *scalar B0=
+. *scalar B1
+. *scalar MYp = B0 + B1*Mx
+. *di MYp
+. di My
+25.416667
+
+. 
+. *****Ejercicio 2 Gasto Salud ************
+. 
+. use "gastos_salud.dta" , clear /*Para limiar la base de variables anterior*/
+
+. sum exphlth income, detail
+
+                           exphlth
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%         .998           .998
+ 5%        1.573          1.499
+10%        2.103          1.573       Obs                  51
+25%        3.747          1.953       Sum of Wgt.          51
+
+50%       10.066                      Mean           15.26494
+                        Largest       Std. Dev.      17.88771
+75%       16.682         44.811
+90%       34.747         49.816       Variance       319.9703
+95%       49.816         67.033       Skewness       2.449679
+99%       94.178         94.178       Kurtosis       9.838013
+
+                           income
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%          9.3            9.3
+ 5%         11.2           10.9
+10%         14.6           11.2       Obs                  51
+25%         26.4           12.8       Sum of Wgt.          51
+
+50%         64.1                      Mean           105.1333
+                        Largest       Std. Dev.      125.2958
+75%        129.8          283.4
+90%          256            345       Variance       15699.03
+95%          345          450.6       Skewness       2.593079
+99%        683.5          683.5       Kurtosis       11.00936
+
+. * el modelo seria: gasto de salud = B0 + B1*ingreso + u
+. scatter exphlth income /*vemos correlacion, pero NO podemos asumir causalidad*/
+
+. reg exphlth income
+
+      Source |       SS       df       MS              Number of obs =      51
+-------------+------------------------------           F(  1,    49) = 5222.92
+       Model |  15849.8179     1  15849.8179           Prob > F      =  0.0000
+    Residual |  148.698513    49  3.03466352           R-squared     =  0.9907
+-------------+------------------------------           Adj R-squared =  0.9905
+       Total |  15998.5164    50  319.970329           Root MSE      =   1.742
+
+------------------------------------------------------------------------------
+     exphlth |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      income |   .1420989   .0019662    72.27   0.000     .1381476    .1460502
+       _cons |   .3256078   .3197417     1.02   0.314    -.3169372    .9681529
+------------------------------------------------------------------------------
+
+. predict residual, r
+
+. scatter residual income
+
+. 
+. *****Ejercicio 3*******
+. clear all
+
+. *****(A) Respuesta: Es un análisis de corte transversal
+. import excel "ejercicio3.xls", sheet(Hoja1) firstrow    /*Importamos el archivo y determinamos las variables*/
+
+. *****(B) Respuesta: 
+. scatter Cantidadllamadas Ingresodisponible Municipio    /*Representamos los datos de las varaibles en un grafic
+> o por medio de puntos*/
+
+. *****(C) Respuesta: El signo del coeficiente de regresión será positivo teniendo en cuenta que de la muestra, s
+> e observan mayor cantidad de llamadas a niveles mayores de ingreso.
+. *****(D) Respuesta: Se concluye que cada un incremento unitario de X1 (Ingresodisponible) la variable explicada
+>  Y (Cantidadllamadas) aumentará 0.257 unidades
+. reg Cantidadllamadas Ingresodisponible
+
+      Source |       SS       df       MS              Number of obs =      36
+-------------+------------------------------           F(  1,    34) =  383.95
+       Model |  33.4572622     1  33.4572622           Prob > F      =  0.0000
+    Residual |  2.96273781    34  .087139347           R-squared     =  0.9187
+-------------+------------------------------           Adj R-squared =  0.9163
+       Total |       36.42    35  1.04057143           Root MSE      =  .29519
+
+-----------------------------------------------------------------------------------
+ Cantidadllamadas |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+------------------+----------------------------------------------------------------
+Ingresodisponible |   .2569814   .0131149    19.59   0.000     .2303288     .283634
+            _cons |  -2.262967   .2663701    -8.50   0.000    -2.804296   -1.721638
+-----------------------------------------------------------------------------------
+
+. scalar B1 = _b[Ingresodisponible]
+
+. di B1
+.25698138
+
+. *****(E): Respuesta:
+. predict r1, residuals
+
+. scatter r1 Ingresodisponible
+
+. sum r1 /*Suma de los residuales cerca de cero*/
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+          r1 |        36    1.23e-09    .2909461  -.5135287   .7277943
+
+. correlate Ingresodisponible r1 /*Covarianza muestral entre regresores y residuales es cero*/
+(obs=36)
+
+             | Ingres~e       r1
+-------------+------------------
+Ingresodis~e |   1.0000
+          r1 |   0.0000   1.0000
+
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP2\tp2.log
+  log type:  text
+ closed on:  23 May 2020, 14:01:08
+-----------------------------------------------------------------------------------------------------------------

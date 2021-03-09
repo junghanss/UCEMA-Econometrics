@@ -1,0 +1,410 @@
+-----------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP3\tp3.log
+  log type:  text
+ opened on:  23 May 2020, 14:08:09
+
+. 
+. import excel "ejercicio1.xls", sheet(Hoja1) firstrow
+
+. *****(A): Se regresará Y (la cantidad demandada) sobre X1 (el precio del bien demandado) y X2 (el precio de un 
+> bien 'complementario o sustituto').
+. scatter Cantidaddemandada Preciobien Preciootrobien Year
+
+. reg Cantidaddemandada Preciobien Preciootrobien
+
+      Source |       SS       df       MS              Number of obs =      13
+-------------+------------------------------           F(  2,    10) =   26.97
+       Model |  63330.4343     2  31665.2171           Prob > F      =  0.0001
+    Residual |  11742.6427    10  1174.26427           R-squared     =  0.8436
+-------------+------------------------------           Adj R-squared =  0.8123
+       Total |  75073.0769    12  6256.08974           Root MSE      =  34.268
+
+--------------------------------------------------------------------------------
+Cantidaddema~a |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+    Preciobien |  -42.63224   15.83878    -2.69   0.023    -77.92324   -7.341242
+Preciootrobien |   40.04771   12.85743     3.11   0.011     11.39957    68.69584
+         _cons |   368.7136   251.5959     1.47   0.174    -191.8771    929.3042
+--------------------------------------------------------------------------------
+
+. scalar B1 = _b[Preciobien]
+
+. scalar B2 = _b[Preciootrobien]
+
+. di B1, B2
+-42.632241 40.047708
+
+. /****(B): Con los coeficientes de regresion estimados por MCO, podemos observar que: por cada unidad que se inc
+> rementa X1 (el precio del bien demandado) manteniendo el resto constante, la variable explicada Y (cantidad dem
+> andada) disminuye -42.63 unidades;
+> por cada unidad que se incrementa X2 (el precio de otro bien), la variable explicada Y (cantidad demandada) aum
+> enta 40.08 unidades.*/
+. *****(C): Mostramos el R-Squared de la regresion que nos muestra que la variable Y se explica en un 84.36% por 
+> las variaciones de X1,X2.
+. di e(r2)
+.84358384
+
+. matrix list e(b)
+
+e(b)[1,3]
+      Preciobien  Preciootro~n         _cons
+y1    -42.632241     40.047708     368.71358
+
+. reg Cantidaddemandada Preciobien /*Regresamos la cantidad demandada del bien con el precio de este (X1)*/
+
+      Source |       SS       df       MS              Number of obs =      13
+-------------+------------------------------           F(  1,    11) =   24.70
+       Model |  51938.0947     1  51938.0947           Prob > F      =  0.0004
+    Residual |  23134.9822    11   2103.1802           R-squared     =  0.6918
+-------------+------------------------------           Adj R-squared =  0.6638
+       Total |  75073.0769    12  6256.08974           Root MSE      =   45.86
+
+------------------------------------------------------------------------------
+Cantidadde~a |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+  Preciobien |  -76.53105   15.40043    -4.97   0.000    -110.4272   -42.63493
+       _cons |   1106.416   113.6113     9.74   0.000     856.3594    1356.473
+------------------------------------------------------------------------------
+
+. predict res1, residuals  /*Generamos el residual, es decir la parte independiente de cantidad demandada (Y) res
+> pecto (X1) del precio del bien*/
+(2 missing values generated)
+
+. summarize res1, detail
+
+                          Residuals
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%    -76.61736      -76.61736
+ 5%    -76.61736      -60.69873
+10%    -60.69873      -58.35184       Obs                  13
+25%    -21.82078      -21.82078       Sum of Wgt.          13
+
+50%     10.52611                      Mean           4.40e-07
+                        Largest       Std. Dev.      43.90803
+75%     27.56679       27.56679
+90%     40.83232       28.48543       Variance       1927.915
+95%     76.23916       40.83232       Skewness      -.3269211
+99%     76.23916       76.23916       Kurtosis        2.37463
+
+. di e(r2) /*Mostramos el R-Squared de esta regresion*/
+.69183383
+
+. gen r2_a_1 = e(r2_a) /*Nombramos el R-Squared ajustado de esta regresion nro 1*/
+
+. reg Cantidaddemandada Preciootrobien /*Regresamos la cantidad demandada del bien con el precio del otro bien (X
+> 2)*/
+
+      Source |       SS       df       MS              Number of obs =      13
+-------------+------------------------------           F(  1,    11) =   29.78
+       Model |  54822.9969     1  54822.9969           Prob > F      =  0.0002
+    Residual |    20250.08    11  1840.91637           R-squared     =  0.7303
+-------------+------------------------------           Adj R-squared =  0.7057
+       Total |  75073.0769    12  6256.08974           Root MSE      =  42.906
+
+--------------------------------------------------------------------------------
+Cantidaddema~a |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+---------------+----------------------------------------------------------------
+Preciootrobien |    63.8276   11.69618     5.46   0.000     38.08447    89.57072
+         _cons |   -234.294   143.3681    -1.63   0.130    -549.8451    81.25699
+--------------------------------------------------------------------------------
+
+. predict res2, residuals  /*Generamos otro residual, es decir la parte independiente de cantidad demandada (Y) r
+> especto (X2) del precio del otro bien*/
+(2 missing values generated)
+
+. summarize res2, detail
+
+                          Residuals
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%    -73.76129      -73.76129
+ 5%    -73.76129      -45.25437
+10%    -45.25437      -43.55093       Obs                  13
+25%    -32.69921      -32.69921       Sum of Wgt.          13
+
+50%     8.893907                      Mean           3.67e-07
+                        Largest       Std. Dev.      41.07927
+75%     16.12839       16.12839
+90%     43.04219       33.04219       Variance       1687.507
+95%     76.88007       43.04219       Skewness      -.0445918
+99%     76.88007       76.88007       Kurtosis        2.48154
+
+. di e(r2) /*Mostramos el R-Squared de esta regresion*/
+.73026175
+
+. gen r2_a_2 = e(r2_a) /*Nombramos el R-Squared ajustado de esta regresion nro 2*/
+
+. *****(D): Si comparamos el R-Squared ajustado de la regresion simple nro 1 con el R-Squared ajustado de la regr
+> esion simple nro 2, podemos vislumbrar que se explica más a la variable Y en función de X2 (variaciones del pre
+> cio de otro bien)
+. di r2_a_1, r2_a_2 /*Mostramos ambos R-Squared ajustados*/
+.66381872 .70574009
+
+. correlate Cantidaddemandada Preciobien Preciootrobien
+(obs=13)
+
+             | Cantid~a P~iobien P~robien
+-------------+---------------------------
+Cantidadde~a |   1.0000
+  Preciobien |  -0.8318   1.0000
+Preciootro~n |   0.8546  -0.6871   1.0000
+
+
+. *****(E): Los coeficientes de correlacion simple nos indican un ajuste entre datos de 0.83 para Y, X1 ; 0.85 pa
+> ra Y, X2 ; 0.68 para X1,X2.
+. *****(F): Hacemos la correlacion parcial que arroja un ajuste de 0.23 entre las partes individuales
+. corr res1 res2
+(obs=13)
+
+             |     res1     res2
+-------------+------------------
+        res1 |   1.0000
+        res2 |   0.2300   1.0000
+
+
+. 
+. 
+. **********Ejercicio 2***********
+. 
+. use "Trigo.dta", clear
+
+. * un modelo sería expo trigo = B0 + B1*Price + B2*TCR + u
+. reg ship price extrate
+
+      Source |       SS       df       MS              Number of obs =     135
+-------------+------------------------------           F(  2,   132) =  406.37
+       Model |  708638.631     2  354319.315           Prob > F      =  0.0000
+    Residual |  115093.448   132  871.920061           R-squared     =  0.8603
+-------------+------------------------------           Adj R-squared =  0.8582
+       Total |  823732.079   134  6147.25432           Root MSE      =  29.528
+
+------------------------------------------------------------------------------
+        ship |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       price |    13.3115   3.160335     4.21   0.000     7.060047    19.56296
+     extrate |   2.088457   .0961841    21.71   0.000     1.898195    2.278718
+       _cons |   2.286088   10.10358     0.23   0.821    -17.69979    22.27197
+------------------------------------------------------------------------------
+
+. scalar B1 = _b[price]
+
+. scalar B2 = _b[extrate]
+
+. reg ship price
+
+      Source |       SS       df       MS              Number of obs =     135
+-------------+------------------------------           F(  1,   133) =   75.22
+       Model |  297563.333     1  297563.333           Prob > F      =  0.0000
+    Residual |  526168.746   133  3956.15599           R-squared     =  0.3612
+-------------+------------------------------           Adj R-squared =  0.3564
+       Total |  823732.079   134  6147.25432           Root MSE      =  62.898
+
+------------------------------------------------------------------------------
+        ship |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       price |   49.56808   5.715433     8.67   0.000     38.26318    60.87299
+       _cons |   175.8107    13.1679    13.35   0.000     149.7651    201.8563
+------------------------------------------------------------------------------
+
+. scalar B1s = _b[price] /*beta1 sesgado seria*/
+
+. reg extrate price
+
+      Source |       SS       df       MS              Number of obs =     135
+-------------+------------------------------           F(  1,   133) =   51.51
+       Model |  36500.4261     1  36500.4261           Prob > F      =  0.0000
+    Residual |  94247.6363   133  708.628844           R-squared     =  0.2792
+-------------+------------------------------           Adj R-squared =  0.2737
+       Total |  130748.062   134  975.731809           Root MSE      =   26.62
+
+------------------------------------------------------------------------------
+     extrate |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       price |   17.36047   2.418922     7.18   0.000     12.57593      22.145
+       _cons |   83.08747   5.573003    14.91   0.000     72.06428    94.11065
+------------------------------------------------------------------------------
+
+. scalar S1 = _b[price]
+
+. scalar sesgo = S1*B2
+
+. di B1s-sesgo
+13.311503
+
+. di B1
+13.311503
+
+. *** otra forma de estimar el B insesgado***
+. reg price extrate
+
+      Source |       SS       df       MS              Number of obs =     135
+-------------+------------------------------           F(  1,   133) =   51.51
+       Model |  33.8094296     1  33.8094296           Prob > F      =  0.0000
+    Residual |  87.2992225   133  .656385132           R-squared     =  0.2792
+-------------+------------------------------           Adj R-squared =  0.2737
+       Total |  121.108652   134  .903795911           Root MSE      =  .81018
+
+------------------------------------------------------------------------------
+       price |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     extrate |   .0160806   .0022406     7.18   0.000     .0116488    .0205124
+       _cons |   .1778205   .2767856     0.64   0.522    -.3696507    .7252917
+------------------------------------------------------------------------------
+
+. predict uu, r /*guardamos los residuos - me tiraba error de u ya definida */
+
+. reg ship uu   /*el coeficiente B1 es igual al de la regression anterior*/
+
+      Source |       SS       df       MS              Number of obs =     135
+-------------+------------------------------           F(  1,   133) =    2.55
+       Model |  15469.0816     1  15469.0816           Prob > F      =  0.1130
+    Residual |  808262.997   133  6077.16539           R-squared     =  0.0188
+-------------+------------------------------           Adj R-squared =  0.0114
+       Total |  823732.079   134  6147.25432           Root MSE      =  77.956
+
+------------------------------------------------------------------------------
+        ship |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+          uu |    13.3115   8.343444     1.60   0.113    -3.191506    29.81451
+       _cons |   279.9148   6.709399    41.72   0.000     266.6439    293.1857
+------------------------------------------------------------------------------
+
+. *punto d
+. reg ship price extrate
+
+      Source |       SS       df       MS              Number of obs =     135
+-------------+------------------------------           F(  2,   132) =  406.37
+       Model |  708638.631     2  354319.315           Prob > F      =  0.0000
+    Residual |  115093.448   132  871.920061           R-squared     =  0.8603
+-------------+------------------------------           Adj R-squared =  0.8582
+       Total |  823732.079   134  6147.25432           Root MSE      =  29.528
+
+------------------------------------------------------------------------------
+        ship |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       price |    13.3115   3.160335     4.21   0.000     7.060047    19.56296
+     extrate |   2.088457   .0961841    21.71   0.000     1.898195    2.278718
+       _cons |   2.286088   10.10358     0.23   0.821    -17.69979    22.27197
+------------------------------------------------------------------------------
+
+. predict exp_m, xb
+
+. *punto e
+. predict residuo, r
+
+. sum residuo
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+     residuo |       135   -5.31e-08     29.3071  -44.85158   193.5348
+
+. *punto f
+. matrix list e(V)
+
+symmetric e(V)[3,3]
+              price     extrate       _cons
+  price   9.9877185
+extrate  -.16060815   .00925137
+  _cons  -1.7760208  -.76867317   102.08233
+
+. 
+. *****Ejercicio 3***********************
+. clear all
+
+. import excel "TP3.xls", sheet (Ej3) firstrow
+
+. gen uno = 1
+
+. mkmat uno X1i X2i, matrix (X)
+
+. mkmat Yi
+
+. matrix list X
+
+X[16,3]
+     uno  X1i  X2i
+ r1    1    8    4
+ r2    1   11    9
+ r3    1    6    2
+ r4    1   11    1
+ r5    1    8    9
+ r6    1    7    7
+ r7    1   10    4
+ r8    1    9    7
+ r9    1   10    2
+r10    1    7    8
+r11    1   12    3
+r12    1    9    4
+r13    1   10    2
+r14    1    9    9
+r15    1    9    1
+r16    1    8    8
+
+. matrix inversa = invsym(X'*X)
+
+. matrix list inversa
+
+symmetric inversa[3,3]
+            uno         X1i         X2i
+uno   2.7817308
+X1i  -.26153846   .02692308
+X2i  -.07307692   .00384615   .00769231
+
+. matrix XY = X'*Yi
+
+. matrix list XY
+
+XY[3,1]
+       Yi
+uno  1008
+X1i  9223
+X2i  4945
+
+. matrix b = inversa*XY /*matriz de los betas*/
+
+. matrix list b
+
+b[3,1]
+        Yi
+uno  30.45
+X1i    3.7
+X2i   -.15
+
+. reg Yi X1i X2i
+
+      Source |       SS       df       MS              Number of obs =      16
+-------------+------------------------------           F(  2,    13) =    9.93
+       Model |      572.95     2     286.475           Prob > F      =  0.0024
+    Residual |      375.05    13       28.85           R-squared     =  0.6044
+-------------+------------------------------           Adj R-squared =  0.5435
+       Total |         948    15        63.2           Root MSE      =  5.3712
+
+------------------------------------------------------------------------------
+          Yi |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         X1i |        3.7   .8813233     4.20   0.001     1.796017    5.603983
+         X2i |       -.15   .4710871    -0.32   0.755    -1.167722    .8677219
+       _cons |      30.45     8.9584     3.40   0.005     11.09655    49.80345
+------------------------------------------------------------------------------
+
+. predict residuos, r
+
+. predict Ypred, xb
+
+. matrix list e(V) /*con el "e" le pido a la ult regresion un valor (V=varianza,covar)*/
+
+symmetric e(V)[3,3]
+              X1i         X2i       _cons
+  X1i   .77673077
+  X2i   .11096154   .22192308
+_cons  -7.5453846  -2.1082692   80.252933
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP3\tp3.log
+  log type:  text
+ closed on:  23 May 2020, 14:08:10
+-----------------------------------------------------------------------------------------------------------------

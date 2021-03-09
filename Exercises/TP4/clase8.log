@@ -1,0 +1,2883 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP4\clase8.log
+  log type:  text
+ opened on:   4 Jun 2020, 12:56:05
+
+. use "Voto.dta"
+
+. gen gastosAD = gastosA*democa 
+
+. gen gastosBD = gastosB*democa
+
+. gen fortAD = fortA*democa
+
+. reg votosA gastosA gastosB fortA gastosAD gastosBD
+
+      Source |       SS       df       MS              Number of obs =     173
+-------------+------------------------------           F(  5,   167) =   49.91
+       Model |  29030.8525     5   5806.1705           Prob > F      =  0.0000
+    Residual |   19426.396   167  116.325725           R-squared     =  0.5991
+-------------+------------------------------           Adj R-squared =  0.5871
+       Total |  48457.2486   172  281.728189           Root MSE      =  10.785
+
+------------------------------------------------------------------------------
+      votosA |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     gastosA |   .0258018   .0043119     5.98   0.000      .017289    .0343145
+     gastosB |  -.0290593   .0039499    -7.36   0.000    -.0368575   -.0212612
+       fortA |   .4648106   .0935067     4.97   0.000     .2802031    .6494181
+    gastosAD |   .0194188   .0059503     3.26   0.001     .0076714    .0311663
+    gastosBD |  -.0052111    .005461    -0.95   0.341    -.0159925    .0055704
+       _cons |   25.67492   4.861902     5.28   0.000     16.07621    35.27363
+------------------------------------------------------------------------------
+
+. /* Si el distrito que quiero ver NO es democrata, miramos fortA, es decir, ante una variacion en 1 punto porcentual del ptdo A, aumentan los votos en 0.66, ceteris paribus
+> Si el distrito es democrata, entonces ante una variacion en un punto porcentual de fortaleza A, los votos cambian en fortA-fortAD.
+> 
+> Coeficientes de variacion para distritos NO democratas:     */
+. di _b[gastosA]
+.02580177
+
+. di _b[gastosB]
+-.02905932
+
+. di _b[fortA]
+.46481057
+
+. di _b[_cons] /*Mostramos la ordenada al origen
+> 
+> Coeficientes de variacion para distritos democratas: */
+25.674919
+
+. di _b[gastosA] + _b[gastosAD]
+.04522061
+
+. di _b[gastosB] + _b[gastosBD]
+-.03427039
+
+. *di _b[fortA] + _b[fortAD]
+. *di _b[_cons] + _b[democA]
+. 
+. ***Test de CHOW***
+. /*Modelo General*/
+. reg votosA gastosA gastosB fortA democa
+
+      Source |       SS       df       MS              Number of obs =     173
+-------------+------------------------------           F(  4,   168) =   70.43
+       Model |  30355.2012     4  7588.80029           Prob > F      =  0.0000
+    Residual |  18102.0474   168  107.750282           R-squared     =  0.6264
+-------------+------------------------------           Adj R-squared =  0.6175
+       Total |  48457.2486   172  281.728189           Root MSE      =   10.38
+
+------------------------------------------------------------------------------
+      votosA |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     gastosA |   .0318006   .0032042     9.92   0.000      .025475    .0381263
+     gastosB |  -.0300953   .0029571   -10.18   0.000    -.0359332   -.0242574
+       fortA |   .5554211   .0921082     6.03   0.000     .3735825    .7372597
+      democa |   9.382202   1.840633     5.10   0.000     5.748452    13.01595
+       _cons |   16.96447   5.217739     3.25   0.001     6.663686    27.26525
+------------------------------------------------------------------------------
+
+. ovtest /* Es para ver NO-linealidades principalmente, porque te eleva el modelo al square y ^3 para ver si son mejores, en este caso no nos sirve mucho */
+
+Ramsey RESET test using powers of the fitted values of votosA
+       Ho:  model has no omitted variables
+                 F(3, 165) =     15.80
+                  Prob > F =      0.0000
+
+. scalar SCEg = e(mss)
+
+. scalar N = e(N)
+
+. reg votosA gastosA gastosB fortA if democa == 1 /*modelo democrata*/
+
+      Source |       SS       df       MS              Number of obs =      96
+-------------+------------------------------           F(  3,    92) =   56.35
+       Model |  16236.2689     3  5412.08963           Prob > F      =  0.0000
+    Residual |  8835.68943    92  96.0401026           R-squared     =  0.6476
+-------------+------------------------------           Adj R-squared =  0.6361
+       Total |  25071.9583    95  263.915351           Root MSE      =     9.8
+
+------------------------------------------------------------------------------
+      votosA |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     gastosA |   .0344252   .0047652     7.22   0.000     .0249611    .0438892
+     gastosB |  -.0390445   .0040398    -9.67   0.000    -.0470679   -.0310212
+       fortA |   .4895604   .1156111     4.23   0.000     .2599468     .719174
+       _cons |   30.72618   5.625731     5.46   0.000     19.55299    41.89936
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(mss)
+
+. reg votosA gastosA gastosB fortA if democa == 0 /*modelo NO democrata*/
+
+      Source |       SS       df       MS              Number of obs =      77
+-------------+------------------------------           F(  3,    73) =   34.77
+       Model |   11875.246     3  3958.41533           Prob > F      =  0.0000
+    Residual |  8310.88387    73  113.847724           R-squared     =  0.5883
+-------------+------------------------------           Adj R-squared =  0.5714
+       Total |  20186.1299    76  265.606972           Root MSE      =   10.67
+
+------------------------------------------------------------------------------
+      votosA |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     gastosA |   .0261662   .0045601     5.74   0.000     .0170779    .0352544
+     gastosB |  -.0212219   .0043307    -4.90   0.000    -.0298531   -.0125908
+       fortA |   .6690255   .1460656     4.58   0.000     .3779171    .9601338
+       _cons |   9.168293   8.012232     1.14   0.256    -6.800062    25.13665
+------------------------------------------------------------------------------
+
+. scalar SCE0 = e(mss)
+
+. scalar FChow = (SCEg-SCE1-SCE0)/(SCE1+SCE0)*(N-2*(3+1)/(3+1))
+
+. di Ftail(4,(N-8), FChow) /*pvalor de Chow*/
+1.235e-09
+
+. di FChow
+13.648156
+
+. di invFtail(4, (N-8), 0.05)
+2.4264382
+
+. /*Si FChow > Ftest (invFtail) entonces rechazamos H0, para ver si las V.Dummies son significativas o no. Halternativa son significativas en forma conjunta.*/
+. 
+. reg votosA gastosA gastosB fortA democa gastosAD gastosBD fortAD
+
+      Source |       SS       df       MS              Number of obs =     173
+-------------+------------------------------           F(  7,   165) =   43.04
+       Model |  31310.6753     7  4472.95361           Prob > F      =  0.0000
+    Residual |  17146.5733   165  103.918626           R-squared     =  0.6462
+-------------+------------------------------           Adj R-squared =  0.6311
+       Total |  48457.2486   172  281.728189           Root MSE      =  10.194
+
+------------------------------------------------------------------------------
+      votosA |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     gastosA |   .0261662   .0043567     6.01   0.000     .0175641    .0347682
+     gastosB |  -.0212219   .0041376    -5.13   0.000    -.0293914   -.0130525
+       fortA |   .6690255   .1395509     4.79   0.000     .3934899    .9445611
+      democa |   21.55788   9.635466     2.24   0.027     2.533177    40.58259
+    gastosAD |    .008259   .0065993     1.25   0.213    -.0047709    .0212889
+    gastosBD |  -.0178226   .0058973    -3.02   0.003    -.0294665   -.0061787
+      fortAD |  -.1794651   .1842195    -0.97   0.331    -.5431964    .1842663
+       _cons |   9.168293   7.654874     1.20   0.233    -5.945839    24.28243
+------------------------------------------------------------------------------
+
+. test democa gastosAD gastosBD fortAD, mtest /*
+> Podemos ver que el est F de democrata es 5 (para un pvalor de 0.0266) = al 5% es significativo para rechazar la H0
+> */
+
+ ( 1)  democa = 0
+ ( 2)  gastosAD = 0
+ ( 3)  gastosBD = 0
+ ( 4)  fortAD = 0
+
+---------------------------------------
+       |   F(df,165)     df       p
+-------+-------------------------------
+  (1)  |        5.01      1     0.0266 #
+  (2)  |        1.57      1     0.2125 #
+  (3)  |        9.13      1     0.0029 #
+  (4)  |        0.95      1     0.3314 #
+-------+-------------------------------
+  all  |        9.03      4     0.0000
+---------------------------------------
+                  # unadjusted p-values
+
+. 
+. 
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial
+
+. set more off
+
+. log using "primer_parcial.log", replace
+log file already open
+r(604);
+
+end of do-file
+
+r(604);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial
+
+. set more off
+
+. log using "primer_parcial.log", replace
+log file already open
+r(604);
+
+end of do-file
+
+r(604);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial
+
+. set more off
+
+. *log using "primer_parcial.log", replace
+. *capture log close
+. use "base16.dta"
+
+. sum prpblck income, detail
+
+                  proportion black, zipcode
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%     .0021295              0
+10%     .0048807              0       Obs                 351
+25%     .0118853              0       Sum of Wgt.         351
+
+50%     .0414442                      Mean           .1098202
+                        Largest       Std. Dev.      .1755828
+75%     .1210589       .9210559
+90%     .3015262       .9210559       Variance       .0308293
+95%     .5422576       .9624618       Skewness        2.78551
+99%     .9210559       .9816579       Kurtosis        11.2913
+
+                median family income, zipcode
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%        20216          15919
+ 5%        27759          18963
+10%        31348          18963       Obs                 351
+25%        37883          20216       Sum of Wgt.         351
+
+50%        46296                      Mean           47138.99
+                        Largest       Std. Dev.      13226.21
+75%        54632          82084
+90%        63905          82797       Variance       1.75e+08
+95%        66939          83379       Skewness       1.092902
+99%        82084         136529       Kurtosis       8.308843
+
+. /*(1)Cuando pedimos un resumen de la estadistica descriptiva correspondiente a las variables prpblck (proporción de afroamericanos) y de income (ingreso familiar medio)
+> por medio de summarize, podemos apreciar los siguientes valores:
+> para prpblck una media de 0.109 y para ingreso familiar 47138.99
+> para prpblck un desvio estandar de 0.1755 y para ingreso familiar 13226.21 
+> Las unidades de prpblck, al tratarse de una proporcion, son puntos porcentuales
+> Las unidades de income son unidades monetarias (dolares estadounidenses)*/
+. 
+. reg psoda prpblck income
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   14.66
+       Model |  .212960068     2  .106480034           Prob > F      =  0.0000
+    Residual |  2.48433237   342   .00726413           R-squared     =  0.0790
+-------------+------------------------------           Adj R-squared =  0.0736
+       Total |  2.69729244   344  .007840966           Root MSE      =  .08523
+
+------------------------------------------------------------------------------
+       psoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1249472   .0286503     4.36   0.000     .0685942    .1813002
+      income |   1.81e-06   3.82e-07     4.74   0.000     1.06e-06    2.57e-06
+       _cons |   .9409066    .020073    46.87   0.000     .9014246    .9803887
+------------------------------------------------------------------------------
+
+. /*(2)Falta resultados como ecuacion.
+> Interpretacion de los coeficientes:
+> Por cada unidad que se incrementa la variable proporcion de afroamericanos, manteniendo el resto de variables constantes, el precio de la soda (la variable explicada) se incrementa en 0.125 unidades monetarias. Siendo 
+> esta una variable significativa para un nivel de significancia 1%
+> Por cada unidad que se incrementa la variable ingreso, para el resto de variales fijas, el precio de la soda se altera en 0,000181. Desde ya nominalmente no es mucho, pero sigue siendo una variable significativa para u
+> n pvalor de cero.
+> En términos económicos se puede considerar que si es grande, ya que teniendo en cuenta que el precio de la soda es de un promedio de 1.07 dolares, 0.125 unidades representaría alrededor de un 11%
+>  */
+. reg psoda prpblck
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  1,   343) =    6.41
+       Model |  .049454648     1  .049454648           Prob > F      =  0.0118
+    Residual |  2.64783779   343  .007719644           R-squared     =  0.0183
+-------------+------------------------------           Adj R-squared =  0.0155
+       Total |  2.69729244   344  .007840966           Root MSE      =  .08786
+
+------------------------------------------------------------------------------
+       psoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0678366   .0268015     2.53   0.012     .0151206    .1205525
+       _cons |   1.032596    .005592   184.65   0.000     1.021597    1.043595
+------------------------------------------------------------------------------
+
+. /*(3)Interpretacion de los coeficientes en la Regresion Simple:
+> Por cada unidad porcentual que se incrementa la variable de proporcion de afroamericanos, ceteris paribus, el precio de la soda se altera en 0.067 unidades, tratandose de una variable significativa para un nivel de sig
+> nificancia del 5%.
+> Podemos concluir que el efecto de la discriminación de precios es menor cuando no se controla el ingreso, por  ende, en la regresion anterior dodne se contempla el efecto marginal del ingreso medio familiar la discrimi
+> nacion es mayor.
+> Las variables en conjunto son más significativas que de manera independiente en una regresion simple.
+> Intuitivamente, en términos económicos, esto implica que las cadenas de fast food pueden ampliar su excedente de productor conociendo más información de la demanda (no solo su rasgo etnico, sino tambien su nivel de ing
+> reso).*/
+. 
+. reg lpsoda prpblck lincome
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   15.64
+       Model |  .208336051     2  .104168025           Prob > F      =  0.0000
+    Residual |  2.27817795   342  .006661339           R-squared     =  0.0838
+-------------+------------------------------           Adj R-squared =  0.0784
+       Total |    2.486514   344  .007228238           Root MSE      =  .08162
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1340475   .0285276     4.70   0.000     .0779358    .1901591
+     lincome |   .0880865   .0178291     4.94   0.000      .053018     .123155
+       _cons |  -.9234493   .1927491    -4.79   0.000    -1.302572   -.5443263
+------------------------------------------------------------------------------
+
+. /*(4)Interpretacion de los coeficientes en la forma funcional tipo elasticidad:
+> Por cada punto porcentual que se incrementa la proporcion de afroamericanos, para el resto constante, la variable del precio de la soda aumenta en 0.13%
+> Por cada porciento que se incrementa el ingreso, manteniendo otras variables constantes, la variable precio de la soda aumenta en 0.088%*/
+. di _b[prpblck]*0.2
+.02680949
+
+. /*Para el caso en que la proporcion de afroamericanos aumentara en 0.20 puntos porcentuales, estimariamos un cambio en el precio de la soda de 0.268*/
+. 
+. reg lpsoda prpblck lincome prppov
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  3,   341) =   13.05
+       Model |  .256125032     3  .085375011           Prob > F      =  0.0000
+    Residual |  2.23038897   341   .00654073           R-squared     =  0.1030
+-------------+------------------------------           Adj R-squared =  0.0951
+       Total |    2.486514   344  .007228238           Root MSE      =  .08087
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0828437   .0340284     2.43   0.015     .0159117    .1497757
+     lincome |   .1496881   .0288357     5.19   0.000     .0929699    .2064064
+      prppov |   .3907673   .1445664     2.70   0.007     .1064131    .6751215
+       _cons |  -1.605851   .3165671    -5.07   0.000    -2.228522   -.9831813
+------------------------------------------------------------------------------
+
+. /*(5)Cuando agregamos la variable prppov (proporcion de personas pobres) al modelo anterior, lo que vemos es una alteración en el coeficiente de proporcion de afroamericanos, en términos absolutos, alrededor de 0.0512
+> Intuitivamente esto significa que cuando se toma en cuenta el efecto parcial de la proporcoin de pobres, el efecto marginal de la proporcion de afroamericanos es menor. 
+> Las variables siguen cumpliendo con la significatividad individual en el test t, para valores de significancia de 1%.
+> */
+. 
+. corr lincome prppov
+(obs=351)
+
+             |  lincome   prppov
+-------------+------------------
+     lincome |   1.0000
+      prppov |  -0.8364   1.0000
+
+
+. corr income prppov
+(obs=351)
+
+             |   income   prppov
+-------------+------------------
+      income |   1.0000
+      prppov |  -0.7188   1.0000
+
+
+. /*(6)La correlación lineal entre la variable log(ingreso) y proporcion de pobres tiene un coeficiente de -0.8364
+> En términos relativos, es intuitivamente correcta esta relación, dado que por cada unidad que son variables que avanzan en direcciones contrarias. 
+> A medida que aumenta el ingreso, disminuye casi perfectamente (tomando el 1 como perfecto) la proporcion de pobreza. 
+> Si tomamos la correlación entre el ingreso nominal y prppov, vemos esta misma tendencia en la relación, ya que el coeficiente es -0.7188
+> En conclusión, se esperaba este tipo de resultado entre estas variables.*/
+. /*(7)Considerando los coeficientes de correlación lineal del punto anterior, podríamos comentar lo siguiente acerca de la afirmación mencionada:
+> Dado que las variables están fuertemente correlacionadas, aunque negativamente, podríamos considerar que no necesariamente resulta útil extraer alguna de la regresión.
+> En primer lugar, podemos fundamentar por medio de los resultados en las salidas de regresion, que son variables independientemente muy significativas.
+> Por otro lado, si nosotros extrayeramos alguna del modelo, vemos una reducción considerable del R^2 */
+. 
+. reg lpsoda prpblck lincome prppov lhseval
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  4,   340) =   20.96
+       Model |  .491777827     4  .122944457           Prob > F      =  0.0000
+    Residual |  1.99473617   340  .005866871           R-squared     =  0.1978
+-------------+------------------------------           Adj R-squared =  0.1883
+       Total |    2.486514   344  .007228238           Root MSE      =   .0766
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1015689    .032363     3.14   0.002     .0379119    .1652258
+     lincome |  -.0396936   .0404815    -0.98   0.328    -.1193193     .039932
+      prppov |   .0788866    .145492     0.54   0.588    -.2072912    .3650645
+     lhseval |   .1235106   .0194882     6.34   0.000      .085178    .1618432
+       _cons |  -1.015172   .3139689    -3.23   0.001    -1.632738   -.3976061
+------------------------------------------------------------------------------
+
+. /*(8)Incorporamos al modelo la variable lhseval (logaritmo del valor promedio de la vivienda en cada zona postal) y podemos inferir lo siguiente:
+> */
+. test lhseval
+
+ ( 1)  lhseval = 0
+
+       F(  1,   340) =   40.17
+            Prob > F =    0.0000
+
+. *mean lhseval
+. scalar n_k = e(df_r)    
+
+. *scalar B4 = _b[lhseval]        
+. *scalar D4 = _se[lhseval]       /*para hallar el desvio estandar*/
+. *scalar t4 = (B4-11.8)/D4       /*para hallar estadistico t*/
+. *di t4
+. di invttail(n_k, 0.025)
+1.9669657
+
+. di 1-ttail(n_k, 6.34)
+1
+
+. 
+. /* Valor-p = P(T>1.64) = (1/2)*P(T>1.64) = */
+. 
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. /*(9)Para determinar si hay discrminacion diferencial entre un estado y otro debemos mirar al modelo que incluye la variable state que posee un valor = 1 si corresponde al estado NJ(Nueva Jersey) y un valor = 2 si refi
+> ere al estado PA(Pensilvania)
+> El grupo base, teniendo en cuenta que en el resto de variables dummies se califican tambien de 1 a +, es aquella que tenga el valor = 1, por ende, el grupo de referencia es Nueva Jersey.
+> La conclusión del modelo es la sigueinte: en aquellos casos que la observación corresponda al estado Nueva Jersey posee un precio mayor, dado que si la observación es igual a 2 (Pensilvania) hay una diferencia en el in
+> tercepto de -0.0512*/
+. 
+. test state, mtest
+
+ ( 1)  state = 0
+
+---------------------------------------
+       |   F(df,339)     df       p
+-------+-------------------------------
+  (1)  |       20.38      1     0.0000 #
+-------+-------------------------------
+  all  |       20.38      1     0.0000
+---------------------------------------
+                  # unadjusted p-values
+
+. 
+. /*Modelo General*/
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. scalar SCEg = e(rss)
+
+. scalar N = e(N)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 2  /*modelo pensilvania*/
+
+      Source |       SS       df       MS              Number of obs =      70
+-------------+------------------------------           F(  4,    65) =    2.66
+       Model |  .054842767     4  .013710692           Prob > F      =  0.0402
+    Residual |  .334694022    65  .005149139           R-squared     =  0.1408
+-------------+------------------------------           Adj R-squared =  0.0879
+       Total |  .389536789    69  .005645461           Root MSE      =  .07176
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |  -.0544421   .2161608    -0.25   0.802     -.486145    .3772607
+     lincome |  -.0279496   .1229877    -0.23   0.821    -.2735729    .2176738
+      prppov |   .1637664   .2865951     0.57   0.570    -.4086036    .7361363
+     lhseval |    .123811    .081179     1.53   0.132    -.0383146    .2859366
+       _cons |  -1.174998   .7064782    -1.66   0.101    -2.585932    .2359365
+------------------------------------------------------------------------------
+
+. scalar SCE2 = e(rss)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 1 /*modelo Nueva Jersey*/
+
+      Source |       SS       df       MS              Number of obs =     275
+-------------+------------------------------           F(  4,   270) =    7.37
+       Model |  .168302361     4   .04207559           Prob > F      =  0.0000
+    Residual |  1.54082517   270   .00570676           R-squared     =  0.0985
+-------------+------------------------------           Adj R-squared =  0.0851
+       Total |  1.70912753   274  .006237692           Root MSE      =  .07554
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |    .065387   .0356676     1.83   0.068    -.0048349     .135609
+     lincome |  -.0468313   .0438445    -1.07   0.286    -.1331519    .0394893
+      prppov |    .021775   .1672236     0.13   0.896    -.3074531    .3510031
+     lhseval |   .0947406    .021208     4.47   0.000     .0529865    .1364947
+       _cons |  -.5798458   .3565387    -1.63   0.105    -1.281795    .1221038
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(rss)
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. scalar FChow = ((SCEg-(SCE2+SCE1))/(6+1))/((SCE2+SCE1)/(352-12-2))
+
+. di Ftail(4,(N-8), FChow) /*pvalor de Chow*/
+.95998065
+
+. di FChow
+.15651047
+
+. di invFtail(4, (N-8), 0.05)
+2.3984468
+
+. /*Si FChow > Ftest (invFtail) entonces rechazamos H0, para ver si las V.Dummies son significativas o no. Halternativa son significativas en forma conjunta.*/
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar n_k = e(df_r)    
+
+. scalar B4 = _b[lhseval] 
+
+. scalar D4 = _se[lhseval]        /*para hallar el desvio estandar*/
+
+. scalar t4 = (B4-11.8)/D4        /*para hallar estadistico t*/
+
+. di t4
+-551.92581
+
+. di invttail(n_k, 0.025)
+1.968789
+
+. di 1-ttail(n_k, 6.34)
+1
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. di ttail(n_k, 6.34)
+4.805e-10
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. di invttail(n_k, 0.025)
+1.968789
+
+. di ttail(n_k, t4)
+1
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar n_k = e(df_r)    
+
+. scalar B4 = _b[lhseval] 
+
+. scalar D4 = _se[lhseval]        /*para hallar el desvio estandar*/
+
+. scalar t4 = (B4)/D4     /*para hallar estadistico t*/
+
+. di t4
+4.4672045
+
+. di invttail(n_k, 0.025)
+1.968789
+
+. di ttail(n_k, t4)
+5.832e-06
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. di invttail(n_k, 0.975)
+-1.968789
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. di 1-ttail(n_k, 6.34)
+1
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. di ttail(n_k, 6.34)
+4.805e-10
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. di 1/2*ttail(n_k, 6.34)
+2.403e-10
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. di 1/2*(1-ttail(n_k, 6.34))
+.5
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. estat, vif
+subcommand expected
+r(198);
+
+end of do-file
+
+r(198);
+
+. doedit "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\6 - sexta_clase.do"
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. estat vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+     lincome |      7.64    0.130965
+      prppov |      6.34    0.157627
+     lhseval |      2.93    0.340829
+     prpblck |      2.25    0.443589
+-------------+----------------------
+    Mean VIF |      4.79
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. test state, mtest
+state not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. /*(9)Para determinar si hay discrminacion diferencial entre un estado y otro debemos mirar al modelo que incluye la variable state que posee un valor = 1 si corresponde al estado NJ(Nueva Jersey) y un valor = 2 si refi
+> ere al estado PA(Pensilvania)
+> El grupo base, teniendo en cuenta que en el resto de variables dummies se califican tambien de 1 a 4, es aquella que tenga el valor = 1, por ende, el grupo de referencia es Nueva Jersey.
+> La conclusión del modelo es la sigueinte: en aquellos casos que la observación corresponda al estado Nueva Jersey posee un precio mayor, dado que si la observación es igual a 2 (Pensilvania) hay una diferencia en el in
+> tercepto de -0.0512
+> Ese mismo número lo podemos hallar si corremos regresiones segmentadas por grupos (ver punto nro 9) y hacemos la diferencia entre los interceptos.*/
+. 
+. test state, mtest
+
+ ( 1)  state = 0
+
+---------------------------------------
+       |   F(df,339)     df       p
+-------+-------------------------------
+  (1)  |       20.38      1     0.0000 #
+-------+-------------------------------
+  all  |       20.38      1     0.0000
+---------------------------------------
+                  # unadjusted p-values
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. /*Modelo General*/
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. scalar SCEg = e(rss)
+
+. scalar N = e(N)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 2  /*modelo pensilvania*/
+
+      Source |       SS       df       MS              Number of obs =      70
+-------------+------------------------------           F(  4,    65) =    2.66
+       Model |  .054842767     4  .013710692           Prob > F      =  0.0402
+    Residual |  .334694022    65  .005149139           R-squared     =  0.1408
+-------------+------------------------------           Adj R-squared =  0.0879
+       Total |  .389536789    69  .005645461           Root MSE      =  .07176
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |  -.0544421   .2161608    -0.25   0.802     -.486145    .3772607
+     lincome |  -.0279496   .1229877    -0.23   0.821    -.2735729    .2176738
+      prppov |   .1637664   .2865951     0.57   0.570    -.4086036    .7361363
+     lhseval |    .123811    .081179     1.53   0.132    -.0383146    .2859366
+       _cons |  -1.174998   .7064782    -1.66   0.101    -2.585932    .2359365
+------------------------------------------------------------------------------
+
+. scalar SCE2 = e(rss)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 1 /*modelo Nueva Jersey*/
+
+      Source |       SS       df       MS              Number of obs =     275
+-------------+------------------------------           F(  4,   270) =    7.37
+       Model |  .168302361     4   .04207559           Prob > F      =  0.0000
+    Residual |  1.54082517   270   .00570676           R-squared     =  0.0985
+-------------+------------------------------           Adj R-squared =  0.0851
+       Total |  1.70912753   274  .006237692           Root MSE      =  .07554
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |    .065387   .0356676     1.83   0.068    -.0048349     .135609
+     lincome |  -.0468313   .0438445    -1.07   0.286    -.1331519    .0394893
+      prppov |    .021775   .1672236     0.13   0.896    -.3074531    .3510031
+     lhseval |   .0947406    .021208     4.47   0.000     .0529865    .1364947
+       _cons |  -.5798458   .3565387    -1.63   0.105    -1.281795    .1221038
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(rss)
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. scalar FChow = ((SCEg-(SCE2+SCE1))/(6+1))/((SCE2+SCE1)/(352-12-2))
+
+. di Ftail(7,352-12-2, FChow) /*pvalor de Chow*/
+.99301368
+
+. di FChow
+.15651047
+
+. di invFtail(4, (N-8), 0.05)
+2.3984468
+
+. /*Si FChow > Ftest (invFtail) entonces rechazamos H0, para ver si las V.Dummies son significativas o no. Halternativa son significativas en forma conjunta.*/
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. /*Modelo General*/
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. scalar SCEg = e(rss)
+
+. scalar N = e(N)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 2  /*modelo pensilvania*/
+
+      Source |       SS       df       MS              Number of obs =      70
+-------------+------------------------------           F(  4,    65) =    2.66
+       Model |  .054842767     4  .013710692           Prob > F      =  0.0402
+    Residual |  .334694022    65  .005149139           R-squared     =  0.1408
+-------------+------------------------------           Adj R-squared =  0.0879
+       Total |  .389536789    69  .005645461           Root MSE      =  .07176
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |  -.0544421   .2161608    -0.25   0.802     -.486145    .3772607
+     lincome |  -.0279496   .1229877    -0.23   0.821    -.2735729    .2176738
+      prppov |   .1637664   .2865951     0.57   0.570    -.4086036    .7361363
+     lhseval |    .123811    .081179     1.53   0.132    -.0383146    .2859366
+       _cons |  -1.174998   .7064782    -1.66   0.101    -2.585932    .2359365
+------------------------------------------------------------------------------
+
+. scalar SCE2 = e(rss)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 1 /*modelo Nueva Jersey*/
+
+      Source |       SS       df       MS              Number of obs =     275
+-------------+------------------------------           F(  4,   270) =    7.37
+       Model |  .168302361     4   .04207559           Prob > F      =  0.0000
+    Residual |  1.54082517   270   .00570676           R-squared     =  0.0985
+-------------+------------------------------           Adj R-squared =  0.0851
+       Total |  1.70912753   274  .006237692           Root MSE      =  .07554
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |    .065387   .0356676     1.83   0.068    -.0048349     .135609
+     lincome |  -.0468313   .0438445    -1.07   0.286    -.1331519    .0394893
+      prppov |    .021775   .1672236     0.13   0.896    -.3074531    .3510031
+     lhseval |   .0947406    .021208     4.47   0.000     .0529865    .1364947
+       _cons |  -.5798458   .3565387    -1.63   0.105    -1.281795    .1221038
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(rss)
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. scalar FChow = ((SCEg-(SCE2+SCE1))/(6+1))/((SCE2+SCE1)/(352-12-2))
+
+. di Ftail(7,352-12-2) /*pvalor de Chow*/
+invalid syntax
+r(198);
+
+end of do-file
+
+r(198);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. 
+. /*Modelo General*/
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. scalar SCEg = e(rss)
+
+. scalar N = e(N)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 2  /*modelo pensilvania*/
+
+      Source |       SS       df       MS              Number of obs =      70
+-------------+------------------------------           F(  4,    65) =    2.66
+       Model |  .054842767     4  .013710692           Prob > F      =  0.0402
+    Residual |  .334694022    65  .005149139           R-squared     =  0.1408
+-------------+------------------------------           Adj R-squared =  0.0879
+       Total |  .389536789    69  .005645461           Root MSE      =  .07176
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |  -.0544421   .2161608    -0.25   0.802     -.486145    .3772607
+     lincome |  -.0279496   .1229877    -0.23   0.821    -.2735729    .2176738
+      prppov |   .1637664   .2865951     0.57   0.570    -.4086036    .7361363
+     lhseval |    .123811    .081179     1.53   0.132    -.0383146    .2859366
+       _cons |  -1.174998   .7064782    -1.66   0.101    -2.585932    .2359365
+------------------------------------------------------------------------------
+
+. scalar SCE2 = e(rss)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 1 /*modelo Nueva Jersey*/
+
+      Source |       SS       df       MS              Number of obs =     275
+-------------+------------------------------           F(  4,   270) =    7.37
+       Model |  .168302361     4   .04207559           Prob > F      =  0.0000
+    Residual |  1.54082517   270   .00570676           R-squared     =  0.0985
+-------------+------------------------------           Adj R-squared =  0.0851
+       Total |  1.70912753   274  .006237692           Root MSE      =  .07554
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |    .065387   .0356676     1.83   0.068    -.0048349     .135609
+     lincome |  -.0468313   .0438445    -1.07   0.286    -.1331519    .0394893
+      prppov |    .021775   .1672236     0.13   0.896    -.3074531    .3510031
+     lhseval |   .0947406    .021208     4.47   0.000     .0529865    .1364947
+       _cons |  -.5798458   .3565387    -1.63   0.105    -1.281795    .1221038
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(rss)
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. scalar FChow = ((SCEg-(SCE2+SCE1))/(6+1))/((SCE2+SCE1)/(352-12-2))
+
+. di Ftail(7,352-12-2, FChow) /*pvalor de Chow*/
+.99301368
+
+. di FChow
+.15651047
+
+. di invFtail(7,352-12-2, 0.05)
+2.0367029
+
+. /*Si FChow > Ftest (invFtail) entonces rechazamos H0, para ver si las V.Dummies son significativas o no. Halternativa son significativas en forma conjunta.*/
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. /*(9)Para determinar si hay discrminacion diferencial entre un estado y otro debemos mirar al modelo que incluye la variable state que posee un valor = 1 si corresponde al estado NJ(Nueva Jersey) y un valor = 2 si refi
+> ere al estado PA(Pensilvania)
+> El grupo base, teniendo en cuenta que en el resto de variables dummies se califican tambien de 1 a 4, es aquella que tenga el valor = 1, por ende, el grupo de referencia es Nueva Jersey.
+> La conclusión del modelo es la sigueinte: en aquellos casos que la observación corresponda al estado Nueva Jersey posee un precio mayor, dado que si la observación es igual a 2 (Pensilvania) hay una diferencia en el in
+> tercepto de -0.0512
+> Ese mismo número lo podemos hallar si corremos regresiones segmentadas por grupos (ver punto nro 9) y hacemos la diferencia entre los interceptos.*/
+. 
+. test state, mtest
+
+ ( 1)  state = 0
+
+---------------------------------------
+       |   F(df,339)     df       p
+-------+-------------------------------
+  (1)  |       20.38      1     0.0000 #
+-------+-------------------------------
+  all  |       20.38      1     0.0000
+---------------------------------------
+                  # unadjusted p-values
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. 
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. /*(9)Para determinar si hay discrminacion diferencial entre un estado y otro debemos mirar al modelo que incluye la variable state que posee un valor = 1 si corresponde al estado NJ(Nueva Jersey) y un valor = 2 si refi
+> ere al estado PA(Pensilvania)
+> El grupo base, teniendo en cuenta que en el resto de variables dummies se califican tambien de 1 a 4, es aquella que tenga el valor = 1, por ende, el grupo de referencia es Nueva Jersey.
+> La conclusión del modelo es la sigueinte: en aquellos casos que la observación corresponda al estado Nueva Jersey posee un precio mayor, dado que si la observación es igual a 2 (Pensilvania) hay una diferencia en el in
+> tercepto de -0.0512
+> Ese mismo número lo podemos hallar si corremos regresiones segmentadas por grupos (ver punto nro 9) y hacemos la diferencia entre los interceptos.*/
+. 
+. test psoda state, mtest
+psoda not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. /*Modelo General*/
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. scalar SCEg = e(rss)
+
+. scalar N = e(N)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 2  /*modelo pensilvania*/
+
+      Source |       SS       df       MS              Number of obs =      70
+-------------+------------------------------           F(  4,    65) =    2.66
+       Model |  .054842767     4  .013710692           Prob > F      =  0.0402
+    Residual |  .334694022    65  .005149139           R-squared     =  0.1408
+-------------+------------------------------           Adj R-squared =  0.0879
+       Total |  .389536789    69  .005645461           Root MSE      =  .07176
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |  -.0544421   .2161608    -0.25   0.802     -.486145    .3772607
+     lincome |  -.0279496   .1229877    -0.23   0.821    -.2735729    .2176738
+      prppov |   .1637664   .2865951     0.57   0.570    -.4086036    .7361363
+     lhseval |    .123811    .081179     1.53   0.132    -.0383146    .2859366
+       _cons |  -1.174998   .7064782    -1.66   0.101    -2.585932    .2359365
+------------------------------------------------------------------------------
+
+. scalar SCE2 = e(rss)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 1 /*modelo Nueva Jersey*/
+
+      Source |       SS       df       MS              Number of obs =     275
+-------------+------------------------------           F(  4,   270) =    7.37
+       Model |  .168302361     4   .04207559           Prob > F      =  0.0000
+    Residual |  1.54082517   270   .00570676           R-squared     =  0.0985
+-------------+------------------------------           Adj R-squared =  0.0851
+       Total |  1.70912753   274  .006237692           Root MSE      =  .07554
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |    .065387   .0356676     1.83   0.068    -.0048349     .135609
+     lincome |  -.0468313   .0438445    -1.07   0.286    -.1331519    .0394893
+      prppov |    .021775   .1672236     0.13   0.896    -.3074531    .3510031
+     lhseval |   .0947406    .021208     4.47   0.000     .0529865    .1364947
+       _cons |  -.5798458   .3565387    -1.63   0.105    -1.281795    .1221038
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(rss)
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. scalar FChow = ((SCEg-(SCE2+SCE1))/(6+1))/((SCE2+SCE1)/(352-12-2))
+
+. di Ftail(7,352-12-2, FChow) /*pvalor de Chow*/
+.99301368
+
+. di FChow
+.15651047
+
+. di invFtail(7,352-12-2, FChow)
+1.5284723
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. /*Modelo General*/
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. scalar SCEg = e(rss)
+
+. scalar N = e(N)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 2  /*modelo pensilvania*/
+
+      Source |       SS       df       MS              Number of obs =      70
+-------------+------------------------------           F(  4,    65) =    2.66
+       Model |  .054842767     4  .013710692           Prob > F      =  0.0402
+    Residual |  .334694022    65  .005149139           R-squared     =  0.1408
+-------------+------------------------------           Adj R-squared =  0.0879
+       Total |  .389536789    69  .005645461           Root MSE      =  .07176
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |  -.0544421   .2161608    -0.25   0.802     -.486145    .3772607
+     lincome |  -.0279496   .1229877    -0.23   0.821    -.2735729    .2176738
+      prppov |   .1637664   .2865951     0.57   0.570    -.4086036    .7361363
+     lhseval |    .123811    .081179     1.53   0.132    -.0383146    .2859366
+       _cons |  -1.174998   .7064782    -1.66   0.101    -2.585932    .2359365
+------------------------------------------------------------------------------
+
+. scalar SCE2 = e(rss)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 1 /*modelo Nueva Jersey*/
+
+      Source |       SS       df       MS              Number of obs =     275
+-------------+------------------------------           F(  4,   270) =    7.37
+       Model |  .168302361     4   .04207559           Prob > F      =  0.0000
+    Residual |  1.54082517   270   .00570676           R-squared     =  0.0985
+-------------+------------------------------           Adj R-squared =  0.0851
+       Total |  1.70912753   274  .006237692           Root MSE      =  .07554
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |    .065387   .0356676     1.83   0.068    -.0048349     .135609
+     lincome |  -.0468313   .0438445    -1.07   0.286    -.1331519    .0394893
+      prppov |    .021775   .1672236     0.13   0.896    -.3074531    .3510031
+     lhseval |   .0947406    .021208     4.47   0.000     .0529865    .1364947
+       _cons |  -.5798458   .3565387    -1.63   0.105    -1.281795    .1221038
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(rss)
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. scalar FChow = ((SCEg-(SCE2+SCE1))/(6+1))/((SCE2+SCE1)/(352-12-2))
+
+. di Ftail(7,352-12-2, FChow) /*pvalor de Chow*/
+.99301368
+
+. di FChow
+.15651047
+
+. di invFtail(7,352-12-2, 0.05)
+2.0367029
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. /*(9)Para determinar si hay discrminacion diferencial entre un estado y otro debemos mirar al modelo que incluye la variable state que posee un valor = 1 si corresponde al estado NJ(Nueva Jersey) y un valor = 2 si refi
+> ere al estado PA(Pensilvania)
+> El grupo base, teniendo en cuenta que en el resto de variables dummies se califican tambien de 1 a 4, es aquella que tenga el valor = 1, por ende, el grupo de referencia es Nueva Jersey.
+> La conclusión del modelo es la sigueinte: en aquellos casos que la observación corresponda al estado Nueva Jersey posee un precio mayor, dado que si la observación es igual a 2 (Pensilvania) hay una diferencia en el in
+> tercepto de -0.0512
+> Ese mismo número lo podemos hallar si corremos regresiones segmentadas por grupos (ver punto nro 9) y hacemos la diferencia entre los interceptos.*/
+. 
+. test state, mtest
+
+ ( 1)  state = 0
+
+---------------------------------------
+       |   F(df,339)     df       p
+-------+-------------------------------
+  (1)  |       20.38      1     0.0000 #
+-------+-------------------------------
+  all  |       20.38      1     0.0000
+---------------------------------------
+                  # unadjusted p-values
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. scalar FChow = ((SCEg-(SCE1+SCE2))/(6))/((SCE2+SCE1)/(352-12-2))
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. di FChow
+.18259555
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. test prpblck=lincome=prppov=lhseval=state
+
+ ( 1)  prpblck - lincome = 0
+ ( 2)  prpblck - prppov = 0
+ ( 3)  prpblck - lhseval = 0
+ ( 4)  prpblck - state = 0
+
+       F(  4,   339) =   26.63
+            Prob > F =    0.0000
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. test state,mtest
+
+ ( 1)  state = 0
+
+---------------------------------------
+       |   F(df,339)     df       p
+-------+-------------------------------
+  (1)  |       20.38      1     0.0000 #
+-------+-------------------------------
+  all  |       20.38      1     0.0000
+---------------------------------------
+                  # unadjusted p-values
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. /*(9)Para determinar si hay discrminacion diferencial entre un estado y otro debemos mirar al modelo que incluye la variable state que posee un valor = 1 si corresponde al estado NJ(Nueva Jersey) y un valor = 2 si refi
+> ere al estado PA(Pensilvania)
+> El grupo base, teniendo en cuenta que en el resto de variables dummies se califican tambien de 1 a 4, es aquella que tenga el valor = 1, por ende, el grupo de referencia es Nueva Jersey.
+> La conclusión del modelo es la sigueinte: en aquellos casos que la observación corresponda al estado Nueva Jersey posee un precio mayor, dado que si la observación es igual a 2 (Pensilvania) hay una diferencia en el in
+> tercepto de -0.0512
+> Ese mismo número lo podemos hallar si corremos regresiones segmentadas por grupos (ver punto nro 9) y hacemos la diferencia entre los interceptos.*/
+. 
+. test prpblck state, mtest
+
+ ( 1)  prpblck = 0
+ ( 2)  state = 0
+
+---------------------------------------
+       |   F(df,339)     df       p
+-------+-------------------------------
+  (1)  |        4.50      1     0.0346 #
+  (2)  |       20.38      1     0.0000 #
+-------+-------------------------------
+  all  |       15.40      2     0.0000
+---------------------------------------
+                  # unadjusted p-values
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial
+
+. set more off
+
+. *log using "primer_parcial.log", replace
+. *capture log close
+. use "base16.dta"
+
+. sum prpblck income, detail
+
+                  proportion black, zipcode
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%     .0021295              0
+10%     .0048807              0       Obs                 351
+25%     .0118853              0       Sum of Wgt.         351
+
+50%     .0414442                      Mean           .1098202
+                        Largest       Std. Dev.      .1755828
+75%     .1210589       .9210559
+90%     .3015262       .9210559       Variance       .0308293
+95%     .5422576       .9624618       Skewness        2.78551
+99%     .9210559       .9816579       Kurtosis        11.2913
+
+                median family income, zipcode
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%        20216          15919
+ 5%        27759          18963
+10%        31348          18963       Obs                 351
+25%        37883          20216       Sum of Wgt.         351
+
+50%        46296                      Mean           47138.99
+                        Largest       Std. Dev.      13226.21
+75%        54632          82084
+90%        63905          82797       Variance       1.75e+08
+95%        66939          83379       Skewness       1.092902
+99%        82084         136529       Kurtosis       8.308843
+
+. /*(1)Cuando pedimos un resumen de la estadistica descriptiva correspondiente a las variables prpblck (proporción de afroamericanos) y de income (ingreso familiar medio)
+> por medio de summarize, podemos apreciar los siguientes valores:
+> para prpblck una media de 0.109 y para ingreso familiar 47138.99
+> para prpblck un desvio estandar de 0.1755 y para ingreso familiar 13226.21 
+> Las unidades de prpblck, al tratarse de una proporcion, son puntos porcentuales
+> Las unidades de income son unidades monetarias (dolares estadounidenses)*/
+. 
+. reg psoda prpblck income
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   14.66
+       Model |  .212960068     2  .106480034           Prob > F      =  0.0000
+    Residual |  2.48433237   342   .00726413           R-squared     =  0.0790
+-------------+------------------------------           Adj R-squared =  0.0736
+       Total |  2.69729244   344  .007840966           Root MSE      =  .08523
+
+------------------------------------------------------------------------------
+       psoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1249472   .0286503     4.36   0.000     .0685942    .1813002
+      income |   1.81e-06   3.82e-07     4.74   0.000     1.06e-06    2.57e-06
+       _cons |   .9409066    .020073    46.87   0.000     .9014246    .9803887
+------------------------------------------------------------------------------
+
+. /*(2)Falta resultados como ecuacion.
+> Interpretacion de los coeficientes:
+> Por cada unidad que se incrementa la variable proporcion de afroamericanos, manteniendo el resto de variables constantes, el precio de la soda (la variable explicada) se incrementa en 0.125 unidades monetarias. Siendo 
+> esta una variable significativa para un nivel de significancia 1%
+> Por cada unidad que se incrementa la variable ingreso, para el resto de variales fijas, el precio de la soda se altera en 0,000181. Desde ya nominalmente no es mucho, pero sigue siendo una variable significativa para u
+> n pvalor de cero.
+> En términos económicos se puede considerar que si es grande, ya que teniendo en cuenta que el precio de la soda es de un promedio de 1.07 dolares, 0.125 unidades representaría alrededor de un 11%
+>  */
+. reg psoda prpblck
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  1,   343) =    6.41
+       Model |  .049454648     1  .049454648           Prob > F      =  0.0118
+    Residual |  2.64783779   343  .007719644           R-squared     =  0.0183
+-------------+------------------------------           Adj R-squared =  0.0155
+       Total |  2.69729244   344  .007840966           Root MSE      =  .08786
+
+------------------------------------------------------------------------------
+       psoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0678366   .0268015     2.53   0.012     .0151206    .1205525
+       _cons |   1.032596    .005592   184.65   0.000     1.021597    1.043595
+------------------------------------------------------------------------------
+
+. /*(3)Interpretacion de los coeficientes en la Regresion Simple:
+> Por cada unidad porcentual que se incrementa la variable de proporcion de afroamericanos, ceteris paribus, el precio de la soda se altera en 0.067 unidades, tratandose de una variable significativa para un nivel de sig
+> nificancia del 5%.
+> Podemos concluir que el efecto de la discriminación de precios es menor cuando no se controla el ingreso, por  ende, en la regresion anterior dodne se contempla el efecto marginal del ingreso medio familiar la discrimi
+> nacion es mayor.
+> Las variables en conjunto son más significativas que de manera independiente en una regresion simple.
+> Intuitivamente, en términos económicos, esto implica que las cadenas de fast food pueden ampliar su excedente de productor conociendo más información de la demanda (no solo su rasgo etnico, sino tambien su nivel de ing
+> reso).*/
+. 
+. reg lpsoda prpblck lincome
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   15.64
+       Model |  .208336051     2  .104168025           Prob > F      =  0.0000
+    Residual |  2.27817795   342  .006661339           R-squared     =  0.0838
+-------------+------------------------------           Adj R-squared =  0.0784
+       Total |    2.486514   344  .007228238           Root MSE      =  .08162
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1340475   .0285276     4.70   0.000     .0779358    .1901591
+     lincome |   .0880865   .0178291     4.94   0.000      .053018     .123155
+       _cons |  -.9234493   .1927491    -4.79   0.000    -1.302572   -.5443263
+------------------------------------------------------------------------------
+
+. /*(4)Interpretacion de los coeficientes en la forma funcional tipo elasticidad:
+> Por cada punto porcentual que se incrementa la proporcion de afroamericanos, para el resto constante, la variable del precio de la soda aumenta en 0.13%
+> Por cada 1% que se incrementa el ingreso, manteniendo las otras variables constantes, la variable precio de la soda aumenta en 0.088%*/
+. di _b[prpblck]*0.2
+.02680949
+
+. /*Para el caso en que la proporcion de afroamericanos aumentara en 0.20 puntos porcentuales, estimariamos un cambio en el precio de la soda de 0.268*/
+. 
+. reg lpsoda prpblck lincome prppov
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  3,   341) =   13.05
+       Model |  .256125032     3  .085375011           Prob > F      =  0.0000
+    Residual |  2.23038897   341   .00654073           R-squared     =  0.1030
+-------------+------------------------------           Adj R-squared =  0.0951
+       Total |    2.486514   344  .007228238           Root MSE      =  .08087
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0828437   .0340284     2.43   0.015     .0159117    .1497757
+     lincome |   .1496881   .0288357     5.19   0.000     .0929699    .2064064
+      prppov |   .3907673   .1445664     2.70   0.007     .1064131    .6751215
+       _cons |  -1.605851   .3165671    -5.07   0.000    -2.228522   -.9831813
+------------------------------------------------------------------------------
+
+. /*(5)Cuando agregamos la variable prppov (proporcion de personas pobres) al modelo anterior, lo que vemos es una alteración en el coeficiente de proporcion de afroamericanos, en términos absolutos, alrededor de 0.0512
+> Intuitivamente esto significa que cuando se toma en cuenta el efecto parcial de la proporcoin de pobres, el efecto marginal de la proporcion de afroamericanos es menor. 
+> Las variables siguen cumpliendo con la significatividad individual en el test t, para valores de significancia de 1%.
+> */
+. 
+. corr lincome prppov
+(obs=351)
+
+             |  lincome   prppov
+-------------+------------------
+     lincome |   1.0000
+      prppov |  -0.8364   1.0000
+
+
+. corr income prppov
+(obs=351)
+
+             |   income   prppov
+-------------+------------------
+      income |   1.0000
+      prppov |  -0.7188   1.0000
+
+
+. /*(6)La correlación lineal entre la variable log(ingreso) y proporcion de pobres tiene un coeficiente de -0.8364
+> En términos relativos, es intuitivamente correcta esta relación, dado que por cada unidad que son variables que avanzan en direcciones contrarias. 
+> A medida que aumenta el ingreso, disminuye casi perfectamente (tomando el 1 como perfecto) la proporcion de pobreza. 
+> Si tomamos la correlación entre el ingreso nominal y prppov, vemos esta misma tendencia en la relación, ya que el coeficiente es -0.7188
+> En conclusión, se esperaba este tipo de resultado entre estas variables.*/
+. /*(7)Considerando los coeficientes de correlación lineal del punto anterior, podríamos comentar lo siguiente acerca de la afirmación mencionada:
+> Dado que las variables están fuertemente correlacionadas, aunque negativamente, podríamos considerar que no necesariamente resulta útil extraer alguna de estas de la regresión.
+> En primer lugar, podemos fundamentar por medio de los resultados en las salidas de la regresion multiple, que son variables independientemente muy significativas.
+> Por otro lado, si nosotros extrayeramos alguna del modelo, vemos una reducción considerable del R^2 */
+. estat vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+      prppov |      4.88    0.204809
+     lincome |      3.50    0.285899
+     prpblck |      1.90    0.525610
+-------------+----------------------
+    Mean VIF |      3.43
+
+. /*Corriendo el comando para obtener el Factor Inflacionario de Varianza (VIF) podemos observar que si bien el de ingreso y prop pobreza son elevados respecto los otros, 
+> aun así siguen debajo del valor problemático 10, ya que matematicamente nos generaría una tolerancia menor a 0.10, lo que ahí sí puede implicar tener que remover o juntar las variables, dependiendo cada modelo.*/
+. 
+. reg lpsoda prpblck lincome prppov lhseval
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  4,   340) =   20.96
+       Model |  .491777827     4  .122944457           Prob > F      =  0.0000
+    Residual |  1.99473617   340  .005866871           R-squared     =  0.1978
+-------------+------------------------------           Adj R-squared =  0.1883
+       Total |    2.486514   344  .007228238           Root MSE      =   .0766
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1015689    .032363     3.14   0.002     .0379119    .1652258
+     lincome |  -.0396936   .0404815    -0.98   0.328    -.1193193     .039932
+      prppov |   .0788866    .145492     0.54   0.588    -.2072912    .3650645
+     lhseval |   .1235106   .0194882     6.34   0.000      .085178    .1618432
+       _cons |  -1.015172   .3139689    -3.23   0.001    -1.632738   -.3976061
+------------------------------------------------------------------------------
+
+. /*(8)Incorporamos al modelo la variable lhseval (logaritmo del valor promedio de la vivienda en cada zona postal) y podemos inferir lo siguiente:
+> Por cada incremento en uno porciento de dicho valor promedio de vivienda, manteniendo el resto de variables constantes, el precio de la soda se incrementa en 0.12 porciento. Siendo esta una variable significativa, a pa
+> rtir un test t con pvalor de 0.
+> Asimismo, podemos ver que algunos coeficientes se ven alterados con la incorporación de esta última variable, proporción de personas afroamericanas se incrementa, el coeficiente de ingreso disminuye y la proporcion de 
+> pobres disminuye.
+> Si presentaramos su valor p-valor a dos colas:*/
+. scalar n_k = e(df_r)    /*Obtenemos los grados de libertad*/
+
+. di invttail(n_k, 0.975) /*Delimitamos los valores para el area de rechazo*/
+-1.9669657
+
+. di invttail(n_k, 0.025) /* Valor-p = P(T>1.96) = (1/2)*P(T>1.96)*/
+1.9669657
+
+. di 1/2*(1-ttail(n_k, 6.34))
+.5
+
+. 
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. /*(9)Para determinar si hay discrminacion diferencial entre un estado y otro debemos mirar al modelo que incluye la variable state que posee un valor = 1 si corresponde al estado NJ(Nueva Jersey) y un valor = 2 si refi
+> ere al estado PA(Pensilvania)
+> El grupo base, teniendo en cuenta que en el resto de variables dummies se califican tambien de 1 a 4, es aquella que tenga el valor = 1, por ende, el grupo de referencia es Nueva Jersey.
+> La conclusión del modelo es la sigueinte: en aquellos casos que la observación corresponda al estado Nueva Jersey posee un precio mayor, dado que si la observación es igual a 2 (Pensilvania) hay una diferencia en el in
+> tercepto de -0.0512
+> Ese mismo número lo podemos hallar si corremos regresiones segmentadas por grupos (ver punto nro 9) y hacemos la diferencia entre los interceptos.*/
+. 
+. 
+. reg lpsoda prpblck lincome prppov lhseval state         /*Modelo General*/
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. scalar SCEg = e(rss)
+
+. scalar N = e(N)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 2  /*Modelo Pensilvania*/
+
+      Source |       SS       df       MS              Number of obs =      70
+-------------+------------------------------           F(  4,    65) =    2.66
+       Model |  .054842767     4  .013710692           Prob > F      =  0.0402
+    Residual |  .334694022    65  .005149139           R-squared     =  0.1408
+-------------+------------------------------           Adj R-squared =  0.0879
+       Total |  .389536789    69  .005645461           Root MSE      =  .07176
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |  -.0544421   .2161608    -0.25   0.802     -.486145    .3772607
+     lincome |  -.0279496   .1229877    -0.23   0.821    -.2735729    .2176738
+      prppov |   .1637664   .2865951     0.57   0.570    -.4086036    .7361363
+     lhseval |    .123811    .081179     1.53   0.132    -.0383146    .2859366
+       _cons |  -1.174998   .7064782    -1.66   0.101    -2.585932    .2359365
+------------------------------------------------------------------------------
+
+. scalar SCE2 = e(rss)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 1 /*Modelo Nueva Jersey*/
+
+      Source |       SS       df       MS              Number of obs =     275
+-------------+------------------------------           F(  4,   270) =    7.37
+       Model |  .168302361     4   .04207559           Prob > F      =  0.0000
+    Residual |  1.54082517   270   .00570676           R-squared     =  0.0985
+-------------+------------------------------           Adj R-squared =  0.0851
+       Total |  1.70912753   274  .006237692           Root MSE      =  .07554
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |    .065387   .0356676     1.83   0.068    -.0048349     .135609
+     lincome |  -.0468313   .0438445    -1.07   0.286    -.1331519    .0394893
+      prppov |    .021775   .1672236     0.13   0.896    -.3074531    .3510031
+     lhseval |   .0947406    .021208     4.47   0.000     .0529865    .1364947
+       _cons |  -.5798458   .3565387    -1.63   0.105    -1.281795    .1221038
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(rss)
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. scalar FChow = ((SCEg-(SCE1+SCE2))/(6+1))/((SCE2+SCE1)/(352-12-2))
+
+. di Ftail(7,352-12-2, FChow) /*pvalor de Chow*/
+.99301368
+
+. di FChow
+.15651047
+
+. di invFtail(7,352-12-2, 0.05)
+2.0367029
+
+. /*Si FChow > Ftest (invFtail) entonces rechazamos H0, para ver si las V.Dummies son significativas o no
+> En este sentido, teniendo en cuenta que NO podemos rechazar la H0, a priori debemos inferir que no hay diferencias entre los grupos según cada estado y el precio de la soda se explica de igual manera.
+> Sin embargo, cuando miramos los coeficientes prpblck en las regresiones if state==2 o if state==1, vemos que el único que cambia de signo es el de la proporcion de personas afroamericanas, indicandonos que 
+> si la observación pertenece a Nueva Jersey, el precio de la soda, manteniendo el resto de variables constantes e incrementando un punto porcentual prpblck, el precio se incrementa en .06, mientras que para el modelo de
+>  Pensilvania el coeficiente es negativo.
+> Para terminar de sustentar esto, si corremos un mtest para la variable dummy, no podemos rechazar la H0 de que es insignificativa.*/
+. test state, mtest
+state not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg lpsoda prpblck lincome
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   15.64
+       Model |  .208336051     2  .104168025           Prob > F      =  0.0000
+    Residual |  2.27817795   342  .006661339           R-squared     =  0.0838
+-------------+------------------------------           Adj R-squared =  0.0784
+       Total |    2.486514   344  .007228238           Root MSE      =  .08162
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1340475   .0285276     4.70   0.000     .0779358    .1901591
+     lincome |   .0880865   .0178291     4.94   0.000      .053018     .123155
+       _cons |  -.9234493   .1927491    -4.79   0.000    -1.302572   -.5443263
+------------------------------------------------------------------------------
+
+. /*(4)Interpretacion de los coeficientes en la forma funcional log-log (tipo elasticidad):
+> Por cada punto porcentual que se incrementa la proporcion de afroamericanos, para el resto constante, la variable del precio de la soda aumenta en 0.13%
+> Por cada 1% que se incrementa el ingreso, manteniendo las otras variables constantes, la variable precio de la soda aumenta en 0.088%*/
+. di _b[prpblck]*0.2
+.02680949
+
+. mfx compute, at(prpblck=0)
+
+warning: no value assigned in at() for variables lincome;
+   means used for lincome
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  .02084446
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+ prpblck |   .1340475      .02853    4.70   0.000   .078134  .189961         0
+ lincome |   .0880865      .01783    4.94   0.000   .053142  .123031   10.7201
+------------------------------------------------------------------------------
+
+. mfx compute, at(prpblck=0.2)
+
+warning: no value assigned in at() for variables lincome;
+   means used for lincome
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  .04765395
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+ prpblck |   .1340475      .02853    4.70   0.000   .078134  .189961        .2
+ lincome |   .0880865      .01783    4.94   0.000   .053142  .123031   10.7201
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg lpsoda prpblck lincome
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   15.64
+       Model |  .208336051     2  .104168025           Prob > F      =  0.0000
+    Residual |  2.27817795   342  .006661339           R-squared     =  0.0838
+-------------+------------------------------           Adj R-squared =  0.0784
+       Total |    2.486514   344  .007228238           Root MSE      =  .08162
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1340475   .0285276     4.70   0.000     .0779358    .1901591
+     lincome |   .0880865   .0178291     4.94   0.000      .053018     .123155
+       _cons |  -.9234493   .1927491    -4.79   0.000    -1.302572   -.5443263
+------------------------------------------------------------------------------
+
+. /*(4)Interpretacion de los coeficientes en la forma funcional log-log (tipo elasticidad):
+> Por cada punto porcentual que se incrementa la proporcion de afroamericanos, para el resto constante, la variable del precio de la soda aumenta en 0.13%
+> Por cada 1% que se incrementa el ingreso, manteniendo las otras variables constantes, la variable precio de la soda aumenta en 0.088%*/
+. di _b[prpblck]*0.2
+.02680949
+
+. /*Para el caso en que la proporcion de afroamericanos aumentara en 0.20 puntos porcentuales, estimariamos un cambio en el precio de la soda de 0.268
+> Esta diferencia podemos hallarla si predecimos los efectos marginales para la proporcion en cero y la proporcion en 0.20 puntos porcentuales*/
+. mfx compute, at(prpblck=0)
+
+warning: no value assigned in at() for variables lincome;
+   means used for lincome
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  .02084446
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+ prpblck |   .1340475      .02853    4.70   0.000   .078134  .189961         0
+ lincome |   .0880865      .01783    4.94   0.000   .053142  .123031   10.7201
+------------------------------------------------------------------------------
+
+. mfx compute, at(prpblck=0.2)
+
+warning: no value assigned in at() for variables lincome;
+   means used for lincome
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  .04765395
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+ prpblck |   .1340475      .02853    4.70   0.000   .078134  .189961        .2
+ lincome |   .0880865      .01783    4.94   0.000   .053142  .123031   10.7201
+------------------------------------------------------------------------------
+
+. di 0.04765395-0.02084446
+.02680949
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg lpsoda prpblck lincome
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   15.64
+       Model |  .208336051     2  .104168025           Prob > F      =  0.0000
+    Residual |  2.27817795   342  .006661339           R-squared     =  0.0838
+-------------+------------------------------           Adj R-squared =  0.0784
+       Total |    2.486514   344  .007228238           Root MSE      =  .08162
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1340475   .0285276     4.70   0.000     .0779358    .1901591
+     lincome |   .0880865   .0178291     4.94   0.000      .053018     .123155
+       _cons |  -.9234493   .1927491    -4.79   0.000    -1.302572   -.5443263
+------------------------------------------------------------------------------
+
+. /*(4)Interpretacion de los coeficientes en la forma funcional log-log (tipo elasticidad):
+> Por cada punto porcentual que se incrementa la proporcion de afroamericanos, para el resto constante, la variable del precio de la soda aumenta en 0.13%
+> Por cada 1% que se incrementa el ingreso, manteniendo las otras variables constantes, la variable precio de la soda aumenta en 0.088%*/
+. di _b[prpblck]*0.2
+.02680949
+
+. /*Para el caso en que la proporcion de afroamericanos aumentara en 0.20 puntos porcentuales, estimariamos un cambio en el precio de la soda de 0.268
+> Esta diferencia podemos hallarla si predecimos los efectos marginales para la proporcion en cero y la proporcion en 0.20 puntos porcentuales*/
+. margins, at(prpblck=0)
+
+Predictive margins                                Number of obs   =        345
+Model VCE    : OLS
+
+Expression   : Linear prediction, predict()
+at           : prpblck         =           0
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       _cons |   .0208445   .0054209     3.85   0.000     .0102197    .0314692
+------------------------------------------------------------------------------
+
+. margins, at(prpblck=0.2)
+
+Predictive margins                                Number of obs   =        345
+Model VCE    : OLS
+
+Expression   : Linear prediction, predict()
+at           : prpblck         =          .2
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       _cons |    .047654   .0050709     9.40   0.000     .0377152    .0575927
+------------------------------------------------------------------------------
+
+. marginsplot, recast(line) noci name(nointeraction, replace)
+
+  Variables that uniquely identify margins:
+
+. di 0.04765395-0.02084446 /*Corroboramos que es igual*/
+.02680949
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. /*Bonus Track: Margins visualizing a quadratic term*/
+. regress lpsoda c.prpblck##c.prpblck /* c(variable continua), #interaccion*/
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =    3.21
+       Model |  .045748346     2  .022874173           Prob > F      =  0.0418
+    Residual |  2.44076565   342  .007136742           R-squared     =  0.0184
+-------------+------------------------------           Adj R-squared =  0.0127
+       Total |    2.486514   344  .007228238           Root MSE      =  .08448
+
+-------------------------------------------------------------------------------------
+             lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+--------------------+----------------------------------------------------------------
+            prpblck |   .0624727   .0703141     0.89   0.375    -.0758299    .2007753
+                    |
+c.prpblck#c.prpblck |   .0038981   .0922881     0.04   0.966    -.1776256    .1854219
+                    |
+              _cons |   .0286396   .0062892     4.55   0.000     .0162693      .04101
+-------------------------------------------------------------------------------------
+
+. margins, at(prpblck(0.20 0.40)) /*vsquish es para que ajuste mas los espacios blancos sin ocupar tanto lugar*/
+(0.20) invalid statistic
+r(198);
+
+end of do-file
+
+r(198);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg psoda prpblck income
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   14.66
+       Model |  .212960068     2  .106480034           Prob > F      =  0.0000
+    Residual |  2.48433237   342   .00726413           R-squared     =  0.0790
+-------------+------------------------------           Adj R-squared =  0.0736
+       Total |  2.69729244   344  .007840966           Root MSE      =  .08523
+
+------------------------------------------------------------------------------
+       psoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1249472   .0286503     4.36   0.000     .0685942    .1813002
+      income |   1.81e-06   3.82e-07     4.74   0.000     1.06e-06    2.57e-06
+       _cons |   .9409066    .020073    46.87   0.000     .9014246    .9803887
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. pcorr lincome prppov
+too few variables specified
+r(102);
+
+end of do-file
+
+r(102);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial
+
+. set more off
+
+. *log using "primer_parcial.log", replace
+. *capture log close
+. use "base16.dta"
+
+. sum prpblck income, detail
+
+                  proportion black, zipcode
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%     .0021295              0
+10%     .0048807              0       Obs                 351
+25%     .0118853              0       Sum of Wgt.         351
+
+50%     .0414442                      Mean           .1098202
+                        Largest       Std. Dev.      .1755828
+75%     .1210589       .9210559
+90%     .3015262       .9210559       Variance       .0308293
+95%     .5422576       .9624618       Skewness        2.78551
+99%     .9210559       .9816579       Kurtosis        11.2913
+
+                median family income, zipcode
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%        20216          15919
+ 5%        27759          18963
+10%        31348          18963       Obs                 351
+25%        37883          20216       Sum of Wgt.         351
+
+50%        46296                      Mean           47138.99
+                        Largest       Std. Dev.      13226.21
+75%        54632          82084
+90%        63905          82797       Variance       1.75e+08
+95%        66939          83379       Skewness       1.092902
+99%        82084         136529       Kurtosis       8.308843
+
+. /*(1)Cuando pedimos un resumen de la estadistica descriptiva correspondiente a las variables prpblck (proporción de afroamericanos) y de income (ingreso familiar medio) por medio de summarize, podemos apreciar los sigu
+> ientes valores:
+> - prpblck posee una media de 0.109 y el ingreso familiar una de 47138.99
+> - prpblck tiene un desvio estandar de 0.1755 y el de ingreso familiar es de 13226.21 
+> Por otro lado, deducimos lo siguiente: 
+> Las unidades de prpblck, al tratarse de una proporcion, son puntos porcentuales.
+> Las unidades de income, siendo estos ingresos, son unidades monetarias (dólares estadounidenses específicamente)*/
+. 
+. reg psoda prpblck income
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   14.66
+       Model |  .212960068     2  .106480034           Prob > F      =  0.0000
+    Residual |  2.48433237   342   .00726413           R-squared     =  0.0790
+-------------+------------------------------           Adj R-squared =  0.0736
+       Total |  2.69729244   344  .007840966           Root MSE      =  .08523
+
+------------------------------------------------------------------------------
+       psoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1249472   .0286503     4.36   0.000     .0685942    .1813002
+      income |   1.81e-06   3.82e-07     4.74   0.000     1.06e-06    2.57e-06
+       _cons |   .9409066    .020073    46.87   0.000     .9014246    .9803887
+------------------------------------------------------------------------------
+
+. /*(2)Falta resultados como ecuacion.
+> Interpretacion de los coeficientes:
+> Por cada unidad que se incrementa la variable proporcion de afroamericanos, manteniendo el resto de variables constantes, el precio de la soda (la variable explicada) se incrementa en 0.125 unidades monetarias. Siendo 
+> esta una variable significativa, según su test t, para un nivel de significancia 1%
+> Por cada unidad que se incrementa la variable ingreso, para el resto de variales fijas, el precio de la soda se altera en 0.000181. Desde ya, si bien nominalmente no es mucho, sigue siendo una variable significativa pa
+> ra un pvalor de cero.
+> En términos económicos se puede considerar que el coeficiente sí es grande, ya que teniendo en cuenta que el precio de la soda es de un promedio de 1.07 dolares, 0.125 unidades representaría alrededor de un 11% */
+. 
+. reg psoda prpblck
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  1,   343) =    6.41
+       Model |  .049454648     1  .049454648           Prob > F      =  0.0118
+    Residual |  2.64783779   343  .007719644           R-squared     =  0.0183
+-------------+------------------------------           Adj R-squared =  0.0155
+       Total |  2.69729244   344  .007840966           Root MSE      =  .08786
+
+------------------------------------------------------------------------------
+       psoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0678366   .0268015     2.53   0.012     .0151206    .1205525
+       _cons |   1.032596    .005592   184.65   0.000     1.021597    1.043595
+------------------------------------------------------------------------------
+
+. /*(3)Interpretacion de los coeficientes en la Regresion Simple:
+> Por cada unidad porcentual que se incrementa la variable de proporcion de afroamericanos, ceteris paribus, el precio de la soda se altera en 0.067 unidades, tratandose de una variable significativa para un nivel de sig
+> nificancia del 5%, según su test t.
+> Podemos concluir que el efecto de la discriminación de precios es menor cuando no se controla el ingreso, por  ende, en la regresion anterior dodne se contempla el efecto marginal del ingreso medio familiar, la discrim
+> inacion resulta mayor.
+> Tener la variable de ingreso presente en nuestro modelo nos explica más el precio de la soda.
+> Intuitivamente, en términos económicos, esto implica que las cadenas de fast food pueden ampliar su excedente de productor conociendo más información de la demanda (no solo su rasgo etnico, sino tambien su nivel de ing
+> reso).*/
+. 
+. reg lpsoda prpblck lincome
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   15.64
+       Model |  .208336051     2  .104168025           Prob > F      =  0.0000
+    Residual |  2.27817795   342  .006661339           R-squared     =  0.0838
+-------------+------------------------------           Adj R-squared =  0.0784
+       Total |    2.486514   344  .007228238           Root MSE      =  .08162
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1340475   .0285276     4.70   0.000     .0779358    .1901591
+     lincome |   .0880865   .0178291     4.94   0.000      .053018     .123155
+       _cons |  -.9234493   .1927491    -4.79   0.000    -1.302572   -.5443263
+------------------------------------------------------------------------------
+
+. /*(4)Interpretacion de los coeficientes en la forma funcional log-log (tipo elasticidad):
+> Por cada punto porcentual que se incrementa la proporcion de afroamericanos, para el resto constante, la variable del precio de la soda aumenta en 0.13%
+> Por cada 1% que se incrementa el ingreso, manteniendo las otras variables constantes, la variable precio de la soda aumenta en 0.088%*/
+. di _b[prpblck]*0.2
+.02680949
+
+. /*Para el caso en que la proporcion de afroamericanos aumentara en 0.20 puntos porcentuales, estimariamos un cambio en el precio de la soda de 0.268
+> Esta diferencia podemos hallarla si predecimos los efectos marginales para la proporcion en cero y la proporcion en 0.20 puntos porcentuales*/
+. mfx compute, at(prpblck=0)
+
+warning: no value assigned in at() for variables lincome;
+   means used for lincome
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  .02084446
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+ prpblck |   .1340475      .02853    4.70   0.000   .078134  .189961         0
+ lincome |   .0880865      .01783    4.94   0.000   .053142  .123031   10.7201
+------------------------------------------------------------------------------
+
+. mfx compute, at(prpblck=0.2)
+
+warning: no value assigned in at() for variables lincome;
+   means used for lincome
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  .04765395
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+ prpblck |   .1340475      .02853    4.70   0.000   .078134  .189961        .2
+ lincome |   .0880865      .01783    4.94   0.000   .053142  .123031   10.7201
+------------------------------------------------------------------------------
+
+. di 0.04765395-0.02084446 /*Corroboramos que es igual*/
+.02680949
+
+. 
+. reg lpsoda prpblck lincome prppov
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  3,   341) =   13.05
+       Model |  .256125032     3  .085375011           Prob > F      =  0.0000
+    Residual |  2.23038897   341   .00654073           R-squared     =  0.1030
+-------------+------------------------------           Adj R-squared =  0.0951
+       Total |    2.486514   344  .007228238           Root MSE      =  .08087
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0828437   .0340284     2.43   0.015     .0159117    .1497757
+     lincome |   .1496881   .0288357     5.19   0.000     .0929699    .2064064
+      prppov |   .3907673   .1445664     2.70   0.007     .1064131    .6751215
+       _cons |  -1.605851   .3165671    -5.07   0.000    -2.228522   -.9831813
+------------------------------------------------------------------------------
+
+. /*(5)Cuando agregamos la variable prppov (proporcion de personas pobres) al modelo anterior, lo que vemos es una alteración en el coeficiente de proporcion de afroamericanos, en términos absolutos, alrededor de 0.0512
+> Intuitivamente esto significa que cuando se toma en cuenta el efecto parcial de la proporcoin de pobres, el efecto marginal de la proporcion de afroamericanos es relativamente menor. 
+> Las variables siguen cumpliendo con la significatividad individual en el test t, para valores de significancia de 1%. */
+. 
+. corr lincome prppov
+(obs=351)
+
+             |  lincome   prppov
+-------------+------------------
+     lincome |   1.0000
+      prppov |  -0.8364   1.0000
+
+
+. corr income prppov
+(obs=351)
+
+             |   income   prppov
+-------------+------------------
+      income |   1.0000
+      prppov |  -0.7188   1.0000
+
+
+. /*(6)La correlación lineal entre la variable log(ingreso) y proporcion de pobres tiene un coeficiente de -0.8364
+> En términos relativos, es intuitivamente acertada esta relación, dado que por cada unidad que se incrementa en el ingreso, las variables avanzan en direcciones contrarias, ya que la pobreza disminuye en 0.8364
+> A medida que aumenta el ingreso, disminuye casi perfectamente (tomando el 1 como perfecto) la proporcion de pobreza. 
+> Si tomamos la correlación entre el ingreso nominal y prppov, vemos esta misma tendencia en la relación, ya que el coeficiente es -0.7188
+> En conclusión, se esperaba este tipo de correlación negativa (tendiente a perfecta) entre estas variables.*/
+. 
+. /*(7)Considerando los coeficientes de correlación lineal del punto anterior, podríamos comentar lo siguiente acerca de la afirmación mencionada:
+> Dado que las variables están fuertemente correlacionadas, aunque negativamente, podríamos considerar que no necesariamente resulta útil extraer alguna de estas de la regresión.
+> En primer lugar, podemos fundamentar por medio de los resultados en las salidas de la regresion multiple, que son variables independientemente muy significativas.
+> Por otro lado, si nosotros extrayeramos alguna del modelo, vemos una reducción notable del R^2 */
+. estat vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+      prppov |      4.88    0.204809
+     lincome |      3.50    0.285899
+     prpblck |      1.90    0.525610
+-------------+----------------------
+    Mean VIF |      3.43
+
+. /*Corriendo el comando para obtener el Factor Inflacionario de Varianza (VIF) podemos observar que si bien el de ingreso y prop pobreza son relativamente mucho más elevados respecto los otros, 
+> aun así siguen debajo del valor problemático 10, ya que matematicamente nos generaría una tolerancia menor a 0.10, lo que ahí sí puede implicar tener que remover o juntar las variables, dependiendo cada modelo.
+> La conclusión es relativa de cada analista y depende de su objetivo o la pregunta que deba responder.*/
+. 
+. reg lpsoda prpblck lincome prppov lhseval
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  4,   340) =   20.96
+       Model |  .491777827     4  .122944457           Prob > F      =  0.0000
+    Residual |  1.99473617   340  .005866871           R-squared     =  0.1978
+-------------+------------------------------           Adj R-squared =  0.1883
+       Total |    2.486514   344  .007228238           Root MSE      =   .0766
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1015689    .032363     3.14   0.002     .0379119    .1652258
+     lincome |  -.0396936   .0404815    -0.98   0.328    -.1193193     .039932
+      prppov |   .0788866    .145492     0.54   0.588    -.2072912    .3650645
+     lhseval |   .1235106   .0194882     6.34   0.000      .085178    .1618432
+       _cons |  -1.015172   .3139689    -3.23   0.001    -1.632738   -.3976061
+------------------------------------------------------------------------------
+
+. /*(8)Incorporamos al modelo la variable lhseval (logaritmo del valor promedio de la vivienda en cada zona postal) y podemos inferir lo siguiente:
+> Por cada incremento en uno porciento de dicho valor promedio de vivienda, manteniendo el resto de variables constantes, el precio de la soda se incrementa en 0.12 porciento. Siendo esta una variable significativa, a pa
+> rtir un test t con pvalor de 0.
+> Asimismo, podemos ver que algunos coeficientes se ven alterados con la incorporación de esta última variable, proporción de personas afroamericanas se incrementa, el coeficiente de ingreso disminuye y la proporcion de 
+> pobres disminuye.
+> Si presentaramos su p-valor a dos colas:*/
+. scalar n_k = e(df_r)    /*Obtenemos los grados de libertad*/
+
+. di invttail(n_k, 0.975) /*Delimitamos los valores para el area de rechazo*/
+-1.9669657
+
+. di invttail(n_k, 0.025) /* Valor-p = P(T>1.96) = (1/2)*P(T>1.96)*/
+1.9669657
+
+. di 1/2*(1-ttail(n_k, 6.34))
+.5
+
+. 
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. /*(9)Para determinar si hay discrminacion diferencial entre un estado y otro debemos mirar al modelo que incluye la variable state que posee un valor = 1 si corresponde al estado NJ(Nueva Jersey) y un valor = 2 si refi
+> ere al estado PA(Pensilvania)
+> El grupo base, teniendo en cuenta que en el resto de variables dummies se califican tambien de 1 a 4, es aquella que tenga el valor = 1, por ende, el grupo de referencia es Nueva Jersey.
+> La conclusión del modelo es la sigueinte: en aquellos casos que la observación corresponda al estado Nueva Jersey posee un precio mayor, dado que si la observación es igual a 2 (Pensilvania) hay una diferencia en el in
+> tercepto de -0.0512
+> Ese mismo número lo podemos hallar si corremos regresiones segmentadas por grupos (ver punto nro 9) y hacemos la diferencia entre los interceptos.*/
+. 
+. reg lpsoda prpblck lincome prppov lhseval state         /*Modelo General*/
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. scalar SCEg = e(rss)
+
+. scalar N = e(N)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 2  /*Modelo Pensilvania*/
+
+      Source |       SS       df       MS              Number of obs =      70
+-------------+------------------------------           F(  4,    65) =    2.66
+       Model |  .054842767     4  .013710692           Prob > F      =  0.0402
+    Residual |  .334694022    65  .005149139           R-squared     =  0.1408
+-------------+------------------------------           Adj R-squared =  0.0879
+       Total |  .389536789    69  .005645461           Root MSE      =  .07176
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |  -.0544421   .2161608    -0.25   0.802     -.486145    .3772607
+     lincome |  -.0279496   .1229877    -0.23   0.821    -.2735729    .2176738
+      prppov |   .1637664   .2865951     0.57   0.570    -.4086036    .7361363
+     lhseval |    .123811    .081179     1.53   0.132    -.0383146    .2859366
+       _cons |  -1.174998   .7064782    -1.66   0.101    -2.585932    .2359365
+------------------------------------------------------------------------------
+
+. scalar SCE2 = e(rss)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 1 /*Modelo Nueva Jersey*/
+
+      Source |       SS       df       MS              Number of obs =     275
+-------------+------------------------------           F(  4,   270) =    7.37
+       Model |  .168302361     4   .04207559           Prob > F      =  0.0000
+    Residual |  1.54082517   270   .00570676           R-squared     =  0.0985
+-------------+------------------------------           Adj R-squared =  0.0851
+       Total |  1.70912753   274  .006237692           Root MSE      =  .07554
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |    .065387   .0356676     1.83   0.068    -.0048349     .135609
+     lincome |  -.0468313   .0438445    -1.07   0.286    -.1331519    .0394893
+      prppov |    .021775   .1672236     0.13   0.896    -.3074531    .3510031
+     lhseval |   .0947406    .021208     4.47   0.000     .0529865    .1364947
+       _cons |  -.5798458   .3565387    -1.63   0.105    -1.281795    .1221038
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(rss)
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. scalar FChow = ((SCEg-(SCE1+SCE2))/(6+1))/((SCE2+SCE1)/(352-12-2))
+
+. di Ftail(7,352-12-2, FChow) /*pvalor de Chow*/
+.99301368
+
+. di FChow
+.15651047
+
+. di invFtail(7,352-12-2, 0.05)
+2.0367029
+
+. /*Si FChow > Ftest (invFtail) entonces rechazamos H0, para ver si las V.Dummies son significativas o no
+> En este sentido, teniendo en cuenta que NO podemos rechazar la H0, a priori debemos inferir que no hay diferencias entre los grupos según cada estado y el precio de la soda se explica de igual manera.
+> Sin embargo, cuando miramos los coeficientes prpblck en las regresiones if state==2 o if state==1, vemos que el único que cambia de signo es el de la proporcion de personas afroamericanas, indicandonos que 
+> si la observación pertenece a Nueva Jersey, el precio de la soda, manteniendo el resto de variables constantes e incrementando un punto porcentual prpblck, el precio se incrementa en .06, mientras que para el modelo de
+>  Pensilvania el coeficiente es negativo.
+> Para terminar de sustentar esto, si corremos un mtest para la variable dummy, no podemos rechazar la H0 de que es insignificativa.*/
+. test state, mtest
+state not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\Examenes\Primer Parcial
+
+. set more off
+
+. *log using "primer_parcial.log", replace
+. *capture log close
+. use "base16.dta"
+
+. sum prpblck income, detail
+
+                  proportion black, zipcode
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            0              0
+ 5%     .0021295              0
+10%     .0048807              0       Obs                 351
+25%     .0118853              0       Sum of Wgt.         351
+
+50%     .0414442                      Mean           .1098202
+                        Largest       Std. Dev.      .1755828
+75%     .1210589       .9210559
+90%     .3015262       .9210559       Variance       .0308293
+95%     .5422576       .9624618       Skewness        2.78551
+99%     .9210559       .9816579       Kurtosis        11.2913
+
+                median family income, zipcode
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%        20216          15919
+ 5%        27759          18963
+10%        31348          18963       Obs                 351
+25%        37883          20216       Sum of Wgt.         351
+
+50%        46296                      Mean           47138.99
+                        Largest       Std. Dev.      13226.21
+75%        54632          82084
+90%        63905          82797       Variance       1.75e+08
+95%        66939          83379       Skewness       1.092902
+99%        82084         136529       Kurtosis       8.308843
+
+. /*(1)Cuando pedimos un resumen de la estadistica descriptiva correspondiente a las variables prpblck (proporción de afroamericanos) y de income (ingreso familiar medio) por medio de summarize, podemos apreciar los sigu
+> ientes valores:
+> - prpblck posee una media de 0.109 y el ingreso familiar una de 47138.99
+> - prpblck tiene un desvio estandar de 0.1755 y el de ingreso familiar es de 13226.21 
+> Por otro lado, deducimos lo siguiente: 
+> Las unidades de prpblck, al tratarse de una proporcion, son puntos porcentuales.
+> Las unidades de income, siendo estos ingresos, son unidades monetarias (dólares estadounidenses específicamente)*/
+. 
+. reg psoda prpblck income
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   14.66
+       Model |  .212960068     2  .106480034           Prob > F      =  0.0000
+    Residual |  2.48433237   342   .00726413           R-squared     =  0.0790
+-------------+------------------------------           Adj R-squared =  0.0736
+       Total |  2.69729244   344  .007840966           Root MSE      =  .08523
+
+------------------------------------------------------------------------------
+       psoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1249472   .0286503     4.36   0.000     .0685942    .1813002
+      income |   1.81e-06   3.82e-07     4.74   0.000     1.06e-06    2.57e-06
+       _cons |   .9409066    .020073    46.87   0.000     .9014246    .9803887
+------------------------------------------------------------------------------
+
+. /*(2)Falta resultados como ecuacion.
+> Interpretacion de los coeficientes:
+> Por cada unidad que se incrementa la variable proporcion de afroamericanos, manteniendo el resto de variables constantes, el precio de la soda (la variable explicada) se incrementa en 0.125 unidades monetarias. Siendo 
+> esta una variable significativa, según su test t, para un nivel de significancia 1%
+> Por cada unidad que se incrementa la variable ingreso, para el resto de variales fijas, el precio de la soda se altera en 0.000181. Desde ya, si bien nominalmente no es mucho, sigue siendo una variable significativa pa
+> ra un pvalor de cero.
+> En términos económicos se puede considerar que el coeficiente sí es grande, ya que teniendo en cuenta que el precio de la soda es de un promedio de 1.07 dolares, 0.125 unidades representaría alrededor de un 11% */
+. 
+. reg psoda prpblck
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  1,   343) =    6.41
+       Model |  .049454648     1  .049454648           Prob > F      =  0.0118
+    Residual |  2.64783779   343  .007719644           R-squared     =  0.0183
+-------------+------------------------------           Adj R-squared =  0.0155
+       Total |  2.69729244   344  .007840966           Root MSE      =  .08786
+
+------------------------------------------------------------------------------
+       psoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0678366   .0268015     2.53   0.012     .0151206    .1205525
+       _cons |   1.032596    .005592   184.65   0.000     1.021597    1.043595
+------------------------------------------------------------------------------
+
+. /*(3)Interpretacion de los coeficientes en la Regresion Simple:
+> Por cada unidad porcentual que se incrementa la variable de proporcion de afroamericanos, ceteris paribus, el precio de la soda se altera en 0.067 unidades, tratandose de una variable significativa para un nivel de sig
+> nificancia del 5%, según su test t.
+> Podemos concluir que el efecto de la discriminación de precios es menor cuando no se controla el ingreso, por  ende, en la regresion anterior dodne se contempla el efecto marginal del ingreso medio familiar, la discrim
+> inacion resulta mayor.
+> Tener la variable de ingreso presente en nuestro modelo nos explica más el precio de la soda.
+> Intuitivamente, en términos económicos, esto implica que las cadenas de fast food pueden ampliar su excedente de productor conociendo más información de la demanda (no solo su rasgo etnico, sino tambien su nivel de ing
+> reso).*/
+. 
+. reg lpsoda prpblck lincome
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  2,   342) =   15.64
+       Model |  .208336051     2  .104168025           Prob > F      =  0.0000
+    Residual |  2.27817795   342  .006661339           R-squared     =  0.0838
+-------------+------------------------------           Adj R-squared =  0.0784
+       Total |    2.486514   344  .007228238           Root MSE      =  .08162
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1340475   .0285276     4.70   0.000     .0779358    .1901591
+     lincome |   .0880865   .0178291     4.94   0.000      .053018     .123155
+       _cons |  -.9234493   .1927491    -4.79   0.000    -1.302572   -.5443263
+------------------------------------------------------------------------------
+
+. /*(4)Interpretacion de los coeficientes en la forma funcional log-log (tipo elasticidad):
+> Por cada punto porcentual que se incrementa la proporcion de afroamericanos, para el resto constante, la variable del precio de la soda aumenta en 0.13%
+> Por cada 1% que se incrementa el ingreso, manteniendo las otras variables constantes, la variable precio de la soda aumenta en 0.088%*/
+. di _b[prpblck]*0.2
+.02680949
+
+. /*Para el caso en que la proporcion de afroamericanos aumentara en 0.20 puntos porcentuales, estimariamos un cambio en el precio de la soda de 0.268
+> Esta diferencia podemos hallarla si predecimos los efectos marginales para la proporcion en cero y la proporcion en 0.20 puntos porcentuales*/
+. mfx compute, at(prpblck=0)
+
+warning: no value assigned in at() for variables lincome;
+   means used for lincome
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  .02084446
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+ prpblck |   .1340475      .02853    4.70   0.000   .078134  .189961         0
+ lincome |   .0880865      .01783    4.94   0.000   .053142  .123031   10.7201
+------------------------------------------------------------------------------
+
+. mfx compute, at(prpblck=0.2)
+
+warning: no value assigned in at() for variables lincome;
+   means used for lincome
+
+Marginal effects after regress
+      y  = Fitted values (predict)
+         =  .04765395
+------------------------------------------------------------------------------
+variable |      dy/dx    Std. Err.     z    P>|z|  [    95% C.I.   ]      X
+---------+--------------------------------------------------------------------
+ prpblck |   .1340475      .02853    4.70   0.000   .078134  .189961        .2
+ lincome |   .0880865      .01783    4.94   0.000   .053142  .123031   10.7201
+------------------------------------------------------------------------------
+
+. di 0.04765395-0.02084446 /*Corroboramos que es igual*/
+.02680949
+
+. 
+. reg lpsoda prpblck lincome prppov
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  3,   341) =   13.05
+       Model |  .256125032     3  .085375011           Prob > F      =  0.0000
+    Residual |  2.23038897   341   .00654073           R-squared     =  0.1030
+-------------+------------------------------           Adj R-squared =  0.0951
+       Total |    2.486514   344  .007228238           Root MSE      =  .08087
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0828437   .0340284     2.43   0.015     .0159117    .1497757
+     lincome |   .1496881   .0288357     5.19   0.000     .0929699    .2064064
+      prppov |   .3907673   .1445664     2.70   0.007     .1064131    .6751215
+       _cons |  -1.605851   .3165671    -5.07   0.000    -2.228522   -.9831813
+------------------------------------------------------------------------------
+
+. /*(5)Cuando agregamos la variable prppov (proporcion de personas pobres) al modelo anterior, lo que vemos es una alteración en el coeficiente de proporcion de afroamericanos, en términos absolutos, alrededor de 0.0512
+> Intuitivamente esto significa que cuando se toma en cuenta el efecto parcial de la proporcoin de pobres, el efecto marginal de la proporcion de afroamericanos es relativamente menor. 
+> Las variables siguen cumpliendo con la significatividad individual en el test t, para valores de significancia de 1%. */
+. 
+. corr lincome prppov
+(obs=351)
+
+             |  lincome   prppov
+-------------+------------------
+     lincome |   1.0000
+      prppov |  -0.8364   1.0000
+
+
+. corr income prppov
+(obs=351)
+
+             |   income   prppov
+-------------+------------------
+      income |   1.0000
+      prppov |  -0.7188   1.0000
+
+
+. /*(6)La correlación lineal entre la variable log(ingreso) y proporcion de pobres tiene un coeficiente de -0.8364
+> En términos relativos, es intuitivamente acertada esta relación, dado que por cada unidad que se incrementa en el ingreso, las variables avanzan en direcciones contrarias, ya que la pobreza disminuye en 0.8364
+> A medida que aumenta el ingreso, disminuye casi perfectamente (tomando el 1 como perfecto) la proporcion de pobreza. 
+> Si tomamos la correlación entre el ingreso nominal y prppov, vemos esta misma tendencia en la relación, ya que el coeficiente es -0.7188
+> En conclusión, se esperaba este tipo de correlación negativa (tendiente a perfecta) entre estas variables.*/
+. 
+. /*(7)Considerando los coeficientes de correlación lineal del punto anterior, podríamos comentar lo siguiente acerca de la afirmación mencionada:
+> Dado que las variables están fuertemente correlacionadas, aunque negativamente, podríamos considerar que no necesariamente resulta útil extraer alguna de estas de la regresión.
+> En primer lugar, podemos fundamentar por medio de los resultados en las salidas de la regresion multiple, que son variables independientemente muy significativas.
+> Por otro lado, si nosotros extrayeramos alguna del modelo, vemos una reducción notable del R^2 */
+. estat vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+      prppov |      4.88    0.204809
+     lincome |      3.50    0.285899
+     prpblck |      1.90    0.525610
+-------------+----------------------
+    Mean VIF |      3.43
+
+. /*Corriendo el comando para obtener el Factor Inflacionario de Varianza (VIF) podemos observar que si bien el de ingreso y prop pobreza son relativamente mucho más elevados respecto los otros, 
+> aun así siguen debajo del valor problemático 10, ya que matematicamente nos generaría una tolerancia menor a 0.10, lo que ahí sí puede implicar tener que remover o juntar las variables, dependiendo cada modelo.
+> La conclusión es relativa de cada analista y depende de su objetivo o la pregunta que deba responder.*/
+. 
+. reg lpsoda prpblck lincome prppov lhseval
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  4,   340) =   20.96
+       Model |  .491777827     4  .122944457           Prob > F      =  0.0000
+    Residual |  1.99473617   340  .005866871           R-squared     =  0.1978
+-------------+------------------------------           Adj R-squared =  0.1883
+       Total |    2.486514   344  .007228238           Root MSE      =   .0766
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .1015689    .032363     3.14   0.002     .0379119    .1652258
+     lincome |  -.0396936   .0404815    -0.98   0.328    -.1193193     .039932
+      prppov |   .0788866    .145492     0.54   0.588    -.2072912    .3650645
+     lhseval |   .1235106   .0194882     6.34   0.000      .085178    .1618432
+       _cons |  -1.015172   .3139689    -3.23   0.001    -1.632738   -.3976061
+------------------------------------------------------------------------------
+
+. /*(8)Incorporamos al modelo la variable lhseval (logaritmo del valor promedio de la vivienda en cada zona postal) y podemos inferir lo siguiente:
+> Por cada incremento en uno porciento de dicho valor promedio de vivienda, manteniendo el resto de variables constantes, el precio de la soda se incrementa en 0.12 porciento. Siendo esta una variable significativa, a pa
+> rtir un test t con pvalor de 0.
+> Asimismo, podemos ver que algunos coeficientes se ven alterados con la incorporación de esta última variable, proporción de personas afroamericanas se incrementa, el coeficiente de ingreso disminuye y la proporcion de 
+> pobres disminuye.
+> Si presentaramos su p-valor a dos colas:*/
+. scalar n_k = e(df_r)    /*Obtenemos los grados de libertad*/
+
+. di invttail(n_k, 0.975) /*Delimitamos los valores para el area de rechazo*/
+-1.9669657
+
+. di invttail(n_k, 0.025) /* Valor-p = P(T>1.96) = (1/2)*P(T>1.96)*/
+1.9669657
+
+. di 1/2*(1-ttail(n_k, 6.34))
+.5
+
+. 
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. /*(9)Para determinar si hay discrminacion diferencial entre un estado y otro debemos mirar al modelo que incluye la variable state que posee un valor = 1 si corresponde al estado NJ(Nueva Jersey) y un valor = 2 si refi
+> ere al estado PA(Pensilvania)
+> El grupo base, teniendo en cuenta que en el resto de variables dummies se califican tambien de 1 a 4, es aquella que tenga el valor = 1, por ende, el grupo de referencia es Nueva Jersey.
+> La conclusión del modelo es la sigueinte: en aquellos casos que la observación corresponda al estado Nueva Jersey posee un precio mayor, dado que si la observación es igual a 2 (Pensilvania) hay una diferencia en el in
+> tercepto de -0.0512
+> Ese mismo número lo podemos hallar si corremos regresiones segmentadas por grupos (ver punto nro 9) y hacemos la diferencia entre los interceptos.*/
+. 
+. reg lpsoda prpblck lincome prppov lhseval state         /*Modelo General*/
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. scalar SCEg = e(rss)
+
+. scalar N = e(N)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 2  /*Modelo Pensilvania*/
+
+      Source |       SS       df       MS              Number of obs =      70
+-------------+------------------------------           F(  4,    65) =    2.66
+       Model |  .054842767     4  .013710692           Prob > F      =  0.0402
+    Residual |  .334694022    65  .005149139           R-squared     =  0.1408
+-------------+------------------------------           Adj R-squared =  0.0879
+       Total |  .389536789    69  .005645461           Root MSE      =  .07176
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |  -.0544421   .2161608    -0.25   0.802     -.486145    .3772607
+     lincome |  -.0279496   .1229877    -0.23   0.821    -.2735729    .2176738
+      prppov |   .1637664   .2865951     0.57   0.570    -.4086036    .7361363
+     lhseval |    .123811    .081179     1.53   0.132    -.0383146    .2859366
+       _cons |  -1.174998   .7064782    -1.66   0.101    -2.585932    .2359365
+------------------------------------------------------------------------------
+
+. scalar SCE2 = e(rss)
+
+. reg lpsoda prpblck lincome prppov lhseval if state == 1 /*Modelo Nueva Jersey*/
+
+      Source |       SS       df       MS              Number of obs =     275
+-------------+------------------------------           F(  4,   270) =    7.37
+       Model |  .168302361     4   .04207559           Prob > F      =  0.0000
+    Residual |  1.54082517   270   .00570676           R-squared     =  0.0985
+-------------+------------------------------           Adj R-squared =  0.0851
+       Total |  1.70912753   274  .006237692           Root MSE      =  .07554
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |    .065387   .0356676     1.83   0.068    -.0048349     .135609
+     lincome |  -.0468313   .0438445    -1.07   0.286    -.1331519    .0394893
+      prppov |    .021775   .1672236     0.13   0.896    -.3074531    .3510031
+     lhseval |   .0947406    .021208     4.47   0.000     .0529865    .1364947
+       _cons |  -.5798458   .3565387    -1.63   0.105    -1.281795    .1221038
+------------------------------------------------------------------------------
+
+. scalar SCE1 = e(rss)
+
+. di SCE2+SCE1
+1.8755192
+
+. di SCEg
+1.8815984
+
+. scalar FChow = ((SCEg-(SCE1+SCE2))/(6+1))/((SCE2+SCE1)/(352-12-2))
+
+. di Ftail(7,352-12-2, FChow) /*pvalor de Chow*/
+.99301368
+
+. di FChow
+.15651047
+
+. di invFtail(7,352-12-2, 0.05)
+2.0367029
+
+. /*Si FChow > Ftest (invFtail) entonces rechazamos H0, para ver si las V.Dummies son significativas o no
+> En este sentido, teniendo en cuenta que NO podemos rechazar la H0, a priori debemos inferir que no hay diferencias entre los grupos según cada estado y el precio de la soda se explica de igual manera.
+> Sin embargo, cuando miramos los coeficientes prpblck en las regresiones if state==2 o if state==1, vemos que el único que cambia de signo es el de la proporcion de personas afroamericanas, indicandonos que 
+> si la observación pertenece a Nueva Jersey, el precio de la soda, manteniendo el resto de variables constantes e incrementando un punto porcentual prpblck, el precio se incrementa en .06, mientras que para el modelo de
+>  Pensilvania el coeficiente es negativo.
+> Para terminar de sustentar esto, si corremos un mtest para la variable dummy, no podemos rechazar la H0 de que es insignificativa.*/
+. reg lpsoda prpblck lincome prppov lhseval state
+
+      Source |       SS       df       MS              Number of obs =     345
+-------------+------------------------------           F(  5,   339) =   21.80
+       Model |  .604915615     5  .120983123           Prob > F      =  0.0000
+    Residual |  1.88159839   339  .005550438           R-squared     =  0.2433
+-------------+------------------------------           Adj R-squared =  0.2321
+       Total |    2.486514   344  .007228238           Root MSE      =   .0745
+
+------------------------------------------------------------------------------
+      lpsoda |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     prpblck |   .0685742   .0323154     2.12   0.035     .0050103    .1321381
+     lincome |  -.0417648   .0393773    -1.06   0.290    -.1192194    .0356898
+      prppov |   .0312234   .1419073     0.22   0.826    -.2479063    .3103531
+     lhseval |   .0976172    .019804     4.93   0.000      .058663    .1365713
+       state |  -.0512101   .0113427    -4.51   0.000     -.073521   -.0288992
+       _cons |   -.618327   .3177826    -1.95   0.053    -1.243401    .0067471
+------------------------------------------------------------------------------
+
+. test state, mtest
+
+ ( 1)  state = 0
+
+---------------------------------------
+       |   F(df,339)     df       p
+-------+-------------------------------
+  (1)  |       20.38      1     0.0000 #
+-------+-------------------------------
+  all  |       20.38      1     0.0000
+---------------------------------------
+                  # unadjusted p-values
+
+. 
+. 
+end of do-file
+
+. di -.5798458-(-1.174998)
+.5951522
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. 
+. di -.5798458-(-1.174998)
+.5951522
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. sum prpblck income, detail vsquish
+option vsquish not allowed
+r(198);
+
+end of do-file
+
+r(198);
+
+. di 1.07/0.125
+8.56
+
+. di 0.125/1.07*100
+11.682243
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. scatter income prppov
+
+. 
+end of do-file
+
+. exit, clear

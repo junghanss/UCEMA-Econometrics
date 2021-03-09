@@ -1,0 +1,143 @@
+-----------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP2\clase2.log
+  log type:  text
+ opened on:  23 May 2020, 13:26:53
+
+. ******TP 2********************
+. ******Ejercicio 1*************
+. import excel "TP2.xls", sheet(Hoja1) firstrow 
+
+. regress /*Para regresionar*/ Y X
+
+      Source |       SS       df       MS              Number of obs =      12
+-------------+------------------------------           F(  1,    10) =   11.09
+       Model |  43.5955882     1  43.5955882           Prob > F      =  0.0076
+    Residual |  39.3210784    10  3.93210784           R-squared     =  0.5258
+-------------+------------------------------           Adj R-squared =  0.4784
+       Total |  82.9166667    11  7.53787879           Root MSE      =   1.983
+
+------------------------------------------------------------------------------
+           Y |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           X |   5.661765   1.700369     3.33   0.008     1.873106    9.450424
+       _cons |    7.29902    5.47121     1.33   0.212    -4.891595    19.48963
+------------------------------------------------------------------------------
+
+. predict residuo /*de la regresion hecha, genera una variable, los residuales*/
+(option xb assumed; fitted values)
+
+. scatter residuo X /*Graficamos*/
+
+. sum X 
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+           X |        12         3.2    .3516196        2.7        3.7
+
+. scalar Mx= r(mean)
+
+. gen x_Mx = X-Mx
+
+. gen x_Mx_u = x_Mx * residuo
+
+. sum x_Mx_u
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+      x_Mx_u |        12    .6416668    8.922355  -11.29289   14.12377
+
+. scalar xMxu = r(sum)
+
+. gen x_u= X*residuo
+
+. sum x_u
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+         x_u |        12      81.975      15.288   60.98162   104.5159
+
+. scalar xu = r(sum)
+
+. display /*o di*/ xMxu
+7.7000022
+
+. di xu
+983.69996
+
+. sum residuo
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+     residuo |        12    25.41667    1.990788   22.58578   28.24755
+
+. di r(mean)
+25.416666
+
+. gen Y_u=Y*residuo
+
+. sum Y_u
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+         Y_u |        12    649.6399    112.6575   486.1912   847.4265
+
+. scalar yu = r(sum)
+
+. di yu
+7795.6788
+
+. predict Yp, xb
+
+. gen Yp_u = Yp*residuo
+
+. sum Yp_u
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+        Yp_u |        12    649.6399    101.0823   510.1177    797.924
+
+. scalar Ypu =r(sum)
+
+. di Ypu /*es mi prediccion sin considerar lo inobservable*/
+7795.6786
+
+. *Asumiendo estos supuestos:
+. *La esperanza de los residuos es 0
+. sum residuo
+
+    Variable |       Obs        Mean    Std. Dev.       Min        Max
+-------------+--------------------------------------------------------
+     residuo |        12    25.41667    1.990788   22.58578   28.24755
+
+. scalar Mu = r(mean)
+
+. scalar sumu=r(sum)
+
+. di Mu
+25.416666
+
+. di sumu
+305
+
+. *la covX y u es 0
+. di xu
+983.69996
+
+. * My=B0+B1*Mx
+. sum y
+variable y not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. clear all
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP2\clase2.log
+  log type:  text
+ closed on:  23 May 2020, 13:34:55
+-----------------------------------------------------------------------------------------------------------------
