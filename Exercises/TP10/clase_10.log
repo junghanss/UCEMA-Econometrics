@@ -1,0 +1,395 @@
+-----------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP10\clase_10.log
+  log type:  text
+ opened on:  30 Jun 2020, 14:23:39
+
+. use "omision_de_habilidad.dta"
+
+. 
+. *Y = b0+b1*x1+b2*x2+b3*x3+u
+. *Y = b0+b1*x1+b2*x2+e    : en el error "e" incluimos b3*x3 y u
+. gen w = exp(logw)
+
+. reg w edu exp
+
+      Source |       SS       df       MS              Number of obs =     934
+-------------+------------------------------           F(  2,   931) =   73.24
+       Model |  20760890.4     2  10380445.2           Prob > F      =  0.0000
+    Residual |   131946965   931  141726.064           R-squared     =  0.1360
+-------------+------------------------------           Adj R-squared =  0.1341
+       Total |   152707856   933  163674.015           Root MSE      =  376.47
+
+------------------------------------------------------------------------------
+           w |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         edu |   76.24733   6.299941    12.10   0.000      63.8836    88.61106
+         exp |   17.69126   3.166098     5.59   0.000     11.47775    23.90478
+       _cons |  -273.7226   107.3538    -2.55   0.011    -484.4061   -63.03917
+------------------------------------------------------------------------------
+
+. /*Como estamos omitiendo la habilidad, podriamos inferir que estos coeficientes estan sesgados
+> Necesitamos buscar una proxy que nos permita quitar la habilidad del termino del error y asi incluirla en la regresion 
+> Una proxy de habilidad podria ser el Coeficiente Intelectual, entonces:  
+> hab = s0 + s1*CI + v    :en este termino de error nuevo no debe haber correlacion con educacion ni experiencia (las dos var
+> iables independientes del mod original), caso contraria seguiríamos con endogeneidad*/
+. * y = b0+b1*x1+b2*x2+b3* (s0+s1*CI+v) +u
+. * y = (b0+s0*b3) + b1*x1+b2*x2+b3*s3*CI+(b3*v+u)
+. * hab = s0+s1*x1+s2*x2+s3*x3+v2
+. * y = b0+b1*x1+b2*x2+b3*(s0+s1*x1+s2*x2+s3*x3+v2)+u
+. * y = (b0+s0*b3) + (b1+b3*s1)*x1 + (b2+b3*x3)*x2 + (b3*s3)*x3 + v2 + u
+. 
+. reg w edu exp ci
+
+      Source |       SS       df       MS              Number of obs =     934
+-------------+------------------------------           F(  3,   930) =   59.93
+       Model |  24739946.6     3  8246648.86           Prob > F      =  0.0000
+    Residual |   127967909   930  137599.902           R-squared     =  0.1620
+-------------+------------------------------           Adj R-squared =  0.1593
+       Total |   152707856   933  163674.015           Root MSE      =  370.94
+
+------------------------------------------------------------------------------
+           w |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         edu |   58.14672   7.061418     8.23   0.000     44.28856    72.00488
+         exp |   17.45437    3.11998     5.59   0.000     11.33136    23.57739
+          ci |   5.062813   .9414797     5.38   0.000     3.215143    6.910484
+       _cons |  -539.9206   116.7894    -4.62   0.000    -769.1219   -310.7192
+------------------------------------------------------------------------------
+
+. /*Notamos que hubo un cambio relevante en el coeficiente de educacion, sobre el coeficiente de experiencia casi no hubo dif
+> erencias.
+> Entonces, por cada punto de coeficiente intelectual, gana 5 dolares más. 
+> Existía una relacion entre educacion y habilidad, es decir, había una endogeneidad y al incluir CI
+> suponemos teoricamente qu hemos solucionado esa relacion al incluir una proxy*/
+. 
+. *******VARIABLE INSTRUMENTAL************
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP11"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP11
+
+. use "Variable_Instrumental.dta", clear
+
+. set more off
+
+. 
+. ***Alternativa (1):
+. reg lwage educ
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  1,  1228) =  236.62
+       Model |  69.9901106     1  69.9901106           Prob > F      =  0.0000
+    Residual |  363.229151  1228  .295789211           R-squared     =  0.1616
+-------------+------------------------------           Adj R-squared =  0.1609
+       Total |  433.219262  1229  .352497365           Root MSE      =  .54387
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .1013613   .0065894    15.38   0.000     .0884336     .114289
+       _cons |   1.092319   .0872969    12.51   0.000     .9210517    1.263587
+------------------------------------------------------------------------------
+
+. reg educ motheduc /*Vemos que la educacion de la madre explica la educacion asi que puede ser un buen instrumento*/
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  1,  1228) =  315.95
+       Model |  1394.03876     1  1394.03876           Prob > F      =  0.0000
+    Residual |  5418.24091  1228   4.4122483           R-squared     =  0.2046
+-------------+------------------------------           Adj R-squared =  0.2040
+       Total |  6812.27967  1229  5.54294522           Root MSE      =  2.1005
+
+------------------------------------------------------------------------------
+        educ |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    motheduc |   .4675143   .0263019    17.77   0.000     .4159126     .519116
+       _cons |   7.343986   .3258576    22.54   0.000     6.704687    7.983285
+------------------------------------------------------------------------------
+
+. scalar a = _b[motheduc]
+
+. 
+. reg lwage motheduc
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  1,  1228) =   81.46
+       Model |   26.949034     1   26.949034           Prob > F      =  0.0000
+    Residual |  406.270228  1228  .330838948           R-squared     =  0.0622
+-------------+------------------------------           Adj R-squared =  0.0614
+       Total |  433.219262  1229  .352497365           Root MSE      =  .57519
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    motheduc |   .0650024   .0072022     9.03   0.000     .0508724    .0791324
+       _cons |   1.622205    .089229    18.18   0.000     1.447147    1.797263
+------------------------------------------------------------------------------
+
+. scalar b = _b[motheduc]
+
+. 
+. di "beta   " b/a
+beta   .13903821
+
+. 
+. ***Alternativa (2):
+. reg educ motheduc
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  1,  1228) =  315.95
+       Model |  1394.03876     1  1394.03876           Prob > F      =  0.0000
+    Residual |  5418.24091  1228   4.4122483           R-squared     =  0.2046
+-------------+------------------------------           Adj R-squared =  0.2040
+       Total |  6812.27967  1229  5.54294522           Root MSE      =  2.1005
+
+------------------------------------------------------------------------------
+        educ |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    motheduc |   .4675143   .0263019    17.77   0.000     .4159126     .519116
+       _cons |   7.343986   .3258576    22.54   0.000     6.704687    7.983285
+------------------------------------------------------------------------------
+
+. predict inst, xb /*predecimos el instrumento, que sera la prediccion lineal*/
+
+. reg lwage inst
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  1,  1228) =   81.46
+       Model |  26.9490325     1  26.9490325           Prob > F      =  0.0000
+    Residual |   406.27023  1228  .330838949           R-squared     =  0.0622
+-------------+------------------------------           Adj R-squared =  0.0614
+       Total |  433.219262  1229  .352497365           Root MSE      =  .57519
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        inst |   .1390382   .0154053     9.03   0.000     .1088145    .1692619
+       _cons |   .6011101   .2015139     2.98   0.003     .2057605    .9964597
+------------------------------------------------------------------------------
+
+. 
+. ***Alternativa (3):
+. reg lwage educ (motheduc) /*Si tuvieramos mas variables independientes, deberian ir dentro del parentesis
+> Ejemplo:        reg lwage educ (motheduc exper)         
+> 
+> Vemos que nos da lo mismo en los 3 casos:
+> con la regresion manual y mostrando el beta: 0.139
+> con la regresion sobre el instrumento, obtenemos el mismo beta: 0.139
+> con la regresion en dos etapas, automatica (con el parentesis), tambien tenemos el mismo beta   */
+
+Instrumental variables (2SLS) regression
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  1,  1228) =   88.75
+       Model |  60.3197327     1  60.3197327           Prob > F      =  0.0000
+    Residual |  372.899529  1228  .303664112           R-squared     =  0.1392
+-------------+------------------------------           Adj R-squared =  0.1385
+       Total |  433.219262  1229  .352497365           Root MSE      =  .55106
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .1390382   .0147591     9.42   0.000     .1100824     .167994
+       _cons |   .6011101   .1930605     3.11   0.002     .2223452     .979875
+------------------------------------------------------------------------------
+
+. 
+. ivregress 2sls lwage (educ= motheduc fatheduc), first
+
+First-stage regressions
+-----------------------
+
+                                                  Number of obs   =       1230
+                                                  F(   2,   1227) =     203.68
+                                                  Prob > F        =     0.0000
+                                                  R-squared       =     0.2493
+                                                  Adj R-squared   =     0.2480
+                                                  Root MSE        =     2.0416
+
+------------------------------------------------------------------------------
+        educ |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    motheduc |   .3041971   .0319266     9.53   0.000     .2415603     .366834
+    fatheduc |   .1902858   .0222839     8.54   0.000     .1465669    .2340046
+       _cons |   6.964355   .3198205    21.78   0.000     6.336899     7.59181
+------------------------------------------------------------------------------
+
+
+Instrumental variables (2SLS) regression               Number of obs =    1230
+                                                       Wald chi2(1)  =  120.01
+                                                       Prob > chi2   =  0.0000
+                                                       R-squared     =  0.1284
+                                                       Root MSE      =  .55408
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .1473058   .0134463    10.96   0.000     .1209515    .1736601
+       _cons |   .4933224   .1760157     2.80   0.005      .148338    .8383068
+------------------------------------------------------------------------------
+Instrumented:  educ
+Instruments:   motheduc fatheduc
+
+. /* Utilizamos first para que nos muestre la primer regresion
+> Cuando vemos la regresion con variables instrumentales la prueba de significancia es con chisquare
+> Vemos que el coeficiente de educacion es 0.147 porque agregamos la educacion del padre. Instrumentamos educacion con mothed
+> uc + fatheduc
+> El R^2 con variables instrumentales no es para nada relevante.   */
+. 
+. ****** HAUSMAN CONTRASTE DE ENDOGENEIDAD ******
+. *Nuestro modelo original es log salary con respecto a educacion y experiencia
+. reg educ motheduc exper /*Suponemos motheduc y exper como exogena, entonces tomamos los errores: la parte de educacion que 
+> no es exogena*/
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  2,  1227) =  680.64
+       Model |  3582.85251     2  1791.42626           Prob > F      =  0.0000
+    Residual |  3229.42716  1227  2.63196998           R-squared     =  0.5259
+-------------+------------------------------           Adj R-squared =  0.5252
+       Total |  6812.27967  1229  5.54294522           Root MSE      =  1.6223
+
+------------------------------------------------------------------------------
+        educ |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    motheduc |    .261864   .0215295    12.16   0.000     .2196254    .3041027
+       exper |  -.4544234   .0157578   -28.84   0.000    -.4853388   -.4235081
+       _cons |   14.72958    .359069    41.02   0.000     14.02512    15.43404
+------------------------------------------------------------------------------
+
+. predict v, r /*Predecimos ese error que no estara correlacionado con motheduc y exper*/
+
+. reg lwage educ exper v  /* Lo introducimos en el modelo original */
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  3,  1226) =   91.42
+       Model |   79.193493     3   26.397831           Prob > F      =  0.0000
+    Residual |  354.025769  1226  .288764901           R-squared     =  0.1828
+-------------+------------------------------           Adj R-squared =  0.1808
+       Total |  433.219262  1229  .352497365           Root MSE      =  .53737
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .2098227   .0272326     7.70   0.000      .156395    .2632504
+       exper |   .0731247   .0149391     4.89   0.000     .0438157    .1024338
+           v |   -.089172   .0288276    -3.09   0.002    -.1457289    -.032615
+       _cons |  -1.107202   .5095251    -2.17   0.030     -2.10684   -.1075643
+------------------------------------------------------------------------------
+
+. /* Si el v nos da que es significativo, significa que esta correlacionado con los errores de la regresion y que la variable
+>  educacion es ENDOGENA.
+> Rechazamos H0 y debemos corregir educacion */
+. ivregress 2sls lwage exper (educ= motheduc fatheduc)
+
+Instrumental variables (2SLS) regression               Number of obs =    1230
+                                                       Wald chi2(2)  =  122.56
+                                                       Prob > chi2   =  0.0000
+                                                       R-squared     =  0.0938
+                                                       Root MSE      =  .56497
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .2297221   .0264488     8.69   0.000     .1778833    .2815608
+       exper |   .0834308    .014644     5.70   0.000     .0547291    .1121325
+       _cons |   -1.47734   .4953573    -2.98   0.003    -2.448223   -.5064578
+------------------------------------------------------------------------------
+Instrumented:  educ
+Instruments:   exper motheduc fatheduc
+
+. estat endogenous 
+
+  Tests of endogeneity
+  Ho: variables are exogenous
+
+  Durbin (score) chi2(1)          =  17.8114  (p = 0.0000)
+  Wu-Hausman F(1,1226)            =  18.0144  (p = 0.0000)
+
+. 
+. **** CONTRASTES DE SOBREIDENTIFICACION ****
+. *Forma manual:
+. reg lwage educ exper (motheduc fatheduc exper)
+
+Instrumental variables (2SLS) regression
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  2,  1227) =   61.13
+       Model |  40.6202308     2  20.3101154           Prob > F      =  0.0000
+    Residual |  392.599031  1227  .319966611           R-squared     =  0.0938
+-------------+------------------------------           Adj R-squared =  0.0923
+       Total |  433.219262  1229  .352497365           Root MSE      =  .56566
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .2297221   .0264812     8.67   0.000     .1777687    .2816754
+       exper |   .0834308   .0146619     5.69   0.000     .0546656     .112196
+       _cons |   -1.47734   .4959625    -2.98   0.003    -2.450369   -.5043118
+------------------------------------------------------------------------------
+
+. predict u, r
+
+. reg u motheduc fatheduc
+
+      Source |       SS       df       MS              Number of obs =    1230
+-------------+------------------------------           F(  2,  1227) =    1.64
+       Model |  1.04748808     2   .52374404           Prob > F      =  0.1942
+    Residual |  391.551543  1227  .319112912           R-squared     =  0.0027
+-------------+------------------------------           Adj R-squared =  0.0010
+       Total |  392.599031  1229  .319445916           Root MSE      =   .5649
+
+------------------------------------------------------------------------------
+           u |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+    motheduc |  -.0135768   .0088339    -1.54   0.125    -.0309081    .0037545
+    fatheduc |   .0104134   .0061658     1.69   0.091    -.0016834    .0225102
+       _cons |   .0357212   .0884926     0.40   0.687    -.1378924    .2093349
+------------------------------------------------------------------------------
+
+. scalar S = e(N)*e(r2)
+
+. di "estadistico de prueba   " S
+estadistico de prueba   3.2817461
+
+. di "valor critico   " invchi2tail(1,0.05)
+valor critico   3.8414588
+
+. *Forma automatizada: 
+. ivregress 2sls lwage exper (educ=motheduc fatheduc)
+
+Instrumental variables (2SLS) regression               Number of obs =    1230
+                                                       Wald chi2(2)  =  122.56
+                                                       Prob > chi2   =  0.0000
+                                                       R-squared     =  0.0938
+                                                       Root MSE      =  .56497
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .2297221   .0264488     8.69   0.000     .1778833    .2815608
+       exper |   .0834308    .014644     5.70   0.000     .0547291    .1121325
+       _cons |   -1.47734   .4953573    -2.98   0.003    -2.448223   -.5064578
+------------------------------------------------------------------------------
+Instrumented:  educ
+Instruments:   exper motheduc fatheduc
+
+. estat overid
+
+  Tests of overidentifying restrictions:
+
+  Sargan (score) chi2(1) =  3.29432  (p = 0.0695)
+  Basmann chi2(1)        =  3.29243  (p = 0.0696)
+
+. /*Al 5 de significativad no podemos rechazar 
+> ESCUCHAR NUEVAMENTE LA CLASE 1:02
+> 
+> 
+> Las v instrumentales no solo se usan para v. omitida sino tambien para cuando tenemos errores de medida
+> */
+. 
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP10\clase_10.log
+  log type:  text
+ closed on:  30 Jun 2020, 14:23:39
+-----------------------------------------------------------------------------------------------------------------------------

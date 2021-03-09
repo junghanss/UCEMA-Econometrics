@@ -1,0 +1,1983 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9\ejercicio5_tp9.log
+  log type:  text
+ opened on:  10 Jul 2020, 14:42:29
+
+. use "WAGE1.DTA" 
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. 
+. /*Punto (A): de manera intuitiva puede esperarse existencia de heterocedasticidad porque el salario suele verse variar mucho frente
+> a */
+. 
+. *Punto (B): Tests para probar heterocedasticidad
+. predict u, r
+
+. gen u2 = u^2
+
+. scatter u2 educ
+
+. reg u2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   15.53
+       Model |  24875.0022     3  8291.66739           Prob > F      =  0.0000
+    Residual |   278734.78   522  533.974674           R-squared     =  0.0819
+-------------+------------------------------           Adj R-squared =  0.0767
+       Total |  303609.782   525  578.304347           Root MSE      =  23.108
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   1.570524   .3841997     4.09   0.000     .8157566    2.325292
+       exper |   .1104628    .090326     1.22   0.222    -.0669843      .28791
+      tenure |   .6931533   .1621544     4.27   0.000     .3745979    1.011709
+       _cons |  -15.70645   5.461164    -2.88   0.004    -26.43501   -4.977886
+------------------------------------------------------------------------------
+
+. scalar bp = e(N)*e(r2)
+
+. di "estadistico de prueba   " bp
+estadistico de prueba   43.095618
+
+. di "valor critico   " invchi2tail(e(df_r), 0.05)
+valor critico   576.25936
+
+. 
+. scalar F = (e(r2)/e(df_m) / (1-e(r2)) / e(df_r))
+
+. di F
+.00005699
+
+. di invFtail(e(df_m),e(df_r),0.05)
+2.6219805
+
+. 
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of u2
+
+         chi2(1)      =   181.58
+         Prob > chi2  =   0.0000
+
+. 
+. *Punto (C):
+. reg lwage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   80.39
+       Model |  46.8741776     3  15.6247259           Prob > F      =  0.0000
+    Residual |  101.455574   522  .194359337           R-squared     =  0.3160
+-------------+------------------------------           Adj R-squared =  0.3121
+       Total |  148.329751   525   .28253286           Root MSE      =  .44086
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .092029   .0073299    12.56   0.000     .0776292    .1064288
+       exper |   .0041211   .0017233     2.39   0.017     .0007357    .0075065
+      tenure |   .0220672   .0030936     7.13   0.000     .0159897    .0281448
+       _cons |   .2843595   .1041904     2.73   0.007     .0796756    .4890435
+------------------------------------------------------------------------------
+
+. 
+. 
+. *Punto (D):
+. gen lu2 = log(u2)
+
+. reg lu2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   27.07
+       Model |  437.433709     3  145.811236           Prob > F      =  0.0000
+    Residual |  2811.45522   522  5.38592955           R-squared     =  0.1346
+-------------+------------------------------           Adj R-squared =  0.1297
+       Total |  3248.88893   525  6.18835987           Root MSE      =  2.3208
+
+------------------------------------------------------------------------------
+         lu2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .2615854   .0385858     6.78   0.000     .1857829    .3373878
+       exper |   .0303997   .0090716     3.35   0.001     .0125784     .048221
+      tenure |   .0583824   .0162854     3.58   0.000     .0263894    .0903754
+       _cons |   -3.60703    .548473    -6.58   0.000    -4.684515   -2.529544
+------------------------------------------------------------------------------
+
+. predict g, xb
+
+. gen h = e(g)
+(526 missing values generated)
+
+. gen rh = h^(1/2)
+(526 missing values generated)
+
+. *Corregimos:
+. gen hlwage = lwage/rh
+(526 missing values generated)
+
+. gen heduc = educ/rh
+(526 missing values generated)
+
+. gen hexper = exper/rh
+(526 missing values generated)
+
+. gen htenure = tenure/rh
+(526 missing values generated)
+
+. 
+. reg hlwage heduc hexper htenure
+no observations
+r(2000);
+
+end of do-file
+
+r(2000);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. predict u, r
+u already defined
+r(110);
+
+end of do-file
+
+r(110);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. predict u, r
+u already defined
+r(110);
+
+end of do-file
+
+r(110);
+
+. do "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9\ejercicio5_tp9.do"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9
+
+. set more off
+
+. log using "ejercicio5_tp9.log", replace
+log file already open
+r(604);
+
+end of do-file
+
+r(604);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9
+
+. set more off
+
+. *log using "ejercicio5_tp9.log", replace
+. use "WAGE1.DTA" 
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. 
+. /*Punto (A): de manera intuitiva puede esperarse existencia de heterocedasticidad porque el salario suele verse variar mucho frente
+> a */
+. 
+. *Punto (B): Tests para probar heterocedasticidad
+. predict u, r
+
+. gen u2 = u^2
+
+. scatter u2 educ
+
+. reg u2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   15.53
+       Model |  24875.0022     3  8291.66739           Prob > F      =  0.0000
+    Residual |   278734.78   522  533.974674           R-squared     =  0.0819
+-------------+------------------------------           Adj R-squared =  0.0767
+       Total |  303609.782   525  578.304347           Root MSE      =  23.108
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   1.570524   .3841997     4.09   0.000     .8157566    2.325292
+       exper |   .1104628    .090326     1.22   0.222    -.0669843      .28791
+      tenure |   .6931533   .1621544     4.27   0.000     .3745979    1.011709
+       _cons |  -15.70645   5.461164    -2.88   0.004    -26.43501   -4.977886
+------------------------------------------------------------------------------
+
+. scalar bp = e(N)*e(r2)
+
+. di "estadistico de prueba   " bp
+estadistico de prueba   43.095618
+
+. di "valor critico   " invchi2tail(e(df_r), 0.05)
+valor critico   576.25936
+
+. 
+. scalar F = (e(r2)/e(df_m) / (1-e(r2)) / e(df_r))
+
+. di F
+.00005699
+
+. di invFtail(e(df_m),e(df_r),0.05)
+2.6219805
+
+. 
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of u2
+
+         chi2(1)      =   181.58
+         Prob > chi2  =   0.0000
+
+. 
+. *Punto (C):
+. reg lwage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   80.39
+       Model |  46.8741776     3  15.6247259           Prob > F      =  0.0000
+    Residual |  101.455574   522  .194359337           R-squared     =  0.3160
+-------------+------------------------------           Adj R-squared =  0.3121
+       Total |  148.329751   525   .28253286           Root MSE      =  .44086
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .092029   .0073299    12.56   0.000     .0776292    .1064288
+       exper |   .0041211   .0017233     2.39   0.017     .0007357    .0075065
+      tenure |   .0220672   .0030936     7.13   0.000     .0159897    .0281448
+       _cons |   .2843595   .1041904     2.73   0.007     .0796756    .4890435
+------------------------------------------------------------------------------
+
+. 
+. 
+. *Punto (D):
+. gen lu2 = log(u2)
+
+. reg lu2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   27.07
+       Model |  437.433709     3  145.811236           Prob > F      =  0.0000
+    Residual |  2811.45522   522  5.38592955           R-squared     =  0.1346
+-------------+------------------------------           Adj R-squared =  0.1297
+       Total |  3248.88893   525  6.18835987           Root MSE      =  2.3208
+
+------------------------------------------------------------------------------
+         lu2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .2615854   .0385858     6.78   0.000     .1857829    .3373878
+       exper |   .0303997   .0090716     3.35   0.001     .0125784     .048221
+      tenure |   .0583824   .0162854     3.58   0.000     .0263894    .0903754
+       _cons |   -3.60703    .548473    -6.58   0.000    -4.684515   -2.529544
+------------------------------------------------------------------------------
+
+. predict g, xb
+
+. gen h = e(g)
+(526 missing values generated)
+
+. gen rh = h^(1/2)
+(526 missing values generated)
+
+. *Corregimos:
+. gen hlwage = lwage/rh
+(526 missing values generated)
+
+. gen heduc = educ/rh
+(526 missing values generated)
+
+. gen hexper = exper/rh
+(526 missing values generated)
+
+. gen htenure = tenure/rh
+(526 missing values generated)
+
+. 
+. reg hlwage heduc hexper htenure
+no observations
+r(2000);
+
+end of do-file
+
+r(2000);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. scatter u educ
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of wage
+
+         chi2(1)      =   129.54
+         Prob > chi2  =   0.0000
+
+. 
+end of do-file
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. reg lwage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   80.39
+       Model |  46.8741776     3  15.6247259           Prob > F      =  0.0000
+    Residual |  101.455574   522  .194359337           R-squared     =  0.3160
+-------------+------------------------------           Adj R-squared =  0.3121
+       Total |  148.329751   525   .28253286           Root MSE      =  .44086
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .092029   .0073299    12.56   0.000     .0776292    .1064288
+       exper |   .0041211   .0017233     2.39   0.017     .0007357    .0075065
+      tenure |   .0220672   .0030936     7.13   0.000     .0159897    .0281448
+       _cons |   .2843595   .1041904     2.73   0.007     .0796756    .4890435
+------------------------------------------------------------------------------
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9
+
+. set more off
+
+. *log using "ejercicio5_tp9.log", replace
+. use "WAGE1.DTA" 
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of wage
+
+         chi2(1)      =   129.54
+         Prob > chi2  =   0.0000
+
+. 
+. /*Punto (A): de manera intuitiva puede esperarse existencia de heterocedasticidad porque el salario suele verse variar mucho frente
+> a */
+. 
+. *Punto (B): Tests para probar heterocedasticidad
+. predict u, r
+
+. *scatter u educ
+. gen u2 = u^2
+
+. reg u2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   15.53
+       Model |  24875.0022     3  8291.66739           Prob > F      =  0.0000
+    Residual |   278734.78   522  533.974674           R-squared     =  0.0819
+-------------+------------------------------           Adj R-squared =  0.0767
+       Total |  303609.782   525  578.304347           Root MSE      =  23.108
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   1.570524   .3841997     4.09   0.000     .8157566    2.325292
+       exper |   .1104628    .090326     1.22   0.222    -.0669843      .28791
+      tenure |   .6931533   .1621544     4.27   0.000     .3745979    1.011709
+       _cons |  -15.70645   5.461164    -2.88   0.004    -26.43501   -4.977886
+------------------------------------------------------------------------------
+
+. scalar bp = e(N)*e(r2)
+
+. di "estadistico de prueba   " bp
+estadistico de prueba   43.095618
+
+. di "valor critico   " invchi2tail(e(df_r), 0.05)
+valor critico   576.25936
+
+. 
+. scalar F = (e(r2)/e(df_m) / (1-e(r2)) / e(df_r))
+
+. di F
+.00005699
+
+. di invFtail(e(df_m),e(df_r),0.05)
+2.6219805
+
+. 
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of u2
+
+         chi2(1)      =   181.58
+         Prob > chi2  =   0.0000
+
+. 
+. *Punto (C):
+. reg lwage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   80.39
+       Model |  46.8741776     3  15.6247259           Prob > F      =  0.0000
+    Residual |  101.455574   522  .194359337           R-squared     =  0.3160
+-------------+------------------------------           Adj R-squared =  0.3121
+       Total |  148.329751   525   .28253286           Root MSE      =  .44086
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .092029   .0073299    12.56   0.000     .0776292    .1064288
+       exper |   .0041211   .0017233     2.39   0.017     .0007357    .0075065
+      tenure |   .0220672   .0030936     7.13   0.000     .0159897    .0281448
+       _cons |   .2843595   .1041904     2.73   0.007     .0796756    .4890435
+------------------------------------------------------------------------------
+
+. 
+. 
+. *Punto (D):
+. gen lu2 = log(u2)
+
+. reg lu2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   27.07
+       Model |  437.433709     3  145.811236           Prob > F      =  0.0000
+    Residual |  2811.45522   522  5.38592955           R-squared     =  0.1346
+-------------+------------------------------           Adj R-squared =  0.1297
+       Total |  3248.88893   525  6.18835987           Root MSE      =  2.3208
+
+------------------------------------------------------------------------------
+         lu2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .2615854   .0385858     6.78   0.000     .1857829    .3373878
+       exper |   .0303997   .0090716     3.35   0.001     .0125784     .048221
+      tenure |   .0583824   .0162854     3.58   0.000     .0263894    .0903754
+       _cons |   -3.60703    .548473    -6.58   0.000    -4.684515   -2.529544
+------------------------------------------------------------------------------
+
+. predict g, xb
+
+. gen h = exp(g)
+
+. gen rh = h^(1/2)
+
+. *Corregimos:
+. gen hlwage = lwage/rh
+
+. gen heduc = educ/rh
+
+. gen hexper = exper/rh
+
+. gen htenure = tenure/rh
+
+. 
+. reg hlwage heduc hexper htenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =  122.49
+       Model |   60.118667     3  20.0395557           Prob > F      =  0.0000
+    Residual |  85.3997246   522  .163601005           R-squared     =  0.4131
+-------------+------------------------------           Adj R-squared =  0.4098
+       Total |  145.518392   525  .277177889           Root MSE      =  .40448
+
+------------------------------------------------------------------------------
+      hlwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       heduc |   .1331854   .0074097    17.97   0.000      .118629    .1477419
+      hexper |   .0188986   .0015734    12.01   0.000     .0158075    .0219896
+     htenure |   .0424239   .0059424     7.14   0.000       .03075    .0540978
+       _cons |  -.4145866   .0958335    -4.33   0.000    -.6028533   -.2263199
+------------------------------------------------------------------------------
+
+. 
+. *log close
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg hlwage educ exper tenure [aweight=1/rh]
+(sum of wgt is   4.5358e+02)
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =  150.45
+       Model |  97.2122713     3  32.4040904           Prob > F      =  0.0000
+    Residual |  112.428412   522  .215380099           R-squared     =  0.4637
+-------------+------------------------------           Adj R-squared =  0.4606
+       Total |  209.640683   525  .399315587           Root MSE      =  .46409
+
+------------------------------------------------------------------------------
+      hlwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |  -.1440312   .0071792   -20.06   0.000    -.1581348   -.1299276
+       exper |  -.0152946   .0018533    -8.25   0.000    -.0189355   -.0116538
+      tenure |  -.0146969   .0041319    -3.56   0.000    -.0228141   -.0065796
+       _cons |   3.425504   .0971814    35.25   0.000     3.234589    3.616419
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9
+
+. set more off
+
+. *log using "ejercicio5_tp9.log", replace
+. use "WAGE1.DTA" 
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of wage
+
+         chi2(1)      =   129.54
+         Prob > chi2  =   0.0000
+
+. 
+. /*Punto (A): de manera intuitiva puede esperarse existencia de heterocedasticidad porque el salario suele verse variar mucho frente
+> a */
+. 
+. *Punto (B): Tests para probar heterocedasticidad
+. predict u, r
+
+. *scatter u educ
+. gen u2 = u^2
+
+. reg u2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   15.53
+       Model |  24875.0022     3  8291.66739           Prob > F      =  0.0000
+    Residual |   278734.78   522  533.974674           R-squared     =  0.0819
+-------------+------------------------------           Adj R-squared =  0.0767
+       Total |  303609.782   525  578.304347           Root MSE      =  23.108
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   1.570524   .3841997     4.09   0.000     .8157566    2.325292
+       exper |   .1104628    .090326     1.22   0.222    -.0669843      .28791
+      tenure |   .6931533   .1621544     4.27   0.000     .3745979    1.011709
+       _cons |  -15.70645   5.461164    -2.88   0.004    -26.43501   -4.977886
+------------------------------------------------------------------------------
+
+. scalar bp = e(N)*e(r2)
+
+. di "estadistico de prueba   " bp
+estadistico de prueba   43.095618
+
+. di "valor critico   " invchi2tail(e(df_r), 0.05)
+valor critico   576.25936
+
+. 
+. scalar F = (e(r2)/e(df_m) / (1-e(r2)) / e(df_r))
+
+. di F
+.00005699
+
+. di invFtail(e(df_m),e(df_r),0.05)
+2.6219805
+
+. 
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of u2
+
+         chi2(1)      =   181.58
+         Prob > chi2  =   0.0000
+
+. 
+. *Punto (C):
+. reg lwage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   80.39
+       Model |  46.8741776     3  15.6247259           Prob > F      =  0.0000
+    Residual |  101.455574   522  .194359337           R-squared     =  0.3160
+-------------+------------------------------           Adj R-squared =  0.3121
+       Total |  148.329751   525   .28253286           Root MSE      =  .44086
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .092029   .0073299    12.56   0.000     .0776292    .1064288
+       exper |   .0041211   .0017233     2.39   0.017     .0007357    .0075065
+      tenure |   .0220672   .0030936     7.13   0.000     .0159897    .0281448
+       _cons |   .2843595   .1041904     2.73   0.007     .0796756    .4890435
+------------------------------------------------------------------------------
+
+. 
+. 
+. *Punto (D):
+. gen lu2 = log(u2)
+
+. /*Generamos los terminos al cuadrado*/
+. gen educ2= educ^2
+
+. gen exper2 = exper^2
+
+. gen tenure2 = tenure^2
+
+. 
+. reg lu2 educ2 exper2 tenure2
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   28.84
+       Model |  461.950342     3  153.983447           Prob > F      =  0.0000
+    Residual |  2786.93859   522  5.33896282           R-squared     =  0.1422
+-------------+------------------------------           Adj R-squared =  0.1373
+       Total |  3248.88893   525  6.18835987           Root MSE      =  2.3106
+
+------------------------------------------------------------------------------
+         lu2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       educ2 |   .0120572    .001598     7.55   0.000     .0089178    .0151965
+      exper2 |   .0007257   .0001889     3.84   0.000     .0003545    .0010968
+     tenure2 |   .0019193   .0005573     3.44   0.001     .0008245    .0030141
+       _cons |  -1.994183   .3152023    -6.33   0.000    -2.613404   -1.374962
+------------------------------------------------------------------------------
+
+. predict g, xb
+
+. gen h = exp(g)
+
+. gen rh = h^(1/2)
+
+. *Corregimos:
+. gen hlwage = lwage/rh
+
+. gen heduc = educ/rh
+
+. gen hexper = exper/rh
+
+. gen htenure = tenure/rh
+
+. 
+. reg hlwage heduc hexper htenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =  140.42
+       Model |  66.2027612     3  22.0675871           Prob > F      =  0.0000
+    Residual |  82.0329138   522  .157151176           R-squared     =  0.4466
+-------------+------------------------------           Adj R-squared =  0.4434
+       Total |  148.235675   525  .282353667           Root MSE      =  .39642
+
+------------------------------------------------------------------------------
+      hlwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       heduc |   .1234747   .0061347    20.13   0.000     .1114229    .1355265
+      hexper |   .0149274   .0017979     8.30   0.000     .0113954    .0184594
+     htenure |   .0321992   .0049136     6.55   0.000     .0225463    .0418522
+       _cons |  -.2388588   .0778651    -3.07   0.002    -.3918262   -.0858913
+------------------------------------------------------------------------------
+
+. reg hlwage educ exper tenure [aweight=1/rh]
+(sum of wgt is   4.5263e+02)
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   72.38
+       Model |  48.0702861     3  16.0234287           Prob > F      =  0.0000
+    Residual |  115.560613   522  .221380485           R-squared     =  0.2938
+-------------+------------------------------           Adj R-squared =  0.2897
+       Total |  163.630899   525  .311677904           Root MSE      =  .47051
+
+------------------------------------------------------------------------------
+      hlwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |  -.1086845   .0079118   -13.74   0.000    -.1242275   -.0931415
+       exper |  -.0149561   .0019243    -7.77   0.000    -.0187365   -.0111757
+      tenure |  -.0014397   .0041943    -0.34   0.732    -.0096794       .0068
+       _cons |    2.95898   .1053525    28.09   0.000     2.752013    3.165947
+------------------------------------------------------------------------------
+
+. 
+. *log close
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9
+
+. set more off
+
+. *log using "ejercicio5_tp9.log", replace
+. use "WAGE1.DTA" 
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of wage
+
+         chi2(1)      =   129.54
+         Prob > chi2  =   0.0000
+
+. 
+. /*Punto (A): de manera intuitiva puede esperarse existencia de heterocedasticidad porque el salario suele verse variar mucho frente
+> a */
+. 
+. *Punto (B): Tests para probar heterocedasticidad
+. predict u, r
+
+. *scatter u educ
+. gen u2 = u^2
+
+. reg u2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   15.53
+       Model |  24875.0022     3  8291.66739           Prob > F      =  0.0000
+    Residual |   278734.78   522  533.974674           R-squared     =  0.0819
+-------------+------------------------------           Adj R-squared =  0.0767
+       Total |  303609.782   525  578.304347           Root MSE      =  23.108
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   1.570524   .3841997     4.09   0.000     .8157566    2.325292
+       exper |   .1104628    .090326     1.22   0.222    -.0669843      .28791
+      tenure |   .6931533   .1621544     4.27   0.000     .3745979    1.011709
+       _cons |  -15.70645   5.461164    -2.88   0.004    -26.43501   -4.977886
+------------------------------------------------------------------------------
+
+. scalar bp = e(N)*e(r2)
+
+. di "estadistico de prueba   " bp
+estadistico de prueba   43.095618
+
+. di "valor critico   " invchi2tail(e(df_r), 0.05)
+valor critico   576.25936
+
+. 
+. scalar F = (e(r2)/e(df_m) / (1-e(r2)) / e(df_r))
+
+. di F
+.00005699
+
+. di invFtail(e(df_m),e(df_r),0.05)
+2.6219805
+
+. 
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of u2
+
+         chi2(1)      =   181.58
+         Prob > chi2  =   0.0000
+
+. 
+. *Punto (C):
+. reg lwage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   80.39
+       Model |  46.8741776     3  15.6247259           Prob > F      =  0.0000
+    Residual |  101.455574   522  .194359337           R-squared     =  0.3160
+-------------+------------------------------           Adj R-squared =  0.3121
+       Total |  148.329751   525   .28253286           Root MSE      =  .44086
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .092029   .0073299    12.56   0.000     .0776292    .1064288
+       exper |   .0041211   .0017233     2.39   0.017     .0007357    .0075065
+      tenure |   .0220672   .0030936     7.13   0.000     .0159897    .0281448
+       _cons |   .2843595   .1041904     2.73   0.007     .0796756    .4890435
+------------------------------------------------------------------------------
+
+. 
+. 
+. *Punto (D):
+. gen lu2 = log(u2)
+
+. /*Generamos los terminos al cuadrado*/
+. gen educ2= educ^2
+
+. gen exper2 = exper^2
+
+. gen tenure2 = tenure^2
+
+. reg lu2 educ2 exper2 tenure2
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   28.84
+       Model |  461.950342     3  153.983447           Prob > F      =  0.0000
+    Residual |  2786.93859   522  5.33896282           R-squared     =  0.1422
+-------------+------------------------------           Adj R-squared =  0.1373
+       Total |  3248.88893   525  6.18835987           Root MSE      =  2.3106
+
+------------------------------------------------------------------------------
+         lu2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       educ2 |   .0120572    .001598     7.55   0.000     .0089178    .0151965
+      exper2 |   .0007257   .0001889     3.84   0.000     .0003545    .0010968
+     tenure2 |   .0019193   .0005573     3.44   0.001     .0008245    .0030141
+       _cons |  -1.994183   .3152023    -6.33   0.000    -2.613404   -1.374962
+------------------------------------------------------------------------------
+
+. predict g, xb
+
+. gen h = exp(g)
+
+. gen rh = h^(1/2)
+
+. *Corregimos:
+. gen hwage = wage/rh
+
+. gen heduc = educ/rh
+
+. gen hexper = exper/rh
+
+. gen htenure = tenure/rh
+
+. reg hwage heduc hexper htenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   29.50
+       Model |  431.833483     3  143.944494           Prob > F      =  0.0000
+    Residual |  2547.50236   522  4.88027271           R-squared     =  0.1449
+-------------+------------------------------           Adj R-squared =  0.1400
+       Total |  2979.33584   525  5.67492541           Root MSE      =  2.2091
+
+------------------------------------------------------------------------------
+       hwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       heduc |   .3037169   .0341869     8.88   0.000     .2365562    .3708776
+      hexper |   .0266084    .010019     2.66   0.008     .0069258    .0462909
+     htenure |   .1467043   .0273821     5.36   0.000     .0929116     .200497
+       _cons |   .5908735   .4339164     1.36   0.174    -.2615634     1.44331
+------------------------------------------------------------------------------
+
+. 
+. reg wage educ exper tenure [aweight=1/rh]
+(sum of wgt is   4.5263e+02)
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   59.38
+       Model |  1275.31314     3  425.104379           Prob > F      =  0.0000
+    Residual |  3737.20823   522  7.15940275           R-squared     =  0.2544
+-------------+------------------------------           Adj R-squared =  0.2501
+       Total |  5012.52137   525  9.54765975           Root MSE      =  2.6757
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .4547839   .0449932    10.11   0.000     .3663939    .5431738
+       exper |   .0272118   .0109433     2.49   0.013     .0057135    .0487102
+      tenure |   .1678653    .023852     7.04   0.000     .1210076    .2147229
+       _cons |  -1.179585   .5991195    -1.97   0.049    -2.356567    -.002604
+------------------------------------------------------------------------------
+
+. 
+. *log close
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9
+
+. set more off
+
+. *log using "ejercicio5_tp9.log", replace
+. use "WAGE1.DTA" 
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of wage
+
+         chi2(1)      =   129.54
+         Prob > chi2  =   0.0000
+
+. 
+. /*Punto (A): de manera intuitiva puede esperarse existencia de heterocedasticidad porque el salario suele verse variar mucho frente
+> a */
+. 
+. *Punto (B): Tests para probar heterocedasticidad
+. predict u, r
+
+. *scatter u educ
+. gen u2 = u^2
+
+. reg u2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   15.53
+       Model |  24875.0022     3  8291.66739           Prob > F      =  0.0000
+    Residual |   278734.78   522  533.974674           R-squared     =  0.0819
+-------------+------------------------------           Adj R-squared =  0.0767
+       Total |  303609.782   525  578.304347           Root MSE      =  23.108
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   1.570524   .3841997     4.09   0.000     .8157566    2.325292
+       exper |   .1104628    .090326     1.22   0.222    -.0669843      .28791
+      tenure |   .6931533   .1621544     4.27   0.000     .3745979    1.011709
+       _cons |  -15.70645   5.461164    -2.88   0.004    -26.43501   -4.977886
+------------------------------------------------------------------------------
+
+. scalar bp = e(N)*e(r2)
+
+. di "estadistico de prueba   " bp
+estadistico de prueba   43.095618
+
+. di "valor critico   " invchi2tail(e(df_r), 0.05)
+valor critico   576.25936
+
+. 
+. scalar F = (e(r2)/e(df_m) / (1-e(r2)) / e(df_r))
+
+. di F
+.00005699
+
+. di invFtail(e(df_m),e(df_r),0.05)
+2.6219805
+
+. 
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of u2
+
+         chi2(1)      =   181.58
+         Prob > chi2  =   0.0000
+
+. 
+. *Punto (C):
+. reg lwage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   80.39
+       Model |  46.8741776     3  15.6247259           Prob > F      =  0.0000
+    Residual |  101.455574   522  .194359337           R-squared     =  0.3160
+-------------+------------------------------           Adj R-squared =  0.3121
+       Total |  148.329751   525   .28253286           Root MSE      =  .44086
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .092029   .0073299    12.56   0.000     .0776292    .1064288
+       exper |   .0041211   .0017233     2.39   0.017     .0007357    .0075065
+      tenure |   .0220672   .0030936     7.13   0.000     .0159897    .0281448
+       _cons |   .2843595   .1041904     2.73   0.007     .0796756    .4890435
+------------------------------------------------------------------------------
+
+. 
+. 
+. *Punto (D):
+. gen lu2 = log(u2)
+
+. /*Generamos los terminos al cuadrado*/
+. gen educ2= educ^2
+
+. gen exper2 = exper^2
+
+. gen tenure2 = tenure^2
+
+. gen educ_exper = educ*exper
+
+. gen educ_tenure = educ*tenure
+
+. gen exper_tenure = exper*tenure
+
+. 
+. reg lu2 educ2 exper2 tenure2 educ_exper educ_tenure exper_tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  6,   519) =   14.64
+       Model |  470.298109     6  78.3830182           Prob > F      =  0.0000
+    Residual |  2778.59082   519  5.35373955           R-squared     =  0.1448
+-------------+------------------------------           Adj R-squared =  0.1349
+       Total |  3248.88893   525  6.18835987           Root MSE      =  2.3138
+
+------------------------------------------------------------------------------
+         lu2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       educ2 |    .011105   .0019352     5.74   0.000     .0073032    .0149068
+      exper2 |    .000757   .0004452     1.70   0.090    -.0001176    .0016316
+     tenure2 |   .0013523   .0017204     0.79   0.432    -.0020274    .0047321
+  educ_exper |   -.000014   .0015543    -0.01   0.993    -.0030675    .0030394
+ educ_tenure |   .0032405   .0029287     1.11   0.269    -.0025131    .0089942
+exper_tenure |  -.0006249   .0014895    -0.42   0.675    -.0035511    .0023013
+       _cons |  -1.923647   .3217903    -5.98   0.000    -2.555819   -1.291476
+------------------------------------------------------------------------------
+
+. 
+. predict g, xb
+
+. gen h = exp(g)
+
+. gen rh = h^(1/2)
+
+. *Corregimos:
+. gen hwage = wage/rh
+
+. gen heduc = educ/rh
+
+. gen hexper = exper/rh
+
+. gen htenure = tenure/rh
+
+. reg hwage heduc hexper htenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   22.90
+       Model |  326.039252     3  108.679751           Prob > F      =  0.0000
+    Residual |  2477.75183   522  4.74665101           R-squared     =  0.1163
+-------------+------------------------------           Adj R-squared =  0.1112
+       Total |  2803.79108   525  5.34055444           Root MSE      =  2.1787
+
+------------------------------------------------------------------------------
+       hwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       heduc |   .2803675   .0345065     8.13   0.000     .2125788    .3481562
+      hexper |   .0244527   .0100078     2.44   0.015     .0047922    .0441132
+     htenure |   .1214774   .0279009     4.35   0.000     .0666655    .1762892
+       _cons |   .9175806   .4424843     2.07   0.039     .0483118    1.786849
+------------------------------------------------------------------------------
+
+. 
+. reg wage educ exper tenure [aweight=1/rh]
+(sum of wgt is   4.5306e+02)
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   57.13
+       Model |  1205.55663     3  401.852209           Prob > F      =  0.0000
+    Residual |  3671.77901   522  7.03405941           R-squared     =  0.2472
+-------------+------------------------------           Adj R-squared =  0.2428
+       Total |  4877.33564   525  9.29016312           Root MSE      =  2.6522
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .4553138   .0442781    10.28   0.000     .3683287    .5422989
+       exper |   .0279375   .0108845     2.57   0.011     .0065546    .0493204
+      tenure |    .159519   .0236529     6.74   0.000     .1130524    .2059856
+       _cons |  -1.185777   .5921603    -2.00   0.046    -2.349088   -.0224675
+------------------------------------------------------------------------------
+
+. 
+. *log close
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9
+
+. set more off
+
+. *log using "ejercicio5_tp9.log", replace
+. use "WAGE1.DTA" 
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. predict u, r
+
+. gen u2 = u^2
+
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of wage
+
+         chi2(1)      =   129.54
+         Prob > chi2  =   0.0000
+
+. 
+. /*Punto (A): de manera intuitiva puede esperarse existencia de heterocedasticidad porque el salario suele verse variar mucho frente
+> a */
+. 
+. *Punto (B): Tests para probar heterocedasticidad
+. *scatter u educ
+. reg u2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   15.53
+       Model |  24875.0022     3  8291.66739           Prob > F      =  0.0000
+    Residual |   278734.78   522  533.974674           R-squared     =  0.0819
+-------------+------------------------------           Adj R-squared =  0.0767
+       Total |  303609.782   525  578.304347           Root MSE      =  23.108
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   1.570524   .3841997     4.09   0.000     .8157566    2.325292
+       exper |   .1104628    .090326     1.22   0.222    -.0669843      .28791
+      tenure |   .6931533   .1621544     4.27   0.000     .3745979    1.011709
+       _cons |  -15.70645   5.461164    -2.88   0.004    -26.43501   -4.977886
+------------------------------------------------------------------------------
+
+. scalar bp = e(N)*e(r2)
+
+. di "estadistico de prueba   " bp
+estadistico de prueba   43.095618
+
+. di "valor critico   " invchi2tail(e(df_r), 0.05)
+valor critico   576.25936
+
+. 
+. scalar F = (e(r2)/e(df_m) / (1-e(r2)) / e(df_r))
+
+. di F
+.00005699
+
+. di invFtail(e(df_m),e(df_r),0.05)
+2.6219805
+
+. 
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of u2
+
+         chi2(1)      =   181.58
+         Prob > chi2  =   0.0000
+
+. 
+. *Punto (C):
+. reg lwage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   80.39
+       Model |  46.8741776     3  15.6247259           Prob > F      =  0.0000
+    Residual |  101.455574   522  .194359337           R-squared     =  0.3160
+-------------+------------------------------           Adj R-squared =  0.3121
+       Total |  148.329751   525   .28253286           Root MSE      =  .44086
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .092029   .0073299    12.56   0.000     .0776292    .1064288
+       exper |   .0041211   .0017233     2.39   0.017     .0007357    .0075065
+      tenure |   .0220672   .0030936     7.13   0.000     .0159897    .0281448
+       _cons |   .2843595   .1041904     2.73   0.007     .0796756    .4890435
+------------------------------------------------------------------------------
+
+. 
+. 
+. *Punto (D):
+. gen lu2 = log(u2)
+
+. /*Generamos los terminos al cuadrado*/
+. gen educ2= educ^2
+
+. gen exper2 = exper^2
+
+. gen tenure2 = tenure^2
+
+. gen educ_exper = educ*exper
+
+. gen educ_tenure = educ*tenure
+
+. gen exper_tenure = exper*tenure
+
+. 
+. reg lu2 educ2 exper2 tenure2 educ_exper educ_tenure exper_tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  6,   519) =   14.64
+       Model |  470.298109     6  78.3830182           Prob > F      =  0.0000
+    Residual |  2778.59082   519  5.35373955           R-squared     =  0.1448
+-------------+------------------------------           Adj R-squared =  0.1349
+       Total |  3248.88893   525  6.18835987           Root MSE      =  2.3138
+
+------------------------------------------------------------------------------
+         lu2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       educ2 |    .011105   .0019352     5.74   0.000     .0073032    .0149068
+      exper2 |    .000757   .0004452     1.70   0.090    -.0001176    .0016316
+     tenure2 |   .0013523   .0017204     0.79   0.432    -.0020274    .0047321
+  educ_exper |   -.000014   .0015543    -0.01   0.993    -.0030675    .0030394
+ educ_tenure |   .0032405   .0029287     1.11   0.269    -.0025131    .0089942
+exper_tenure |  -.0006249   .0014895    -0.42   0.675    -.0035511    .0023013
+       _cons |  -1.923647   .3217903    -5.98   0.000    -2.555819   -1.291476
+------------------------------------------------------------------------------
+
+. 
+. predict g, xb
+
+. gen h = exp(g)
+
+. gen rh = h^(1/2)
+
+. *Corregimos:
+. gen hwage = wage/rh
+
+. gen heduc = educ/rh
+
+. gen hexper = exper/rh
+
+. gen htenure = tenure/rh
+
+. reg hwage heduc hexper htenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   22.90
+       Model |  326.039252     3  108.679751           Prob > F      =  0.0000
+    Residual |  2477.75183   522  4.74665101           R-squared     =  0.1163
+-------------+------------------------------           Adj R-squared =  0.1112
+       Total |  2803.79108   525  5.34055444           Root MSE      =  2.1787
+
+------------------------------------------------------------------------------
+       hwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       heduc |   .2803675   .0345065     8.13   0.000     .2125788    .3481562
+      hexper |   .0244527   .0100078     2.44   0.015     .0047922    .0441132
+     htenure |   .1214774   .0279009     4.35   0.000     .0666655    .1762892
+       _cons |   .9175806   .4424843     2.07   0.039     .0483118    1.786849
+------------------------------------------------------------------------------
+
+. 
+. reg wage educ exper tenure [aweight=1/rh]
+(sum of wgt is   4.5306e+02)
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   57.13
+       Model |  1205.55663     3  401.852209           Prob > F      =  0.0000
+    Residual |  3671.77901   522  7.03405941           R-squared     =  0.2472
+-------------+------------------------------           Adj R-squared =  0.2428
+       Total |  4877.33564   525  9.29016312           Root MSE      =  2.6522
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .4553138   .0442781    10.28   0.000     .3683287    .5422989
+       exper |   .0279375   .0108845     2.57   0.011     .0065546    .0493204
+      tenure |    .159519   .0236529     6.74   0.000     .1130524    .2059856
+       _cons |  -1.185777   .5921603    -2.00   0.046    -2.349088   -.0224675
+------------------------------------------------------------------------------
+
+. 
+. *log close
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9
+
+. set more off
+
+. *log using "ejercicio5_tp9.log", replace
+. use "WAGE1.DTA" 
+
+. reg wage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   76.87
+       Model |   2194.1116     3  731.370532           Prob > F      =  0.0000
+    Residual |  4966.30269   522  9.51398984           R-squared     =  0.3064
+-------------+------------------------------           Adj R-squared =  0.3024
+       Total |  7160.41429   525  13.6388844           Root MSE      =  3.0845
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .5989651   .0512835    11.68   0.000     .4982176    .6997126
+       exper |   .0223395   .0120568     1.85   0.064    -.0013464    .0460254
+      tenure |   .1692687   .0216446     7.82   0.000     .1267474    .2117899
+       _cons |  -2.872735   .7289643    -3.94   0.000    -4.304799   -1.440671
+------------------------------------------------------------------------------
+
+. predict u, r
+
+. gen u2 = u^2
+
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of wage
+
+         chi2(1)      =   129.54
+         Prob > chi2  =   0.0000
+
+. 
+. /*Punto (A): de manera intuitiva puede esperarse existencia de heterocedasticidad porque el salario suele verse variar mucho frente
+> a */
+. 
+. *Punto (B): Tests para probar heterocedasticidad
+. *scatter u educ
+. reg u2 educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   15.53
+       Model |  24875.0022     3  8291.66739           Prob > F      =  0.0000
+    Residual |   278734.78   522  533.974674           R-squared     =  0.0819
+-------------+------------------------------           Adj R-squared =  0.0767
+       Total |  303609.782   525  578.304347           Root MSE      =  23.108
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   1.570524   .3841997     4.09   0.000     .8157566    2.325292
+       exper |   .1104628    .090326     1.22   0.222    -.0669843      .28791
+      tenure |   .6931533   .1621544     4.27   0.000     .3745979    1.011709
+       _cons |  -15.70645   5.461164    -2.88   0.004    -26.43501   -4.977886
+------------------------------------------------------------------------------
+
+. scalar bp = e(N)*e(r2)
+
+. di "estadistico de prueba   " bp
+estadistico de prueba   43.095618
+
+. di "valor critico   " invchi2tail(e(df_r), 0.05)
+valor critico   576.25936
+
+. 
+. scalar F = (e(r2)/e(df_m) / (1-e(r2)) / e(df_r))
+
+. di F
+.00005699
+
+. di invFtail(e(df_m),e(df_r),0.05)
+2.6219805
+
+. 
+. estat hettes
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of u2
+
+         chi2(1)      =   181.58
+         Prob > chi2  =   0.0000
+
+. 
+. *Punto (C):
+. reg lwage educ exper tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   80.39
+       Model |  46.8741776     3  15.6247259           Prob > F      =  0.0000
+    Residual |  101.455574   522  .194359337           R-squared     =  0.3160
+-------------+------------------------------           Adj R-squared =  0.3121
+       Total |  148.329751   525   .28253286           Root MSE      =  .44086
+
+------------------------------------------------------------------------------
+       lwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    .092029   .0073299    12.56   0.000     .0776292    .1064288
+       exper |   .0041211   .0017233     2.39   0.017     .0007357    .0075065
+      tenure |   .0220672   .0030936     7.13   0.000     .0159897    .0281448
+       _cons |   .2843595   .1041904     2.73   0.007     .0796756    .4890435
+------------------------------------------------------------------------------
+
+. 
+. 
+. *Punto (D):
+. gen lu2 = log(u2)
+
+. /*Generamos los terminos al cuadrado*/
+. gen educ2= educ^2
+
+. gen exper2 = exper^2
+
+. gen tenure2 = tenure^2
+
+. 
+. gen educ_exper = educ*exper
+
+. gen educ_tenure = educ*tenure
+
+. gen exper_tenure = exper*tenure
+
+. 
+. reg lu2 educ2 exper2 tenure2 educ_exper educ_tenure exper_tenure
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  6,   519) =   14.64
+       Model |  470.298109     6  78.3830182           Prob > F      =  0.0000
+    Residual |  2778.59082   519  5.35373955           R-squared     =  0.1448
+-------------+------------------------------           Adj R-squared =  0.1349
+       Total |  3248.88893   525  6.18835987           Root MSE      =  2.3138
+
+------------------------------------------------------------------------------
+         lu2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       educ2 |    .011105   .0019352     5.74   0.000     .0073032    .0149068
+      exper2 |    .000757   .0004452     1.70   0.090    -.0001176    .0016316
+     tenure2 |   .0013523   .0017204     0.79   0.432    -.0020274    .0047321
+  educ_exper |   -.000014   .0015543    -0.01   0.993    -.0030675    .0030394
+ educ_tenure |   .0032405   .0029287     1.11   0.269    -.0025131    .0089942
+exper_tenure |  -.0006249   .0014895    -0.42   0.675    -.0035511    .0023013
+       _cons |  -1.923647   .3217903    -5.98   0.000    -2.555819   -1.291476
+------------------------------------------------------------------------------
+
+. 
+. predict g, xb
+
+. gen h = exp(g)
+
+. gen rh = h^(1/2)
+
+. *Corregimos:
+. gen hcons = 1/rh
+
+. gen hwage = wage/rh
+
+. gen heduc = educ/rh
+
+. gen hexper = exper/rh
+
+. gen htenure = tenure/rh
+
+. reg hwage hcons heduc hexper htenure hcons, noconst
+note: hcons omitted because of collinearity
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  4,   522) =  561.62
+       Model |  10750.5944     4   2687.6486           Prob > F      =  0.0000
+    Residual |  2498.03185   522  4.78550162           R-squared     =  0.8114
+-------------+------------------------------           Adj R-squared =  0.8100
+       Total |  13248.6263   526  25.1875024           Root MSE      =  2.1876
+
+------------------------------------------------------------------------------
+       hwage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       hcons |     .08199   .4941906     0.17   0.868    -.8888568    1.052837
+       heduc |     .34131   .0387957     8.80   0.000      .265095     .417525
+      hexper |   .0325364   .0103307     3.15   0.002     .0122415    .0528313
+     htenure |   .1473849   .0250565     5.88   0.000     .0981608    .1966089
+       hcons |          0  (omitted)
+------------------------------------------------------------------------------
+
+. 
+. reg wage educ exper tenure [aweight=1/rh]
+(sum of wgt is   4.5306e+02)
+
+      Source |       SS       df       MS              Number of obs =     526
+-------------+------------------------------           F(  3,   522) =   57.13
+       Model |  1205.55663     3  401.852209           Prob > F      =  0.0000
+    Residual |  3671.77901   522  7.03405941           R-squared     =  0.2472
+-------------+------------------------------           Adj R-squared =  0.2428
+       Total |  4877.33564   525  9.29016312           Root MSE      =  2.6522
+
+------------------------------------------------------------------------------
+        wage |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   .4553138   .0442781    10.28   0.000     .3683287    .5422989
+       exper |   .0279375   .0108845     2.57   0.011     .0065546    .0493204
+      tenure |    .159519   .0236529     6.74   0.000     .1130524    .2059856
+       _cons |  -1.185777   .5921603    -2.00   0.046    -2.349088   -.0224675
+------------------------------------------------------------------------------
+
+. 
+. *log close
+. 
+end of do-file
+
+. doedit "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9\ejercicio2_tp9.do"
+
+. doedit "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\10 - decima_clase_tp10_11.do"
+
+. doedit "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\11 - onceava_clase_formafuncional.do"
+
+. doedit "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\10 - decima_clase_tp10_11.do"
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. set more off
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP10"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP10
+
+. use "Impacto.dta"
+
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. clear all
+
+. set more off
+
+. cd "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP10"
+C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP10
+
+. use "Impacto.dta"
+
+. 
+. reg salario educ exper partic
+
+      Source |       SS       df       MS              Number of obs =      49
+-------------+------------------------------           F(  3,    45) =   12.29
+       Model |   9082756.6     3  3027585.53           Prob > F      =  0.0000
+    Residual |  11089355.4    45  246430.119           R-squared     =  0.4503
+-------------+------------------------------           Adj R-squared =  0.4136
+       Total |    20172112    48  420252.332           Root MSE      =  496.42
+
+------------------------------------------------------------------------------
+     salario |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   133.5511   31.50806     4.24   0.000     70.09059    197.0116
+       exper |   34.45434   12.13158     2.84   0.007     10.02009     58.8886
+      partic |   470.4604   144.8698     3.25   0.002     178.6775    762.2432
+       _cons |   434.8209   258.8708     1.68   0.100    -86.57158    956.2134
+------------------------------------------------------------------------------
+
+. 
+. 
+end of do-file
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg salario educ exper partic (at partic=1)
+variable at not found
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg salario educ exper (partic=1)
+parentheses unbalanced
+r(132);
+
+end of do-file
+
+r(132);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. for partic=1{
+invalid syntax
+r(198);
+
+end of do-file
+
+r(198);
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. 
+. reg salario educ exper partic
+
+      Source |       SS       df       MS              Number of obs =      49
+-------------+------------------------------           F(  3,    45) =   12.29
+       Model |   9082756.6     3  3027585.53           Prob > F      =  0.0000
+    Residual |  11089355.4    45  246430.119           R-squared     =  0.4503
+-------------+------------------------------           Adj R-squared =  0.4136
+       Total |    20172112    48  420252.332           Root MSE      =  496.42
+
+------------------------------------------------------------------------------
+     salario |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   133.5511   31.50806     4.24   0.000     70.09059    197.0116
+       exper |   34.45434   12.13158     2.84   0.007     10.02009     58.8886
+      partic |   470.4604   144.8698     3.25   0.002     178.6775    762.2432
+       _cons |   434.8209   258.8708     1.68   0.100    -86.57158    956.2134
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. margins at partic=1
+invalid syntax
+r(198);
+
+. margins, at (partic=1)
+
+Predictive margins                                Number of obs   =         49
+Model VCE    : OLS
+
+Expression   : Linear prediction, predict()
+at           : partic          =           1
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       _cons |   2041.032   98.25072    20.77   0.000     1848.465      2233.6
+------------------------------------------------------------------------------
+
+. doedit "C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP8\ej9_tp8_alt.do"
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg salario educ exper edad partic
+
+      Source |       SS       df       MS              Number of obs =      49
+-------------+------------------------------           F(  4,    44) =    9.27
+       Model |  9225977.69     4  2306494.42           Prob > F      =  0.0000
+    Residual |  10946134.3    44  248775.779           R-squared     =  0.4574
+-------------+------------------------------           Adj R-squared =  0.4080
+       Total |    20172112    48  420252.332           Root MSE      =  498.77
+
+------------------------------------------------------------------------------
+     salario |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   132.4995   31.68798     4.18   0.000     68.63655    196.3624
+       exper |   37.96947   13.03989     2.91   0.006      11.6893    64.24965
+        edad |  -5.832355   7.686782    -0.76   0.452    -21.32405    9.659335
+      partic |   487.6751   147.3153     3.31   0.002     190.7806    784.5695
+       _cons |   648.2713   383.1342     1.69   0.098    -123.8849    1420.428
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. scatter salario partic
+
+. En relación a un posible sesgo o un análisis más detallado de la variable participacion, si corremos un F-Test, tanto para la variable independiente sola, como para todas las variables explicativas, visualizaremos insi
+> gnificancia conjunta: */
+unrecognized command:  En
+r(199);
+
+. 
+. test educ exper edad partic
+
+ ( 1)  educ = 0
+ ( 2)  exper = 0
+ ( 3)  edad = 0
+ ( 4)  partic = 0
+
+       F(  4,    44) =    9.27
+            Prob > F =    0.0000
+
+. 
+. test partic, mtest
+
+ ( 1)  partic = 0
+
+---------------------------------------
+       |    F(df,44)     df       p
+-------+-------------------------------
+  (1)  |       10.96      1     0.0019 #
+-------+-------------------------------
+  all  |       10.96      1     0.0019
+---------------------------------------
+                  # unadjusted p-values
+
+. test edad
+
+ ( 1)  edad = 0
+
+       F(  1,    44) =    0.58
+            Prob > F =    0.4520
+
+. do "C:\Users\JUAN\AppData\Local\Temp\STD00000000.tmp"
+
+. reg salario educ exper edad partic iq
+
+      Source |       SS       df       MS              Number of obs =      49
+-------------+------------------------------           F(  5,    43) =    8.65
+       Model |  10114387.1     5  2022877.41           Prob > F      =  0.0000
+    Residual |  10057724.9    43  233900.579           R-squared     =  0.5014
+-------------+------------------------------           Adj R-squared =  0.4434
+       Total |    20172112    48  420252.332           Root MSE      =  483.63
+
+------------------------------------------------------------------------------
+     salario |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |    116.019   31.86842     3.64   0.001     51.75018    180.2878
+       exper |   28.04104   13.63173     2.06   0.046     .5500357    55.53204
+        edad |   13.02948   12.21558     1.07   0.292    -11.60559    37.66455
+      partic |   468.6268   143.1771     3.27   0.002     179.8826     757.371
+          iq |   5.126481    2.63044     1.95   0.058    -.1783073    10.43127
+       _cons |  -555.2906   720.6886    -0.77   0.445    -2008.698    898.1165
+------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. reg salario educ exper partic iq
+
+      Source |       SS       df       MS              Number of obs =      49
+-------------+------------------------------           F(  4,    44) =   10.49
+       Model |  9848279.69     4  2462069.92           Prob > F      =  0.0000
+    Residual |  10323832.3    44  234632.552           R-squared     =  0.4882
+-------------+------------------------------           Adj R-squared =  0.4417
+       Total |    20172112    48  420252.332           Root MSE      =  484.39
+
+------------------------------------------------------------------------------
+     salario |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |   122.2905   31.37028     3.90   0.000     59.06785    185.5132
+       exper |   35.26966   11.84623     2.98   0.005     11.39515    59.14416
+      partic |   491.2038   141.8253     3.46   0.001     205.3737    777.0339
+          iq |   2.903581   1.607492     1.81   0.078     -.336107    6.143269
+       _cons |   144.1144   299.5133     0.48   0.633     -459.515    747.7438
+------------------------------------------------------------------------------
+
+. ivregress 2sls salario educ exper partic (iq)
+invalid syntax
+syntax is "(all instrumented variables = instrument variables)"
+the equal sign "=" is required
+r(198);
+
+. ivregress 2sls salario partic (educ exper = iq)
+equation not identified; must have at least as many instruments not in
+the regression as there are instrumented variables
+r(481);
+
+. ivregress 2sls salario educ partic (exper=iq)
+
+Instrumental variables (2SLS) regression               Number of obs =      49
+                                                       Wald chi2(3)  =    0.71
+                                                       Prob > chi2   =  0.8713
+                                                       R-squared     =       .
+                                                       Root MSE      =  3312.3
+
+------------------------------------------------------------------------------
+     salario |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       exper |  -526.3022   2124.431    -0.25   0.804     -4690.11    3637.505
+        educ |  -281.2993   1584.532    -0.18   0.859    -3386.925    2824.326
+      partic |   1749.904   4939.174     0.35   0.723    -7930.699    11430.51
+       _cons |   7293.421   26022.39     0.28   0.779    -43709.52    58296.36
+------------------------------------------------------------------------------
+Instrumented:  exper
+Instruments:   educ partic iq
+
+. ivregress 2sls salario educ partic (exper=iq), first
+
+First-stage regressions
+-----------------------
+
+                                                  Number of obs   =         49
+                                                  F(   3,     45) =       1.85
+                                                  Prob > F        =     0.1509
+                                                  R-squared       =     0.1100
+                                                  Adj R-squared   =     0.0507
+                                                  Root MSE        =     6.0955
+
+------------------------------------------------------------------------------
+       exper |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+        educ |  -.7186789   .3799434    -1.89   0.065    -1.483924    .0465663
+      partic |   2.241387   1.753153     1.28   0.208    -1.289644    5.772418
+          iq |  -.0051705   .0202138    -0.26   0.799    -.0458831    .0355421
+       _cons |   12.73089   3.256366     3.91   0.000     6.172227    19.28954
+------------------------------------------------------------------------------
+
+
+Instrumental variables (2SLS) regression               Number of obs =      49
+                                                       Wald chi2(3)  =    0.71
+                                                       Prob > chi2   =  0.8713
+                                                       R-squared     =       .
+                                                       Root MSE      =  3312.3
+
+------------------------------------------------------------------------------
+     salario |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       exper |  -526.3022   2124.431    -0.25   0.804     -4690.11    3637.505
+        educ |  -281.2993   1584.532    -0.18   0.859    -3386.925    2824.326
+      partic |   1749.904   4939.174     0.35   0.723    -7930.699    11430.51
+       _cons |   7293.421   26022.39     0.28   0.779    -43709.52    58296.36
+------------------------------------------------------------------------------
+Instrumented:  exper
+Instruments:   educ partic iq
+
+. exit, clear

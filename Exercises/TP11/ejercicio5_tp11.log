@@ -1,0 +1,203 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP11\ejercicio5_tp11.log
+  log type:  text
+ opened on:   7 Jul 2020, 12:27:51
+
+. *TRABAJO PRACTICO 11 - Ejercicio Nº5:
+. use "Vinos.dta"
+
+. 
+. *(A) Excluimos la variable M (eficiencia del management) para correr la siguiente regresión.
+. reg q k l
+
+      Source |       SS       df       MS              Number of obs =      75
+-------------+------------------------------           F(  2,    72) =   40.35
+       Model |  650.085128     2  325.042564           Prob > F      =  0.0000
+    Residual |  580.056998    72  8.05634719           R-squared     =  0.5285
+-------------+------------------------------           Adj R-squared =  0.5154
+       Total |  1230.14213    74  16.6235422           Root MSE      =  2.8384
+
+------------------------------------------------------------------------------
+           q |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           k |   .4804981   .1195778     4.02   0.000     .2421241    .7188722
+           l |   .2388341   .1027779     2.32   0.023     .0339502     .443718
+       _cons |   3.470363   .7770077     4.47   0.000     1.921427      5.0193
+------------------------------------------------------------------------------
+
+. predict u, r
+
+. *Test de White:
+. estat hettes /*Detectamos heterocedasticidad, porque rechaza H0, ya que 0.0138<0.05*/
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of q
+
+         chi2(1)      =     6.06
+         Prob > chi2  =   0.0138
+
+. *Comprobación grafica:
+. *scatter u k 
+. *scatter u l
+. /*Podemos notar cierta variabilidad en los residuales para los valores que toman las variables independientes, por lo que intuitivamente inferiríamos q
+> ue por la forma hay heteroc.*/
+. *Test de Breusch-Pagan:
+. gen u2 = u^2
+
+. reg u2 k l 
+
+      Source |       SS       df       MS              Number of obs =      75
+-------------+------------------------------           F(  2,    72) =    2.24
+       Model |  827.956411     2  413.978206           Prob > F      =  0.1140
+    Residual |  13313.6629    72  184.911985           R-squared     =  0.0585
+-------------+------------------------------           Adj R-squared =  0.0324
+       Total |  14141.6193    74  191.102964           Root MSE      =  13.598
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           k |   -.890105   .5728806    -1.55   0.125    -2.032122    .2519117
+           l |   .1031374   .4923943     0.21   0.835    -.8784327    1.084707
+       _cons |    13.6716   3.722535     3.67   0.000     6.250858    21.09233
+------------------------------------------------------------------------------
+
+. scalar bp = e(N)*e(r2)
+
+. di "Estadistico de prueba    "bp
+Estadistico de prueba    4.3910622
+
+. di "Valor critico     " invchi2tail(e(df_r), 0.05)
+Valor critico     92.80827
+
+. 
+. /*(B)
+> La principal consecuencia sobre los estimadores resulta en el SESGO que se genera por omitir una variable, a pesar de que esta es NO observable. */
+. 
+. *(C) Agregamos una variable proxy:
+. reg q k l exper
+
+      Source |       SS       df       MS              Number of obs =      75
+-------------+------------------------------           F(  3,    71) =   30.31
+       Model |  690.791296     3  230.263765           Prob > F      =  0.0000
+    Residual |   539.35083    71  7.59649056           R-squared     =  0.5616
+-------------+------------------------------           Adj R-squared =  0.5430
+       Total |  1230.14213    74  16.6235422           Root MSE      =  2.7562
+
+------------------------------------------------------------------------------
+           q |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           k |   .4379566   .1175603     3.73   0.000     .2035481    .6723652
+           l |   .2391613   .0998016     2.40   0.019     .0401627      .43816
+       exper |   .1468382    .063433     2.31   0.024     .0203563      .27332
+       _cons |   1.762261   1.055347     1.67   0.099    -.3420408    3.866564
+------------------------------------------------------------------------------
+
+. /* Si probamos otro test de White, detectamos aún presencia de heterocedasticidad, exper no nos sirve para resolverla.
+> En base a la salida de la regresión anterior, podemos inferir lo siguiente:
+> Por cada punto porcentual que se incrementa el insumo capital (K), manteniendo el resto constante, el Output (q) se incrementa en promedio 43 puntos po
+> rcentuales. Siendo el índice de insumo capital un variable significativa con un estádistico "t" de 3.73
+> Por cada punto porcentual que se incrementa el insumo trabajo (L), para el resto de variables constantes, el Output (q) se incrementa en promedio 23.91
+>  puntos porcentuales,  siendo el índice de insumo laboral una variable significativa al 0.019 de valor p.
+> Por cada unidad que aumenta los años de experiencia (exper), ceteris paribus, el nivel de output (q) se ve afectado en promedio 14 puntos porcentuales 
+> positivamente.
+> En síntesis, como no cambian los estimadores, siguen siendo insesgados. Se comprueba de que al agregar años de experiencia (Exper), una variable que es
+> taba en el termino de error, no afecta el sesgo de los coeficientes, ya que son completamente exógenas. */
+. 
+. 
+. *(D) Método de mínimos cuadrados en dos etapas:
+. ivregress 2sls q k l (exper=age), first
+
+First-stage regressions
+-----------------------
+
+                                                  Number of obs   =         75
+                                                  F(   3,     71) =       4.78
+                                                  Prob > F        =     0.0043
+                                                  R-squared       =     0.1681
+                                                  Adj R-squared   =     0.1330
+                                                  Root MSE        =     4.8334
+
+------------------------------------------------------------------------------
+       exper |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+           k |   .4066095   .2070154     1.96   0.053    -.0061675    .8193865
+           l |  -.1150556   .1786841    -0.64   0.522    -.4713415    .2412304
+         age |   .1661195   .0530281     3.13   0.003     .0603844    .2718546
+       _cons |   4.715996    2.57399     1.83   0.071    -.4163945    9.848386
+------------------------------------------------------------------------------
+
+
+Instrumental variables (2SLS) regression               Number of obs =      75
+                                                       Wald chi2(3)  =   67.32
+                                                       Prob > chi2   =  0.0000
+                                                       R-squared     =  0.3568
+                                                       Root MSE      =   3.248
+
+------------------------------------------------------------------------------
+           q |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       exper |   .5121021   .2145152     2.39   0.017       .09166    .9325441
+           k |   .3321335    .150289     2.21   0.027     .0375726    .6266945
+           l |   .2399754    .117613     2.04   0.041     .0094581    .4704926
+       _cons |  -2.486688   2.649039    -0.94   0.348     -7.67871    2.705334
+------------------------------------------------------------------------------
+Instrumented:  exper
+Instruments:   k l age
+
+. /*Los errores estándar son 0.2145; 0.15; 0.117 y 2.64 respectivamente
+> La interpretación del coeficiente B3 es que por cada unidad adicional que se incrementa la variable independiente de años de experiencia, para el resto
+>  constante, el output aumenta 51 puntos porcentuales en promedio... siendo una variable significativa a un pvalor 0.017<0.05
+> */
+. 
+. *(E)
+. estat endogenous 
+
+  Tests of endogeneity
+  Ho: variables are exogenous
+
+  Durbin (score) chi2(1)          =  4.84123  (p = 0.0278)
+  Wu-Hausman F(1,70)              =  4.83028  (p = 0.0313)
+
+. /*De la salida del test de Haussman podemos concluir la siguiente apreciación:
+> Para el estadistico chi2, debemos rechazar H0 ya que 0.0278<0.05
+> Para el estadistico F, debemos también rechazar H0 porque 0.313<0.05
+> Por ende, en síntesis, rechazamos la H0 de que la variable experiencia sea exogena, esto implica que estamos ante un caso de endogeneidad. */
+. 
+. *(F): Computamos la predicción para los valores de experiencia 10/20/30, seteando el intervalo con un step de 10 unidades. El comando vsquish es para e
+> liminar espacios blancos en la salida del test y que se compacte más la tabla.
+. margins, at(exper=(10(10)30)) vsquish          /*
+> Para la variable experiencia determinada en 10, tenemos un resultado en la variable explicativa de 7.647, con un intervalo de confianza al 95% de 5.858
+> 181; 9.436752
+> Para el caso que se fija la variable experiencia en 20, tenemos un resultado en la Y de 12.768, con un intervalo de confianza del 95% de 10.09244; 15.4
+> 4453
+> Cuando fijamos, una vez más, la variable independiente experiencia con un valor de 30, obtenemos un resultado de la variable dependiente de 17.889, con
+>  un intervalo de confianza de 95% de 11.07223; 24.70678
+> */
+
+Predictive margins                                Number of obs   =         75
+Model VCE    : Unadjusted
+
+Expression   : Linear prediction, predict()
+1._at        : exper           =          10
+2._at        : exper           =          20
+3._at        : exper           =          30
+
+------------------------------------------------------------------------------
+             |            Delta-method
+             |     Margin   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+         _at |
+          1  |   7.647467   .9129175     8.38   0.000     5.858181    9.436752
+          2  |   12.76849   1.365355     9.35   0.000     10.09244    15.44453
+          3  |   17.88951   3.478265     5.14   0.000     11.07223    24.70678
+------------------------------------------------------------------------------
+
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP11\ejercicio5_tp11.log
+  log type:  text
+ closed on:   7 Jul 2020, 12:27:53
+---------------------------------------------------------------------------------------------------------------------------------------------------------

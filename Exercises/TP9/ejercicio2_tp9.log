@@ -1,0 +1,140 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9\ejercicio2_tp9.log
+  log type:  text
+ opened on:  10 Jul 2020, 14:09:02
+
+. set more off
+
+. *TP9 - Ejercicio 2: Heterocedasticidad conocida (MCP)
+. *Punto (A): 
+. reg fallas h_uso
+
+      Source |       SS       df       MS              Number of obs =      20
+-------------+------------------------------           F(  1,    18) =   33.02
+       Model |  97998.4861     1  97998.4861           Prob > F      =  0.0000
+    Residual |  53421.5139    18  2967.86189           R-squared     =  0.6472
+-------------+------------------------------           Adj R-squared =  0.6276
+       Total |      151420    19  7969.47368           Root MSE      =  54.478
+
+------------------------------------------------------------------------------
+      fallas |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+       h_uso |   .0441833    .007689     5.75   0.000     .0280293    .0603373
+       _cons |   109.5219   30.94764     3.54   0.002     44.50334    174.5405
+------------------------------------------------------------------------------
+
+. predict u, r
+
+. gen u2 = u^2
+
+. gen h_uso2 = h_uso^2
+
+. reg u2 fallas h_uso
+
+      Source |       SS       df       MS              Number of obs =      20
+-------------+------------------------------           F(  2,    17) =    7.53
+       Model |  50295062.1     2  25147531.1           Prob > F      =  0.0046
+    Residual |    56776581    17  3339798.88           R-squared     =  0.4697
+-------------+------------------------------           Adj R-squared =  0.4073
+       Total |   107071643    19  5635349.64           Root MSE      =  1827.5
+
+------------------------------------------------------------------------------
+          u2 |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      fallas |  -10.58997   7.906824    -1.34   0.198    -27.27191    6.091966
+       h_uso |   1.407341    .434252     3.24   0.005     .4911489    2.323532
+       _cons |   354.9786    1351.92     0.26   0.796    -2497.324    3207.281
+------------------------------------------------------------------------------
+
+. scatter u2 h_uso
+
+. *scatter u2 h_uso2
+. *scatter u2 fallas
+. /*Cuando graficamos los residuos al cuadrado contra los valores de la variable explicativa X (las horas de uso) podemos observar 
+> que hay poca dispersión de los residuos en los valores de Xi al principio y luego aumenta cuando cambia Xi, lo que nos indica presencia de heterocedasticidad.
+> Dado que la varianza de los errores deja de ser constante para los distintos valores de X, para poder corregirla, una propuesta sería rehacer
+> el modelo general por minimos cuadrados ponderados donde nos permitira hallar estimadores más eficientes y errores homoscedasticos.
+> Conociendo la forma que toman los residuos al cuadrado respecto X, podemos inferir cómo será el término que h(x) que utilizaremos para corregir la ecuación. Utilizaremos la raíz cuadra del término H, que dividirá cada 
+> elemento de la regresion.*/
+. 
+. *Punto (B):
+. gen H = h_uso2
+
+. gen rH = H^(1/2)
+
+. 
+. gen const_H = 1/rH /* Generamos la constante, que no es más que B0 multiplicando el cociente de la raíz de H*/
+
+. gen fallas_H = fallas/rH /* Generamos la variable explicada corregida por el término H */
+
+. gen h_uso_H = h_uso/rH /* Generamos la variable explicativa corregida por el término H */
+
+. 
+. reg fallas_H const_H h_uso_H, noconst /* Corremos la regresion nueva que contiene la ecuacion del modelo original pero corregida por el término H */
+
+      Source |       SS       df       MS              Number of obs =      20
+-------------+------------------------------           F(  2,    18) =  308.47
+       Model |  .134975071     2  .067487535           Prob > F      =  0.0000
+    Residual |  .003938126    18  .000218785           R-squared     =  0.9717
+-------------+------------------------------           Adj R-squared =  0.9685
+       Total |  .138913197    20   .00694566           Root MSE      =  .01479
+
+------------------------------------------------------------------------------
+    fallas_H |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     const_H |   115.9542   23.11787     5.02   0.000     67.38534     164.523
+     h_uso_H |   .0422901   .0082973     5.10   0.000      .024858    .0597221
+------------------------------------------------------------------------------
+
+. 
+. /*Punto (C):
+> De los estimadores obtenidos por MCP de la regresión anterior, donde tenemos el siguiente modelo general: Fallas = (115.95) + (0.042)X ; podemos inferir que:
+> - Los estimadores son, por propiedad estadística, mucho más eficientes que los del modelo original.
+> - En relación a su insesgadez, son estimadores insesgados, ya que esa propiedad GM la cumplían en su modelo original y con la transformación, los supuestos de Gauss-Markov que ya se cumplían, siguen cumpliendose. 
+> Solo cambia que ahora también se cumple el supuesto de errores homocedasticos.
+> 
+> Punto (D): 
+> Si bien tenemos un R^2 de 0.971 para esta regresion, raramente nos serviría para utilizar como medida de bondad de ajuste, ya que las variables transformadas no explican lo que literalmente estamos estudiando detrás.
+> Para este caso, deberíamos seguir utilizando como medida de ajuste el R^2 del modelo original.
+> Cabe destacar como recordatorio, que la presencia de heteroscedasticidad no afecta nuestro R^2, por lo que podemos seguir empleando el original, que es de 0.6472 y representa un ajuste de la X sobre Y de casi un 65%.
+> 
+> Punto (E):
+> Para el caso donde la función de heterocedasticidad es incorrecta, es decir, que la función de varianza esté mal especificada, hay dos consecuencias:
+> Primeramente, caemos en la problemática de que los errores estándar y los estadísticos de prueba ya no son válidos, inclusive en muestras grandes.
+> Por otro lado, la otra consecuencia es que no sabremos con ninguna certeza que los estimadors MCP sean más eficientes que los de MCO.
+> 
+> Punto (F): Asumiendo hipoteticamente que la funcion H(x) que hemos empleado en el punto (B) está mal especificada, podemos proceder convirtiendo los errores estándar en robustos de la siguiente manera:   */
+. 
+. reg fallas_H const_H h_uso_H, noconst r
+
+Linear regression                                      Number of obs =      20
+                                                       F(  2,    18) =  296.08
+                                                       Prob > F      =  0.0000
+                                                       R-squared     =  0.9717
+                                                       Root MSE      =  .01479
+
+------------------------------------------------------------------------------
+             |               Robust
+    fallas_H |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+     const_H |   115.9542   23.14042     5.01   0.000     67.33797    164.5704
+     h_uso_H |   .0422901   .0077361     5.47   0.000     .0260371     .058543
+------------------------------------------------------------------------------
+
+. di "Diferencia  " 23.11787-23.14042 
+Diferencia  -.02255
+
+. di "Diferencia  " .0082973-.0077361 
+Diferencia  .0005612
+
+. /* Cuando convertimos los errores en robustos, podemos evaluar el tipo de diferencia que presentan frente a los errores estándar del modelo inicial por MCP.
+> La diferencia de los errores de la constante es negativa pero cercana a cero, además, la diferencia de los errores estándar de la variable X (horas de uso) es prácticamente cero, por lo que no tiene significatividad es
+> tadística.     */
+. 
+. log close
+      name:  <unnamed>
+       log:  C:\Users\JUAN\Google Drive\Universidad\UCEMA\Econometria\TP\TP9\ejercicio2_tp9.log
+  log type:  text
+ closed on:  10 Jul 2020, 14:09:03
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
